@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>popstar ★ depop seller discovery</title>
+
+<style>
+:root{
+  --brand:#8ace00;
+  --bg:#f6f6f2;
+  --ink:#0b0b0c;
+  --muted:rgba(11,11,12,.70);
+  --radius:18px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(900px 700px at 10% 10%, rgba(138,206,0,.10), transparent 55%),
+    radial-gradient(700px 600px at 90% 20%, rgba(0,0,0,.04), transparent 55%),
+    var(--bg);
+  font-family:-apple-system,BlinkMacSystemFont,"sf pro text",system-ui;
+  color:var(--ink);
+  text-transform:lowercase;
+  overflow-x:hidden;
+}
+
+/* subtle grain */
+body:before{
+  content:"";
+  position:fixed; inset:0;
+  pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.10'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+  opacity:.24;
+}
+
+a{color:inherit}
+.wrap{max-width:1100px; margin:0 auto; padding:18px 16px 90px;}
+
+.topbar{
+  position:sticky; top:0; z-index:10;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; padding:10px 6px;
+  backdrop-filter: blur(10px);
+  background: rgba(246,246,242,.82);
+  border-bottom:1px solid rgba(0,0,0,.06);
+}
+.brand{display:flex; align-items:center; gap:10px; font-weight:1000; letter-spacing:-.03em;}
+.brandMark{
+  width:30px; height:30px; border-radius:10px;
+  background: var(--brand);
+  border:2px solid #000;
+  box-shadow: 0 10px 18px rgba(0,0,0,.12), 0 0 22px rgba(138,206,0,.35);
+  display:grid; place-items:center;
+  transform: rotate(-8deg);
+}
+.brandMark span{font-size:16px; font-weight:1000}
+.nav{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+.chip{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 12px; border-radius:999px;
+  border:1px solid rgba(0,0,0,.12);
+  background: rgba(255,255,255,.70);
+  text-decoration:none; font-weight:950;
+  box-shadow: 0 10px 22px rgba(0,0,0,.06);
+  transition: transform .08s ease;
+  white-space:nowrap;
+}
+.chip:active{transform: translateY(1px) scale(.99)}
+
+.ticker{
+  margin:12px 6px 0;
+  border:2px solid #000;
+  border-radius:14px;
+  background:#fff;
+  overflow:hidden;
+  box-shadow: 0 10px 18px rgba(0,0,0,.06);
+}
+.tickerTrack{
+  display:flex; gap:28px;
+  padding:10px 12px;
+  white-space:nowrap;
+  will-change: transform;
+  animation: scroll 18s linear infinite;
+  font-weight:950;
+}
+.tickerTrack span{opacity:.85}
+.tickerTrack b{background: rgba(138,206,0,.55); padding:3px 8px; border-radius:999px; border:2px solid #000;}
+@keyframes scroll{
+  from{transform: translateX(0)}
+  to{transform: translateX(-50%)}
+}
+
+.hero{padding:26px 6px 10px;}
+h1{
+  margin:0 0 10px;
+  font-size:56px; line-height:.95;
+  letter-spacing:-.05em; font-weight:1000;
+  text-shadow: 0 0 22px rgba(138,206,0,.18);
+}
+@media (max-width:520px){ h1{font-size:46px} }
+.sub{margin:0 0 14px; color:var(--muted); font-weight:750; max-width: 70ch;}
+.btnRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  padding:12px 16px; border-radius:14px;
+  font-weight:1000; text-decoration:none;
+  border:2px solid #000;
+  transition: transform .08s ease;
+}
+.btn:active{transform: translateY(1px) scale(.99)}
+.btn.boost{
+  background:var(--brand); color:#000;
+  box-shadow: 0 12px 24px rgba(0,0,0,.10), 0 0 0 4px rgba(138,206,0,.20), 0 0 26px rgba(138,206,0,.45);
+}
+.btn.apply{background:#000; color:#fff; box-shadow: 0 12px 24px rgba(0,0,0,.12);}
+.pricing{margin-top:12px; font-weight:850; color:var(--muted);}
+
+.tools{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns: 1fr auto;
+  gap:10px;
+}
+@media (max-width:720px){ .tools{grid-template-columns:1fr} }
+.search{
+  width:100%;
+  padding:12px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background:#fff;
+  font-weight:850;
+  outline:none;
+  box-shadow: 0 10px 18px rgba(0,0,0,.06);
+}
+.filterBar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.fchip{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 12px;
+  border-radius:999px;
+  border:2px solid #000;
+  background:#fff;
+  font-weight:950;
+  cursor:pointer;
+  user-select:none;
+  box-shadow: 0 10px 18px rgba(0,0,0,.06);
+}
+.fchip.is-on{
+  background: rgba(138,206,0,.55);
+}
+
+/* spotlight carousel */
+.spotlight{
+  margin-top:18px;
+  border:2px solid #000;
+  border-radius:18px;
+  padding:12px;
+  background: rgba(255,255,255,.78);
+  box-shadow: 0 16px 34px rgba(0,0,0,.10), 0 0 0 4px rgba(138,206,0,.10), 0 0 30px rgba(138,206,0,.18);
+}
+.spotlightHead{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-bottom:10px;
+}
+.spotlightTitle{font-weight:1000; letter-spacing:-.02em;}
+.spotlightNote{color:var(--muted); font-weight:800; font-size:12px;}
+.carousel{
+  position:relative;
+  overflow:hidden;
+  border-radius:16px;
+  border:1px solid rgba(0,0,0,.10);
+  background:#fff;
+}
+.track{
+  display:flex;
+  width:100%;
+  transition: transform .45s cubic-bezier(.2,.9,.2,1);
+  will-change: transform;
+}
+.slide{
+  flex: 0 0 100%;
+  display:grid;
+  grid-template-columns: 170px 1fr;
+  gap:14px;
+  align-items:stretch;
+  text-decoration:none;
+  color:inherit;
+  padding:12px;
+}
+@media (max-width:520px){ .slide{grid-template-columns:1fr} }
+.slideMedia{
+  position:relative;
+  height:170px;
+  border-radius:14px;
+  overflow:hidden;
+  background: linear-gradient(135deg, rgba(138,206,0,.30), rgba(0,0,0,.06));
+}
+.slideMedia img{
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+  filter:saturate(1.10) contrast(1.05);
+}
+.stickerSponsored{
+  position:absolute;
+  top:10px; left:10px;
+  background: var(--brand); color:#000;
+  padding:7px 11px;
+  border-radius:999px;
+  border:2px solid #000;
+  font-size:12px;
+  font-weight:1000;
+  transform: rotate(-7deg);
+  box-shadow: 0 10px 18px rgba(0,0,0,.12), 0 0 18px rgba(138,206,0,.35);
+}
+.slideMeta{display:flex; flex-direction:column; justify-content:center; padding:4px 4px 4px 0;}
+.slideName{font-weight:1000; letter-spacing:-.02em; font-size:20px;}
+.slideHandle{margin-top:6px; color:var(--muted); font-weight:900; font-size:13px;}
+.slideTags{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+.pill{
+  display:inline-flex; align-items:center;
+  padding:7px 10px;
+  border-radius:999px;
+  font-weight:950;
+  font-size:12px;
+  border:1px solid rgba(0,0,0,.14);
+  background: rgba(255,255,255,.80);
+}
+.pill.primary{border:2px solid #000; background: rgba(138,206,0,.55);}
+.pill.secondary{border:2px solid #000; background: transparent;}
+
+.carouselControls{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px;}
+.dots{display:flex; gap:7px; align-items:center;}
+.dot{width:8px; height:8px; border-radius:999px; border:1px solid rgba(0,0,0,.25); background: rgba(0,0,0,.10);}
+.dot.is-on{background: var(--brand); border-color:#000; box-shadow: 0 0 14px rgba(138,206,0,.45);}
+.ctrl{display:flex; gap:8px;}
+.iconBtn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:34px;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  font-weight:1000;
+  cursor:pointer;
+  box-shadow: 0 10px 18px rgba(0,0,0,.08);
+}
+.iconBtn:active{transform: translateY(1px)}
+
+/* magazine section dividers */
+.section{margin-top:54px; padding:0 6px;}
+.divider{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:10px; margin:0 0 14px;
+  padding-bottom:10px;
+  border-bottom:2px solid rgba(0,0,0,.12);
+  position:relative;
+}
+.divider:after{
+  content:"";
+  position:absolute;
+  left:0; bottom:-2px;
+  width:150px; height:2px;
+  background: var(--brand);
+  box-shadow: 0 0 18px rgba(138,206,0,.35);
+}
+h2{
+  margin:0;
+  font-size:28px;
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:-.04em;
+}
+.dividerHint{color:var(--muted); font-weight:850; font-size:12px; text-align:right;}
+.dividerActions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; margin-top:8px;}
+.smallBtn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  border-radius:999px;
+  border:2px solid #000;
+  background:#fff;
+  text-decoration:none;
+  font-weight:950;
+  box-shadow: 0 10px 18px rgba(0,0,0,.06);
+}
+.smallBtn.boost{
+  background: rgba(138,206,0,.55);
+}
+
+/* grids + cards */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap:14px;
+}
+@media (max-width:980px){ .grid{grid-template-columns: repeat(2, minmax(0, 1fr));} }
+@media (max-width:520px){ .grid{grid-template-columns: 1fr;} }
+
+.card{
+  background: rgba(255,255,255,.85);
+  border-radius: var(--radius);
+  overflow:hidden;
+  border:1px solid rgba(0,0,0,.10);
+  text-decoration:none;
+  color:inherit;
+  position:relative;
+  box-shadow: 0 10px 22px rgba(0,0,0,.06);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0,0,0,.10), 0 0 0 4px rgba(138,206,0,.10);
+}
+.card:active{transform: translateY(-1px)}
+.thumb{
+  height:150px;
+  background: linear-gradient(135deg, rgba(138,206,0,.22), rgba(0,0,0,.04));
+}
+.thumb img{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1.10) contrast(1.05);}
+.meta{padding:12px;}
+.name{font-weight:1000; letter-spacing:-.02em; margin:0 0 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.handle{margin:0 0 10px; color:var(--muted); font-weight:900; font-size:13px;}
+.tags{display:flex; gap:8px; flex-wrap:wrap;}
+
+.footer{margin-top:64px; padding:0 6px; color:var(--muted); font-weight:750; font-size:12px; line-height:1.5;}
+
+.hidden{display:none !important;}
+</style>
+</head>
+
+<body>
+
+<script>
+  // ✅ replace these with your real links
+  const APPLY_FORM_LINK = "https://forms.gle/REPLACE_ME";
+  // optional embed: google form → send → <> embed → copy the "src" url and paste here
+  const APPLY_FORM_EMBED_SRC = ""; // leave blank to hide embed
+
+  // ✅ separate boost links (replace each)
+  const BOOST_LINK_SPOTLIGHT = "https://buy.stripe.com/REPLACE_ME";
+  const BOOST_LINK_ALT = "https://buy.stripe.com/REPLACE_ME";
+  const BOOST_LINK_2000S = "https://buy.stripe.com/REPLACE_ME";
+  const BOOST_LINK_ELEVATED = "https://buy.stripe.com/REPLACE_ME";
+  const BOOST_LINK_EVERYDAY = "https://buy.stripe.com/REPLACE_ME";
+</script>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brandMark"><span>★</span></div>
+      <div>popstar</div>
+    </div>
+    <div class="nav">
+      <a class="chip" href="#spotlight">★ spotlight</a>
+      <a class="chip" href="#alt">★ alt</a>
+      <a class="chip" href="#twothousands">★ 2000s</a>
+      <a class="chip" href="#elevated">★ elevated</a>
+      <a class="chip" href="#everyday">★ everyday</a>
+      <a class="chip" href="#apply" id="applyTop">✦ apply</a>
+    </div>
+  </div>
+
+  <div class="ticker" aria-label="new this week ticker">
+    <div class="tickerTrack" id="tickerTrack">
+      <span><b>new this week</b> @fsu • @cybercloset • @archiveangel • @neonmarket • @softgrunge.shop •</span>
+      <span><b>boosted</b> spotlight carousel • separate genre boosts •</span>
+      <span><b>apply</b> pick primary + secondary genre •</span>
+      <span><b>new this week</b> @fsu • @cybercloset • @archiveangel • @neonmarket • @softgrunge.shop •</span>
+      <span><b>boosted</b> spotlight carousel • separate genre boosts •</span>
+      <span><b>apply</b> pick primary + secondary genre •</span>
+    </div>
+  </div>
+
+  <section class="hero">
+    <h1>popstar ★</h1>
+    <p class="sub">promote your depop. get discovered. boosted placements are always labeled <b>sponsored</b>.</p>
+
+    <div class="btnRow">
+      <a class="btn boost" href="#" id="boostSpotlightBtn">★ boost spotlight</a>
+      <a class="btn apply" href="#" id="applyBtn">✦ apply (free)</a>
+    </div>
+
+    <div class="pricing">★ 24 hour boost — $5 • ★ 7 day boost — $15 • ★ 30 day boost — $39</div>
+
+    <div class="tools">
+      <input class="search" id="search" placeholder="search by @handle or shop name…" />
+      <div class="filterBar" id="filterBar">
+        <div class="fchip is-on" data-filter="all">all</div>
+        <div class="fchip" data-filter="alt">alt</div>
+        <div class="fchip" data-filter="twothousands">2000s</div>
+        <div class="fchip" data-filter="elevated">elevated</div>
+        <div class="fchip" data-filter="everyday">everyday</div>
+      </div>
+    </div>
+
+    <!-- spotlight -->
+    <div class="spotlight" id="spotlight">
+      <div class="spotlightHead">
+        <div class="spotlightTitle">★ featured spotlight</div>
+        <div class="spotlightNote">sideways sliding carousel • sponsored</div>
+      </div>
+
+      <div class="carousel" aria-label="featured spotlight carousel">
+        <div class="track" id="track"></div>
+      </div>
+
+      <div class="carouselControls">
+        <div class="dots" id="dots"></div>
+        <div class="ctrl">
+          <button class="iconBtn" id="prevBtn" aria-label="previous">‹</button>
+          <button class="iconBtn" id="nextBtn" aria-label="next">›</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ★ alt -->
+  <section class="section cluster" id="alt" data-cluster="alt">
+    <div class="divider">
+      <div>
+        <h2>★ alt</h2>
+        <div class="dividerActions">
+          <a class="smallBtn boost" href="#" id="boostAltBtn">★ boost in alt</a>
+        </div>
+      </div>
+      <div class="dividerHint">grunge • goth • fairycore</div>
+    </div>
+
+    <div class="grid">
+      <a class="card seller" data-name="nightthread" data-handle="@nightthread" data-primary="goth" data-secondary="designer" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975661595-6453be3f7070?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">nightthread</div>
+          <div class="handle">@nightthread</div>
+          <div class="tags"><span class="pill primary">goth</span><span class="pill secondary">designer</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="softstatic" data-handle="@softstatic" data-primary="fairycore" data-secondary="vintage" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975958225-39e75c6a38f8?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">softstatic</div>
+          <div class="handle">@softstatic</div>
+          <div class="tags"><span class="pill primary">fairycore</span><span class="pill secondary">vintage</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="gritclub" data-handle="@gritclub" data-primary="grunge" data-secondary="streetwear" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975681976-80b826c6a34a?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">gritclub</div>
+          <div class="handle">@gritclub</div>
+          <div class="tags"><span class="pill primary">grunge</span><span class="pill secondary">streetwear</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="laceghost" data-handle="@laceghost" data-primary="goth" data-secondary="archive" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">laceghost</div>
+          <div class="handle">@laceghost</div>
+          <div class="tags"><span class="pill primary">goth</span><span class="pill secondary">archive</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ★ 2000s -->
+  <section class="section cluster" id="twothousands" data-cluster="twothousands">
+    <div class="divider">
+      <div>
+        <h2>★ 2000s</h2>
+        <div class="dividerActions">
+          <a class="smallBtn boost" href="#" id="boost2000sBtn">★ boost in 2000s</a>
+        </div>
+      </div>
+      <div class="dividerHint">y2k • streetwear</div>
+    </div>
+
+    <div class="grid">
+      <a class="card seller" data-name="chromeangel" data-handle="@chromeangel" data-primary="y2k" data-secondary="coquette" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975802862-6db90b3dfc03?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">chromeangel</div>
+          <div class="handle">@chromeangel</div>
+          <div class="tags"><span class="pill primary">y2k</span><span class="pill secondary">coquette</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="cargomarket" data-handle="@cargomarket" data-primary="streetwear" data-secondary="minimal" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975592411-3b2d8a3cce61?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">cargomarket</div>
+          <div class="handle">@cargomarket</div>
+          <div class="tags"><span class="pill primary">streetwear</span><span class="pill secondary">minimal</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="babyteebin" data-handle="@babyteebin" data-primary="y2k" data-secondary="vintage" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975922284-7c2d6fba4e90?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">babyteebin</div>
+          <div class="handle">@babyteebin</div>
+          <div class="tags"><span class="pill primary">y2k</span><span class="pill secondary">vintage</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="neontees" data-handle="@neontees" data-primary="streetwear" data-secondary="grunge" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975926711-5c6a9a5bdf2e?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">neontees</div>
+          <div class="handle">@neontees</div>
+          <div class="tags"><span class="pill primary">streetwear</span><span class="pill secondary">grunge</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ★ elevated -->
+  <section class="section cluster" id="elevated" data-cluster="elevated">
+    <div class="divider">
+      <div>
+        <h2>★ elevated</h2>
+        <div class="dividerActions">
+          <a class="smallBtn boost" href="#" id="boostElevatedBtn">★ boost in elevated</a>
+        </div>
+      </div>
+      <div class="dividerHint">designer • archive • minimal</div>
+    </div>
+
+    <div class="grid">
+      <!-- you -->
+      <a class="card seller" data-name="fsu" data-handle="@fsu" data-primary="designer" data-secondary="archive" href="https://depop.com/fsu" target="_blank" rel="noopener">
+        <div class="thumb"><img src="images/fsu-jacket.jpg" alt=""></div>
+        <div class="meta">
+          <div class="name">fsu</div>
+          <div class="handle">@fsu</div>
+          <div class="tags"><span class="pill primary">designer</span><span class="pill secondary">archive</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="labelroom" data-handle="@labelroom" data-primary="designer" data-secondary="minimal" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975684320-04a05a6f1188?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">labelroom</div>
+          <div class="handle">@labelroom</div>
+          <div class="tags"><span class="pill primary">designer</span><span class="pill secondary">minimal</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="archivestack" data-handle="@archivestack" data-primary="archive" data-secondary="designer" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975682096-7a71f6a5d9d8?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">archivestack</div>
+          <div class="handle">@archivestack</div>
+          <div class="tags"><span class="pill primary">archive</span><span class="pill secondary">designer</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="neutralstudio" data-handle="@neutralstudio" data-primary="minimal" data-secondary="clean girl" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975802862-6db90b3dfc03?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">neutralstudio</div>
+          <div class="handle">@neutralstudio</div>
+          <div class="tags"><span class="pill primary">minimal</span><span class="pill secondary">clean girl</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ★ everyday -->
+  <section class="section cluster" id="everyday" data-cluster="everyday">
+    <div class="divider">
+      <div>
+        <h2>★ everyday</h2>
+        <div class="dividerActions">
+          <a class="smallBtn boost" href="#" id="boostEverydayBtn">★ boost in everyday</a>
+        </div>
+      </div>
+      <div class="dividerHint">clean girl • vintage • fitness</div>
+    </div>
+
+    <div class="grid">
+      <a class="card seller" data-name="linenlist" data-handle="@linenlist" data-primary="clean girl" data-secondary="minimal" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975661595-6453be3f7070?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">linenlist</div>
+          <div class="handle">@linenlist</div>
+          <div class="tags"><span class="pill primary">clean girl</span><span class="pill secondary">minimal</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="vintageweekday" data-handle="@vintageweekday" data-primary="vintage" data-secondary="grunge" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975958225-39e75c6a38f8?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">vintageweekday</div>
+          <div class="handle">@vintageweekday</div>
+          <div class="tags"><span class="pill primary">vintage</span><span class="pill secondary">grunge</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="sweatset" data-handle="@sweatset" data-primary="fitness" data-secondary="streetwear" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1520975922284-7c2d6fba4e90?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">sweatset</div>
+          <div class="handle">@sweatset</div>
+          <div class="tags"><span class="pill primary">fitness</span><span class="pill secondary">streetwear</span></div>
+        </div>
+      </a>
+
+      <a class="card seller" data-name="cleancloset" data-handle="@cleancloset" data-primary="clean girl" data-secondary="vintage" href="https://www.depop.com/" target="_blank" rel="noopener">
+        <div class="thumb"><img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80" alt=""></div>
+        <div class="meta">
+          <div class="name">cleancloset</div>
+          <div class="handle">@cleancloset</div>
+          <div class="tags"><span class="pill primary">clean girl</span><span class="pill secondary">vintage</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- apply -->
+  <section class="section" id="apply">
+    <div class="divider">
+      <div>
+        <h2>✦ apply</h2>
+        <div class="dividerActions">
+          <a class="smallBtn" href="#" id="applyBtn2">✦ open google form</a>
+          <a class="smallBtn boost" href="#" id="boostSpotlightBtn2">★ boost spotlight</a>
+        </div>
+      </div>
+      <div class="dividerHint">pick primary + optional secondary • influencer code optional</div>
+    </div>
+
+    <p class="sub" style="margin:0 0 12px; padding:0 2px;">
+      influencer codes unlock free featured placement. if you don’t have one, leave it blank and submit normally.
+    </p>
+
+    <div id="formEmbedWrap" class="hidden" style="border:2px solid #000; border-radius:18px; overflow:hidden; background:#fff; box-shadow:0 16px 34px rgba(0,0,0,.10);">
+      <iframe id="formEmbed" title="popstar apply form" style="width:100%; height:900px; border:0;" loading="lazy"></iframe>
+    </div>
+  </section>
+
+  <div class="footer">
+    <div><b>not affiliated with depop.</b> popstar is an independent promotion platform for depop sellers.</div>
+  </div>
+
+</div>
+
+<script>
+  // links
+  document.getElementById("applyBtn").href = APPLY_FORM_LINK;
+  document.getElementById("applyBtn2").href = APPLY_FORM_LINK;
+  document.getElementById("applyTop").href = APPLY_FORM_LINK;
+
+  document.getElementById("boostSpotlightBtn").href = BOOST_LINK_SPOTLIGHT;
+  document.getElementById("boostSpotlightBtn2").href = BOOST_LINK_SPOTLIGHT;
+  document.getElementById("boostAltBtn").href = BOOST_LINK_ALT;
+  document.getElementById("boost2000sBtn").href = BOOST_LINK_2000S;
+  document.getElementById("boostElevatedBtn").href = BOOST_LINK_ELEVATED;
+  document.getElementById("boostEverydayBtn").href = BOOST_LINK_EVERYDAY;
+
+  // form embed (optional)
+  if (APPLY_FORM_EMBED_SRC && APPLY_FORM_EMBED_SRC.trim().length){
+    document.getElementById("formEmbedWrap").classList.remove("hidden");
+    document.getElementById("formEmbed").src = APPLY_FORM_EMBED_SRC;
+  }
+
+  // spotlight (includes you + demo users)
+  const SPOTLIGHT = [
+    {
+      name: "fsu",
+      handle: "@fsu",
+      img: "images/fsu-profile.png",
+      link: "https://depop.com/fsu",
+      primary: "designer",
+      secondary: "archive"
+    },
+    {
+      name: "cybercloset",
+      handle: "@cybercloset",
+      img: "https://images.unsplash.com/photo-1520975926711-5c6a9a5bdf2e?auto=format&fit=crop&w=1200&q=80",
+      link: "https://www.depop.com/",
+      primary: "y2k",
+      secondary: "streetwear"
+    },
+    {
+      name: "archiveangel",
+      handle: "@archiveangel",
+      img: "https://images.unsplash.com/photo-1520975684320-04a05a6f1188?auto=format&fit=crop&w=1200&q=80",
+      link: "https://www.depop.com/",
+      primary: "archive",
+      secondary: "designer"
+    },
+    {
+      name: "neonmarket",
+      handle: "@neonmarket",
+      img: "https://images.unsplash.com/photo-1520975592411-3b2d8a3cce61?auto=format&fit=crop&w=1200&q=80",
+      link: "https://www.depop.com/",
+      primary: "streetwear",
+      secondary: "grunge"
+    },
+    {
+      name: "softgrunge.shop",
+      handle: "@softgrunge.shop",
+      img: "https://images.unsplash.com/photo-1520975661595-6453be3f7070?auto=format&fit=crop&w=1200&q=80",
+      link: "https://www.depop.com/",
+      primary: "grunge",
+      secondary: "vintage"
+    }
+  ];
+
+  const track = document.getElementById("track");
+  const dots = document.getElementById("dots");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  let idx = 0;
+  let timer = null;
+  let isDragging = false;
+  let startX = 0;
+  let dx = 0;
+
+  function slideTemplate(s){
+    return `
+      <a class="slide" href="${s.link}" target="_blank" rel="noopener">
+        <div class="slideMedia">
+          <img src="${s.img}" alt="">
+          <div class="stickerSponsored">★ sponsored</div>
+        </div>
+        <div class="slideMeta">
+          <div class="slideName">${s.name}</div>
+          <div class="slideHandle">${s.handle}</div>
+          <div class="slideTags">
+            <span class="pill primary">${s.primary}</span>
+            <span class="pill secondary">${s.secondary}</span>
+            <span class="pill">tap to view shop</span>
+          </div>
+        </div>
+      </a>
+    `;
+  }
+
+  function buildCarousel(){
+    track.innerHTML = SPOTLIGHT.map(slideTemplate).join("");
+    dots.innerHTML = SPOTLIGHT.map((_, i) =>
+      `<div class="dot ${i===0 ? "is-on" : ""}" data-i="${i}" role="button" aria-label="go to slide ${i+1}"></div>`
+    ).join("");
+    dots.querySelectorAll(".dot").forEach(d => {
+      d.addEventListener("click", () => {
+        idx = Number(d.getAttribute("data-i"));
+        goTo(idx);
+        restart();
+      });
+    });
+  }
+
+  function updateDots(){
+    dots.querySelectorAll(".dot").forEach((d, i) => d.classList.toggle("is-on", i === idx));
+  }
+
+  function goTo(i){
+    idx = (i + SPOTLIGHT.length) % SPOTLIGHT.length;
+    track.style.transform = `translateX(${-idx * 100}%)`;
+    updateDots();
+  }
+
+  function next(){ goTo(idx + 1); }
+  function prev(){ goTo(idx - 1); }
+
+  function restart(){
+    if (timer) clearInterval(timer);
+    timer = setInterval(next, 3500);
+  }
+
+  prevBtn.addEventListener("click", () => { prev(); restart(); });
+  nextBtn.addEventListener("click", () => { next(); restart(); });
+
+  const carousel = document.querySelector(".carousel");
+  carousel.addEventListener("mouseenter", () => timer && clearInterval(timer));
+  carousel.addEventListener("mouseleave", restart);
+
+  // swipe (mobile)
+  carousel.addEventListener("touchstart", (e) => {
+    isDragging = true;
+    startX = e.touches[0].clientX;
+    dx = 0;
+  }, {passive:true});
+  carousel.addEventListener("touchmove", (e) => {
+    if (!isDragging) return;
+    dx = e.touches[0].clientX - startX;
+  }, {passive:true});
+  carousel.addEventListener("touchend", () => {
+    if (!isDragging) return;
+    isDragging = false;
+    if (Math.abs(dx) > 40) {
+      dx < 0 ? next() : prev();
+      restart();
+    }
+  });
+
+  // build
+  buildCarousel();
+  goTo(0);
+  restart();
+
+  // search + cluster filter
+  const search = document.getElementById("search");
+  const fchips = Array.from(document.querySelectorAll(".fchip"));
+  let activeCluster = "all";
+  const sellers = Array.from(document.querySelectorAll(".seller"));
+  const clusters = Array.from(document.querySelectorAll(".cluster"));
+
+  function applyFilters(){
+    const q = (search.value || "").trim().toLowerCase();
+
+    // show/hide clusters
+    clusters.forEach(sec => {
+      const secCluster = sec.getAttribute("data-cluster");
+      const shouldShowCluster = (activeCluster === "all" || activeCluster === secCluster);
+      sec.classList.toggle("hidden", !shouldShowCluster);
+    });
+
+    // within visible clusters, filter sellers by text
+    sellers.forEach(card => {
+      const cardCluster = card.closest(".cluster")?.getAttribute("data-cluster") || "";
+      const clusterOk = (activeCluster === "all" || activeCluster === cardCluster);
+
+      const hay = [
+        card.getAttribute("data-name") || "",
+        card.getAttribute("data-handle") || "",
+        card.getAttribute("data-primary") || "",
+        card.getAttribute("data-secondary") || ""
+      ].join(" ").toLowerCase();
+
+      const match = !q || hay.includes(q);
+      card.classList.toggle("hidden", !(clusterOk && match));
+    });
+  }
+
+  fchips.forEach(ch => {
+    ch.addEventListener("click", () => {
+      fchips.forEach(c => c.classList.remove("is-on"));
+      ch.classList.add("is-on");
+      activeCluster = ch.getAttribute("data-filter");
+      applyFilters();
+      if (activeCluster !== "all") document.getElementById(activeCluster).scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  });
+
+  search.addEventListener("input", applyFilters);
+</script>
+
+</body>
+</html>
