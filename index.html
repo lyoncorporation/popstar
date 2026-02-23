@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>popstar ★ depop seller discovery</title>
+
+<style>
+:root{
+  --brand:#8ACE00;
+  --bg:#8ACE00;
+  --ink:#0b0b0c;
+  --radius:18px;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#8ACE00;
+  font-family:-apple-system,BlinkMacSystemFont,system-ui;
+  color:#000;
+  text-transform:lowercase;
+}
+
+.wrap{max-width:1100px;margin:0 auto;padding:30px 16px 80px;}
+
+h1{font-size:56px;margin:0 0 10px;font-weight:1000;}
+h2{font-size:28px;margin:60px 0 14px;font-weight:1000;border-bottom:2px solid #000;padding-bottom:6px;}
+
+.btn{
+  display:inline-block;
+  padding:12px 18px;
+  border-radius:14px;
+  border:2px solid #000;
+  font-weight:1000;
+  text-decoration:none;
+  margin-right:10px;
+}
+
+.btn.primary{background:#000;color:#fff;}
+.btn.secondary{background:#8ACE00;color:#000;}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+}
+
+.card{
+  background:#fff;
+  border:2px solid #000;
+  border-radius:18px;
+  overflow:hidden;
+}
+
+.thumb{height:180px;}
+.thumb img{width:100%;height:100%;object-fit:cover;}
+
+.meta{padding:14px;}
+.name{font-weight:1000;margin-bottom:4px;}
+.handle{font-weight:800;margin-bottom:8px;}
+
+.tag{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  border:2px solid #000;
+  font-size:12px;
+  font-weight:900;
+  margin-right:6px;
+}
+
+.tag.primary{background:#8ACE00;}
+.tag.secondary{background:#fff;}
+
+.formWrap{
+  background:#fff;
+  border:2px solid #000;
+  border-radius:18px;
+  padding:20px;
+}
+
+.field{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:2px solid #000;
+  margin-bottom:12px;
+  font-weight:800;
+}
+
+.notice{
+  padding:12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background:#8ACE00;
+  font-weight:900;
+}
+
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<h1>popstar ★</h1>
+<p>promote your depop. get discovered.</p>
+
+<a class="btn primary" href="#apply">✦ apply</a>
+<a class="btn secondary" href="#">★ boost spotlight</a>
+
+<h2>★ elevated</h2>
+
+<div class="grid">
+
+  <!-- YOUR SELLER CARD -->
+  <div class="card">
+    <div class="thumb">
+      <img src="fsu-jacket.jpg" alt="fsu item">
+    </div>
+    <div class="meta">
+      <div class="name">fsu</div>
+      <div class="handle">@fsu</div>
+      <span class="tag primary">designer</span>
+      <span class="tag secondary">archive</span>
+    </div>
+  </div>
+
+</div>
+
+<h2 id="apply">✦ apply</h2>
+
+<div class="formWrap">
+<form action="https://formspree.io/f/REPLACE_ME" method="POST">
+  <input class="field" name="depop_url" placeholder="depop url" required>
+  <input class="field" name="handle" placeholder="@username" required>
+  <input class="field" name="shop_name" placeholder="shop name" required>
+  <textarea class="field" name="pitch" rows="4" placeholder="1–2 sentence pitch" required></textarea>
+  <input class="field" name="primary_genre" placeholder="primary genre" required>
+  <input class="field" name="secondary_genre" placeholder="secondary genre (optional)">
+  <input class="field" name="influencer_code" placeholder="influencer code (optional)">
+  <button class="btn primary" type="submit">submit</button>
+</form>
+</div>
+
+</div>
+</body>
+</html>
