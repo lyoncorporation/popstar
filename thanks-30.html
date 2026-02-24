@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>popstar — claim your feature</title>
+<style>
+
+:root{
+  --brand:#8ACE00;
+  --bg:#f5f5f2;
+  --ink:#111;
+  --radius:18px;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:-apple-system,BlinkMacSystemFont,system-ui;
+  color:var(--ink);
+  text-transform:lowercase;
+}
+
+.wrap{max-width:920px;margin:0 auto;padding:56px 20px 110px;}
+.top{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  margin-bottom:26px;
+}
+.brand{display:flex;align-items:center;gap:12px;}
+.brandMark{
+  width:38px;height:38px;background:var(--brand);
+  display:flex;align-items:center;justify-content:center;
+  border-radius:6px;border:2px solid #000;
+}
+.brandMark span{color:#000;font-weight:1000;font-size:18px;line-height:1;}
+h1{
+  font-size:64px;line-height:.92;margin:0 0 10px;font-weight:1000;letter-spacing:-.05em;
+}
+.sub{margin:0 0 26px;max-width:720px;font-weight:750;color:rgba(0,0,0,.65)}
+.card{
+  background:#fff;border:2px solid #000;border-radius:var(--radius);
+  padding:22px;
+}
+.badgeRow{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px;}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 10px;border-radius:999px;border:2px solid #000;
+  background:rgba(255,255,255,.92);
+  font-weight:1000;
+}
+.badge strong{font-weight:1000}
+form{margin-top:12px;}
+.field, select, textarea{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:2px solid #000;
+  margin:0 0 14px;
+  font-weight:850;
+  background:#fff;
+  color:#000;
+}
+textarea{min-height:120px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:680px){.row{grid-template-columns:1fr} h1{font-size:52px}}
+.btnRow{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.btn{
+  display:inline-block;
+  padding:12px 18px;
+  border-radius:14px;
+  border:2px solid #000;
+  font-weight:1000;
+  text-decoration:none;
+  background:#000;
+  color:#fff;
+  cursor:pointer;
+}
+.btn:hover{background:var(--brand);color:#000;}
+.note{
+  margin-top:14px;
+  padding:14px;
+  border-radius:14px;
+  border:2px solid #000;
+  background:rgba(255,255,255,.92);
+  font-weight:900;
+  color:rgba(0,0,0,.72)
+}
+.small{font-size:13px;color:rgba(0,0,0,.6);font-weight:800;margin-top:10px}
+a{color:#000}
+a:hover{color:var(--brand)}
+
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="brandMark" aria-label="popstar"><span>★</span></div>
+      </div>
+      <a class="badge" href="/" title="back to popstar">← back</a>
+    </div>
+
+    <h1>payment received</h1>
+    <p class="sub">claim your featured placement so we can add you to popstar. this takes ~30 seconds.</p>
+
+    <div class="card">
+      <div class="badgeRow">
+        <div class="badge"><strong>duration</strong> — 30 day</div>
+        <div class="badge"><strong>status</strong> — sponsored</div>
+      </div>
+
+      <form action="https://formspree.io/f/REPLACE_ME" method="POST">
+        <input type="hidden" name="boost_duration" value="30 day">
+        <input type="hidden" name="submission_type" value="paid_claim">
+
+        <div class="row">
+          <input class="field" name="depop_url" placeholder="depop url" required>
+          <input class="field" name="handle" placeholder="@username" required>
+        </div>
+
+        <div class="row">
+          <input class="field" name="shop_name" placeholder="shop name" required>
+          <select name="purchased_section" class="field" required>
+            <option value="" selected disabled>which section did you buy?</option>
+            <option value="spotlight">spotlight</option>
+            <option value="alt">alt</option>
+            <option value="2000s">2000s</option>
+            <option value="elevated">elevated</option>
+            <option value="everyday">everyday</option>
+          </select>
+        </div>
+
+        <textarea class="field" name="pitch" placeholder="1–2 sentence pitch" required></textarea>
+
+        <div class="row">
+          <input class="field" name="profile_photo_url" placeholder="profile photo url (optional)">
+          <input class="field" name="item_photo_url" placeholder="item photo url (optional)">
+        </div>
+
+        <div class="row">
+          <input class="field" name="primary_genre" placeholder="primary genre (optional)">
+          <input class="field" name="secondary_genre" placeholder="secondary genre (optional)">
+        </div>
+
+        <div class="btnRow">
+          <button class="btn" type="submit">submit claim</button>
+          <a class="btn" href="/" style="background:#fff;color:#000;">view popstar</a>
+        </div>
+
+        <div class="note">after you submit, we’ll add your shop to the section you chose. if you purchased spotlight, you’ll be added to the spotlight carousel.</div>
+        <div class="small">replace the formspree endpoint in this file: <code>https://formspree.io/f/REPLACE_ME</code></div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
