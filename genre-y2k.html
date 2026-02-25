@@ -3265,59 +3265,24 @@ a.card.seller .bioSnippet{
 </style>
 
 </head>
-<body>
+<body class="genrePage">
 <div class="topbar">
 <div aria-label="categories" class="ticker"><div class="tickerTrack"><div aria-hidden="true" class="tickerGroup">alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ </div><div aria-hidden="true" class="tickerGroup">alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ </div></div></div></div><div class="wrap">
 
 <section class="hero">
-<div class="heroHeader">
-<div class="heroLeft">
-<h1>popstar ★</h1>
-<p class="sub">promote your depop. get discovered.</p>
-<div class="btnRow">
-<a class="btn boost" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" id="boostSpotlightBtn_disabled" rel="noopener" target="_blank">★ feature my shop</a>
-<a class="btn apply" href="#apply" id="applyBtn">✦ submit your shop</a>
-</div>
-<!-- spotlight -->
-<!-- spotlight moved into hero -->
-</div>
-<div class="heroRight">
-<div class="spotlightLabel">★ featured spotlight</div>
-<div class="spotlight" id="spotlight">
-<div aria-label="featured spotlight carousel" class="carousel">
-<div class="track" id="track"></div>
-</div>
-<div class="carouselControls">
-<div class="ctrl">
-<button aria-label="previous" class="iconBtn" id="prevBtn">‹</button>
-<button aria-label="next" class="iconBtn" id="nextBtn">›</button>
-</div>
-<div class="dots" id="dots"></div>
-</div>
-</div>
-</div>
-</div>
-<div class="heroBelow">
-<div class="heroBelowBoosts">
-<div class="pricing pricingRow" id="boosts">
-<a class="priceLink" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour boost — $5</a>
-<a class="priceLink" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day boost — $15</a>
-<a class="priceLink" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day boost — $39</a>
-</div>
-</div>
-<div class="heroBelowTools">
-<div class="tools">
-<input class="search" id="search" placeholder="search by @handle or shop name…"/>
-<div class="filterBar" id="filterBar">
-<div class="fchip is-on" data-filter="all">all</div>
-<div class="fchip" data-filter="alt">alt</div>
-<div class="fchip" data-filter="y2k">y2k</div>
-<div class="fchip" data-filter="street">street</div>
-<div class="fchip" data-filter="vintage">vintage</div>
-<div class="fchip" data-filter="archive">archive</div>
-<div class="fchip" data-filter="clean">clean</div>
-</div></div></div>
-</div>
+  <div class="heroHeader" style="grid-template-columns:1fr !important; gap:18px !important;">
+    <div class="heroLeft">
+      <div class="kicker">genre</div>
+      <h1 class="title" id="genreTitle">popstar — alt</h1>
+      <p class="sub" id="genreSub">discover sellers in this lane.</p>
+      <div class="heroBelow heroBelowTools" style="margin-top:14px !important;">
+        <div class="tools">
+          <input class="search" id="search" placeholder="search sellers" autocomplete="off" />
+          <div class="filterBar" id="filterBar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section></div>
 
 
@@ -3817,7 +3782,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const search = document.getElementById("search");
   const chips = Array.from(document.querySelectorAll("#filterBar .fchip"));
   const sections = Array.from(document.querySelectorAll("section.cluster[data-cluster]"));
-  const cards = Array.from(document.querySelectorAll("a.card.seller"));
+  
+  // --- genre page: set this per-file (alt, y2k, street, vintage, archive, clean) ---
+  const GENRE_PAGE = "y2k";
+const cards = Array.from(document.querySelectorAll("a.card.seller"));
 
   let active = "all";
   let query = "";
@@ -3880,15 +3848,29 @@ document.addEventListener("DOMContentLoaded", () => {
   apply();
 
 
-  // --- genre chip redirect to standalone pages ---
-  chips.forEach(chip => {
-    const g = chip.getAttribute("data-filter");
-    if(g && g !== "all"){
-      chip.addEventListener("click", (e) => {
-        window.location.href = `genre-${g}.html`;
-      });
-    }
-  });
+  // --- genre page filtering ---
+  (function(){
+    const allowed = ["alt","y2k","street","vintage","archive","clean"];
+    const g = (GENRE_PAGE || "").toLowerCase().trim();
+    if(!g || !allowed.includes(g)) return;
+
+    // update header copy
+    const t = document.getElementById("genreTitle");
+    const s = document.getElementById("genreSub");
+    if(t) t.textContent = `popstar — ${g}`;
+    if(s) s.textContent = `showing ${g} sellers.`;
+    document.title = `popstar — ${g}`;
+
+    // activate chip (reuses existing logic)
+    const chip = chips.find(c => (c.getAttribute("data-filter") || "") === g);
+    if(chip) chip.click();
+
+    // hide other clusters entirely
+    sections.forEach(sec => {
+      const c = sec.getAttribute("data-cluster");
+      sec.style.display = (c === g) ? "" : "none";
+    });
+  })();
 });
 </script>
 
@@ -4145,6 +4127,15 @@ document.addEventListener("DOMContentLoaded", () => {
   padding-left:0 !important;
   padding-right:0 !important;
 }
+</style>
+
+
+<style>
+/* --- genre page polish (v1) --- */
+body.genrePage .heroRight{ display:none !important; } /* remove spotlight column from hero layout */
+body.genrePage .heroBelowBoosts{ display:none !important; } /* remove global boosts row */
+body.genrePage #apply{ display:none !important; } /* genre pages don't show apply form */
+body.genrePage .hero .kicker{ display:inline-block !important; }
 </style>
 
 </body>
