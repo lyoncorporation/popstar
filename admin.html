@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Popstar Admin</title>
+  <style>
+    body {
+      margin:0;
+      font-family: Arial, sans-serif;
+      background:#0b0b0b;
+      color:#fff;
+    }
+    .wrap { max-width:800px; margin:0 auto; padding:20px; }
+    .card {
+      background:#111;
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:14px;
+      padding:16px;
+      margin-bottom:14px;
+    }
+    button {
+      padding:10px 14px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:bold;
+      margin-right:8px;
+    }
+    .approve { background:#26f16a; color:#000; }
+    .reject { background:#ff4d4d; color:#fff; }
+    input {
+      width:100%;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.2);
+      background:#000;
+      color:#fff;
+      margin-bottom:10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h2>popstar ★ admin</h2>
+
+    <div id="loginSection" class="card">
+      <h3>Login</h3>
+      <input type="email" id="email" value="popstarthewebsite@gmail.com" />
+      <button onclick="sendLink()">Send Magic Link</button>
+      <div id="loginMsg"></div>
+    </div>
+
+    <div id="pendingSection" style="display:none;">
+      <h3>Pending Sellers</h3>
+      <div id="list"></div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://otvznctmwutbwulbhfvx.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90dnpuY3Rtd3V0Ynd1bGJoZnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNzc3MzcsImV4cCI6MjA4NzY1MzczN30.txShYO4rqLSMHeLuN_2rzRmvXZK3mnPsaabFtTa8Ph8";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function sendLink(){
+  const email = document.getElementById('email').value;
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href }
+  });
+  document.getElementById('loginMsg').innerText = error ? error.message : "Magic link sent. Check your email.";
+}
+
+async function loadPending(){
+  const { data, error } = await supabase
+    .from('sellers')
+    .select('*')
+    .eq('status','pending')
+    .order('created_at', { ascending: true });
+
+  if(error) return;
+
+  const list = document.getElementById('list');
+  list.innerHTML = "";
+
+  if(!data.length){
+    list.innerHTML = "<div class='card'>No pending submissions.</div>";
+    return;
+  }
+
+  data.forEach(s => {
+    const card = document.createElement('div');
+    card.className = "card";
+    card.innerHTML = `
+      <strong>${s.shop_name || s.depop_handle}</strong><br/>
+      @${s.depop_handle}<br/>
+      ${s.main_category || ''}<br/><br/>
+      <button class="approve" onclick="approve('${s.id}')">Approve</button>
+      <button class="reject" onclick="rejectSeller('${s.id}')">Reject</button>
+    `;
+    list.appendChild(card);
+  });
+}
+
+async function approve(id){
+  await supabase.from('sellers').update({ status: 'approved' }).eq('id', id);
+  loadPending();
+}
+
+async function rejectSeller(id){
+  await supabase.from('sellers').update({ status: 'rejected' }).eq('id', id);
+  loadPending();
+}
+
+supabase.auth.onAuthStateChange((event, session) => {
+  if(session){
+    document.getElementById('loginSection').style.display = "none";
+    document.getElementById('pendingSection').style.display = "block";
+    loadPending();
+  }
+});
+</script>
+</body>
+</html>
