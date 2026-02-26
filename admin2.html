@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>popstar admin</title>
+  <style>
+    :root{ --brand:#8ACE00; --bg:#f5f5f2; --ink:#0b0b0c; --muted:rgba(11,11,12,.72); --r:18px; }
+    *{box-sizing:border-box}
+    body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"sf pro text",system-ui; background:var(--bg); color:var(--ink); text-transform:lowercase; }
+    .wrap{ max-width:980px; margin:0 auto; padding:18px 16px 80px; }
+    .top{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 0; }
+    .brand{ font-weight:1000; letter-spacing:-.03em; }
+    .meta{ color:var(--muted); font-weight:850; font-size:12px; }
+    .card{ background:rgba(255,255,255,.92); border:2px solid #000; border-radius:var(--r); box-shadow:0 14px 30px rgba(0,0,0,.10); padding:14px; }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+    input{ width:100%; padding:12px 12px; border-radius:14px; border:2px solid #000; background:rgba(255,255,255,.96); font-weight:850; outline:none; }
+    input:focus{ box-shadow:0 0 0 4px rgba(138,206,0,.28); }
+    .btn{ display:inline-flex; align-items:center; justify-content:center; padding:10px 12px; border-radius:14px; border:2px solid #000; font-weight:1000; cursor:pointer; background:#000; color:#fff; }
+    .btn.ok{ background:var(--brand); color:#000; }
+    .small{ font-size:12px; color:var(--muted); font-weight:900; line-height:1.45; }
+    .log{ margin-top:10px; padding:10px 12px; border-radius:14px; border:2px solid rgba(0,0,0,.18); background:rgba(255,255,255,.85); }
+    code{ font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">popstar ★ admin</div>
+      <div class="meta" id="ver">loading…</div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:1000; margin-bottom:6px;">magic link login</div>
+      <div class="small">enter your admin email → tap <b>send magic link</b> → open the email on this phone and tap the link.</div>
+
+      <div class="row" style="margin-top:12px;">
+        <div style="flex:1 1 260px; min-width:240px;">
+          <div class="meta" style="margin-bottom:6px;">admin email</div>
+          <input id="email" type="email" placeholder="you@domain.com" autocomplete="email" />
+        </div>
+        <div style="flex:0 0 auto;">
+          <button id="sendLinkBtn" class="btn ok" type="button">send magic link</button>
+        </div>
+      </div>
+
+      <div class="log">
+        <div class="meta">status</div>
+        <div id="status" class="small">—</div>
+        <div class="meta" style="margin-top:10px;">debug</div>
+        <div id="debug" class="small">—</div>
+      </div>
+
+      <div class="small" style="margin-top:10px;">
+        redirect target: <code id="redir"></code>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const BUILD = "admin-v1-2026-02-25";
+    document.getElementById("ver").textContent = BUILD + " · " + new Date().toLocaleString();
+
+    const statusEl = document.getElementById("status");
+    const debugEl  = document.getElementById("debug");
+    const redirEl  = document.getElementById("redir");
+
+    function setStatus(msg){ statusEl.textContent = msg; }
+    function setDebug(msg){ debugEl.textContent = msg; }
+
+    // Show JS is running immediately
+    setStatus("js running ✅");
+    setDebug("userAgent: " + navigator.userAgent);
+
+    window.addEventListener("error", (e) => {
+      setStatus("js error ❌");
+      setDebug(String(e.message || e.error || e));
+    });
+
+    const SUPABASE_URL = "https://otvznctmwutbwulbhfvx.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90dnpuY3Rtd3V0Ynd1bGJoZnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNzc3MzcsImV4cCI6MjA4NzY1MzczN30.txShYO4rqLSMHeLuN_2rzRmvXZK3mnPsaabFtTa8Ph8";
+
+    const btn = document.getElementById("sendLinkBtn");
+    btn.addEventListener("click", async () => {
+      try{
+        setStatus("clicked…");
+
+        if (typeof window.supabase === "undefined"){
+          setStatus("supabase lib not loaded ❌");
+          setDebug("cdn script failed to load. try disabling content blockers/vpn and refresh.");
+          return;
+        }
+
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const email = (document.getElementById("email").value || "").trim();
+        if (!email){
+          setStatus("enter email");
+          return;
+        }
+
+        const redirectTo = location.origin + "/admin.html";
+        redirEl.textContent = redirectTo;
+
+        setStatus("sending magic link…");
+        const { error } = await client.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: redirectTo }
+        });
+
+        if (error){
+          setStatus("supabase error ❌");
+          setDebug(error.message);
+          return;
+        }
+
+        setStatus("sent ✅ check inbox/spam on this phone and tap the link");
+        setDebug("ok");
+      }catch(err){
+        setStatus("exception ❌");
+        setDebug((err && err.message) ? err.message : String(err));
+      }
+    });
+  </script>
+</body>
+</html>
