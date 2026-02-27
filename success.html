@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>popstar ★ payment confirmed</title>
+  <link rel="icon" href="favicon.ico" />
+  <style>
+    body {
+      margin: 0;
+      background: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 500px;
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 16px;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 24px;
+      background: #00ff66;
+      color: #000;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 6px;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>payment confirmed ★</h1>
+    <p>
+      your boost has been received and is pending approval.
+      <br /><br />
+      please complete the popstar submission form if you haven’t already.
+    </p>
+
+    <a href="/?buyer=1" class="btn">complete submission →</a>
+  </div>
+
+  <script>
+    // Persist buyer state
+    localStorage.setItem("popstar_buyer", "1");
+  </script>
+
+</body>
+</html>
