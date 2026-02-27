@@ -1,0 +1,6124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>popstar</title>
+<style>
+:root{
+  --brand:#8ACE00;
+  --bg:#f5f5f2;
+  --ink:#0b0b0c;
+  --muted:rgba(11,11,12,.70);
+  --radius:18px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+html{scroll-behavior:smooth; scroll-padding-top: 100px;}
+.section,.hero,#spotlight,#apply{scroll-margin-top: 100px;}
+body{
+  margin:0;
+  background: var(--bg); /* solid brand background */
+  font-family:-apple-system,BlinkMacSystemFont,"sf pro text",system-ui;
+  color:var(--ink);
+  text-transform:lowercase;
+  overflow-x:hidden;
+}
+
+/* subtle grain */
+body:before{
+  content:"";
+  position:fixed; inset:0;
+  pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.10'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+  opacity:.20;
+}
+
+a{color:inherit}
+.wrap{max-width:1100px; margin:0 auto; padding:18px 16px 90px;}
+
+/* sticky nav */
+.topbar{position:relative; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:18px 6px; background: transparent; border-bottom:0;}
+.brand{display:flex; align-items:center; gap:10px; font-weight:1000; letter-spacing:-.03em;}
+.brandMark{
+  width:30px; height:30px; border-radius:10px;
+  background: var(--brand);
+  border:2px solid #000;
+  box-shadow: 0 10px 18px rgba(0,0,0,.16), 0 0 22px rgba(138,206,0,.35);
+  display:grid; place-items:center;
+  transform:none;
+  }
+.brandMark span{font-size:16px; font-weight:1000}
+.nav{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+.chip{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 12px; border-radius:999px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.88);
+  text-decoration:none; font-weight:950;
+  box-shadow: 0 10px 22px rgba(0,0,0,.08);
+  transition: transform .08s ease;
+  white-space:nowrap;
+}
+.chip:active{transform: translateY(1px) scale(.99)}
+
+/* ticker */
+.ticker{display:none; 
+  margin:12px 6px 0;
+  border:2px solid #000;
+  border-radius:14px;
+  background: rgba(255,255,255,.92);
+  overflow:hidden;
+  box-shadow: 0 10px 18px rgba(0,0,0,.10);
+}
+
+.tickerTrack span{opacity:.90}
+.tickerTrack b{
+  background: var(--brand);
+  padding:3px 8px;
+  border-radius:999px;
+  border:2px solid #000;
+}
+@keyframes scroll{ from{transform: translateX(0)} to{transform: translateX(-50%)} }
+
+/* hero */
+.hero{padding:26px 6px 10px;}
+h1{
+  margin:0 0 10px;
+  font-size: 82px; line-height:.95;
+  letter-spacing:-.05em; font-weight:1000;
+  text-shadow: none;
+}
+@media (max-width:520px){ h1{font-size:56px} }
+.sub{margin:0 0 14px; color:rgba(0,0,0,.72); font-weight:800; max-width: 70ch;}
+
+.btnRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  padding:12px 16px; border-radius:14px;
+  font-weight:1000; text-decoration:none;
+  border:2px solid #000;
+  transition: transform .08s ease;
+}
+.btn:active{transform: translateY(1px) scale(.99)}
+.btn.boost{background:#000; color:var(--brand); box-shadow: 0 12px 24px rgba(0,0,0,.10);}
+.btn.apply{background:#000; color:#fff; box-shadow: 0 12px 24px rgba(0,0,0,.10);}
+.pricing{margin-top:12px; font-weight:900; color:rgba(0,0,0,.70);}
+
+.tools{
+  margin-top:14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+@media (max-width:720px){ .tools{grid-template-columns:1fr} }
+.search{
+  width:100%;
+  max-width:360px;
+  flex:0 0 auto;
+}
+
+.filterBar{
+  display:flex;
+  gap:8px;
+  flex-wrap:nowrap;
+  justify-content:flex-end;
+  min-width:0;
+  overflow-x:auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom:2px;
+  flex:1 1 auto;
+}
+
+.fchip{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 12px;
+  border-radius:999px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:950;
+  cursor:pointer;
+  user-select:none;
+  box-shadow: 0 10px 18px rgba(0,0,0,.10);
+}
+.fchip.is-on{background: var(--brand);}
+
+/* spotlight carousel */
+.spotlight{
+  margin-top:18px;
+  border:2px solid #000;
+  border-radius:18px;
+  padding:12px;
+  background: rgba(255,255,255,.90);
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+}
+.spotlightHead{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-bottom:10px;
+}
+.spotlightTitle{font-weight:1000; letter-spacing:-.02em;}
+.spotlightNote{color:rgba(0,0,0,.70); font-weight:850; font-size:12px;}
+.carousel{
+  position:relative;
+  overflow:hidden;
+  border-radius:16px;
+  border:1px solid rgba(0,0,0,.14);
+  background:#fff;
+}
+.track{
+  display:flex;
+  width:100%;
+  transition: transform .45s cubic-bezier(.2,.9,.2,1);
+  will-change: transform;
+}
+.slide{
+  flex: 0 0 100%;
+  display:grid;
+  grid-template-columns: 170px 1fr;
+  gap:14px;
+  align-items:stretch;
+  text-decoration:none;
+  color:inherit;
+  padding:12px;
+}
+@media (max-width:520px){ .slide{grid-template-columns:1fr} }
+.slideMedia{
+  position:relative;
+  height:170px;
+  border-radius:14px;
+  overflow:hidden;
+  background: linear-gradient(135deg, rgba(138,206,0,.35), rgba(0,0,0,.06));
+}
+.slideMedia img{
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+  filter:saturate(1.10) contrast(1.05);
+}
+.stickerSpotlight{
+  position:absolute;
+  top:14px; left:14px;
+  background: var(--brand); color:#000;
+  padding:7px 11px;
+  border-radius:999px;
+  border:2px solid #000;
+  font-size:12px;
+  font-weight:1000;
+  transform: rotate(-8deg);
+  box-shadow: 0 10px 18px rgba(0,0,0,.12);
+  z-index:3;
+}
+.stickerBoosted{
+  position:absolute;
+  top:14px; left:14px;
+  background:#000; color:var(--brand);
+  padding:7px 11px;
+  border-radius:999px;
+  border:2px solid #000;
+  font-size:12px;
+  font-weight:1000;
+  transform: rotate(-8deg);
+  box-shadow: 0 10px 18px rgba(0,0,0,.12);
+  z-index:3;
+}
+
+.slideMeta{display:flex; flex-direction:column; justify-content:center; padding:4px 4px 4px 0;}
+.slideName{font-weight:1000; letter-spacing:-.02em; font-size:20px;}
+.slideHandle{margin-top:6px; color:rgba(0,0,0,.72); font-weight:900; font-size:13px;}
+.slideTags{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+.pill{
+  display:inline-flex; align-items:center;
+  padding:7px 10px;
+  border-radius:999px;
+  font-weight:950;
+  font-size:12px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+}
+.pill.primary{background: var(--brand);}
+.pill.secondary{background: transparent;}
+
+.carouselControls{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px;}
+.dots{display:flex; gap:7px; align-items:center;}
+.dot{width:8px; height:8px; border-radius:999px; border:1px solid rgba(0,0,0,.35); background: rgba(0,0,0,.16);}
+.dot.is-on{background: var(--brand); border-color:#000;}
+
+.dot.is-ghost{opacity:.25;}
+.ctrl{display:flex; gap:8px;}
+.iconBtn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:34px;
+  border-radius:12px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:1000;
+  cursor:pointer;
+  box-shadow: 0 10px 18px rgba(0,0,0,.10);
+}
+.iconBtn:active{transform: translateY(1px)}
+
+/* magazine section dividers */
+.section{margin-top:54px; padding:0 6px;}
+.divider{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:10px; margin:0 0 14px;
+  padding-bottom:10px;
+  border-bottom:2px solid rgba(0,0,0,.18);
+  position:relative;
+}
+.divider:after{content:""; position:absolute; left:0; bottom:-2px; width:150px; height:3px; background: var(--brand); box-shadow: 0 0 18px rgba(138,206,0,.25);}
+h2{
+  margin:0;
+  font-size:28px;
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:-.04em;
+}
+.dividerHint{color:rgba(0,0,0,.70); font-weight:900; font-size:12px; text-align:right;}
+
+/* grids + cards */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap:14px;
+}
+@media (max-width:980px){ .grid{grid-template-columns: repeat(2, minmax(0, 1fr));} }
+@media (max-width:520px){ .grid{grid-template-columns: 1fr;} }
+
+.card{
+  background: rgba(255,255,255,.92);
+  border-radius: var(--radius);
+  overflow:hidden;
+  border:2px solid #000;
+  text-decoration:none;
+  color:inherit;
+  position:relative;
+  box-shadow: 0 10px 22px rgba(0,0,0,.10);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+}
+.thumb{
+  height:150px;
+  background: linear-gradient(135deg, rgba(138,206,0,.28), rgba(0,0,0,.04));
+}
+.thumb img{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1.10) contrast(1.05);}
+.meta{padding:12px;}
+.name{font-weight:1000; letter-spacing:-.02em; margin:0 0 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.handle{margin:0 0 10px; color:rgba(0,0,0,.72); font-weight:900; font-size:13px;}
+.tags{display:flex; gap:8px; flex-wrap:wrap;}
+
+.footer{margin-top:64px; padding:0 6px; color:rgba(0,0,0,.70); font-weight:850; font-size:12px; line-height:1.5;}
+.hidden{display:none !important;}
+
+/* popstar native form */
+.formWrap{
+  border:2px solid #000;
+  border-radius:18px;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+  overflow:hidden;
+}
+.formInner{padding:14px;}
+.formGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+}
+@media (max-width:720px){ .formGrid{grid-template-columns:1fr;} }
+
+label{display:block; font-weight:950; margin:0 0 6px;}
+.field{
+  width:100%;
+  padding:12px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.96);
+  font-weight:850;
+  outline:none;
+}
+.field:focus{box-shadow: 0 0 0 4px rgba(138,206,0,.28);}
+
+.help{margin-top:6px; color:rgba(0,0,0,.70); font-weight:850; font-size:12px; line-height:1.35;}
+.row{margin-bottom:12px;}
+.full{grid-column:1 / -1;}
+
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.choice{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  border-radius:999px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:950;
+  cursor:pointer;
+  user-select:none;
+}
+.choice input{display:none;}
+.choice.is-on{background: var(--brand);}
+
+.inline{
+  display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+}
+.checkbox{
+  display:inline-flex; align-items:center; gap:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:950;
+}
+
+.notice{
+  margin-top:10px;
+  padding:12px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.96);
+  font-weight:950;
+}
+.notice b{background: var(--brand); padding:2px 8px; border-radius:999px; border:2px solid #000;}
+.error{
+  margin-top:10px;
+  padding:12px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,0,0,.10);
+  font-weight:950;
+}
+.small{font-size:12px; color:rgba(0,0,0,.70); font-weight:900;}
+
+/* --- boosts layout (v5) --- */
+.pricingRow{
+  display:flex !important;
+  gap:24px !important;          /* half of the extreme spacing */
+  flex-wrap:wrap !important;
+  align-items:flex-start !important;
+}
+
+.sectionBoostRow{
+  margin: 20px 0 16px !important;  /* half vertical spacing */
+}
+
+.priceLink{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  font-weight:1000 !important;
+  padding: 10px 14px !important;
+  text-decoration:none !important;
+  color:#000 !important;             /* true black */
+  cursor:pointer !important;
+  transition: color .12s ease, transform .12s ease;
+}
+
+.priceLink:hover{
+  color: var(--brand) !important;    /* hover to green */
+}
+
+.priceLink:active{
+  transform: translateY(1px);
+}
+
+
+/* --- hero play / pause icon style --- */
+.mediaControls{
+  display:flex;
+  gap:4px; /* extra tight spacing */
+  margin-top:12px;
+  justify-content:flex-start;
+}
+
+.mediaIconBtn{
+  background:transparent;
+  border:none;
+  padding:0;
+  cursor:pointer;
+}
+
+.mediaIconBtn svg{
+  display:block;
+}
+
+.mediaIconBtn:active{
+  transform: translateY(1px);
+}
+
+/* build marker: popstar premium v6 */
+
+/* --- hover states (v6) --- */
+/* hero buttons under title */
+.btn.boost:hover,
+.btn.apply:hover{
+  background: var(--brand) !important;
+  color:#000 !important;
+}
+
+/* white buttons */
+.chip:hover,
+.fchip:hover,
+.iconBtn:hover{
+  background: var(--brand) !important;
+  color:#000 !important;
+}
+
+
+/* --- overrides: popstar build v91 --- */
+.brandMark{ transform:none !important; }
+.brandMark span{ color:#000 !important; }
+
+/* center boosts */
+.pricingRow, .pricingBlock{
+  display:flex !important;
+  justify-content:center !important;
+  gap:24px !important;
+  flex-wrap:wrap !important;
+}
+.sectionBoostRow, .sectionPricing{
+  display:flex !important;
+  justify-content:center !important;
+  margin:20px 0 16px !important;
+}
+.priceLink{ color:#000 !important; font-weight:1000 !important; }
+.priceLink:hover{ color: var(--brand) !important; }
+
+/* influencer message */
+.influencerMsg{
+  margin:-6px 0 14px;
+  font-weight:900;
+  color:rgba(0,0,0,.68);
+}
+.influencerMsg.ok{ color:#000; }
+.influencerMsg.ok span{ background:var(--brand); border:2px solid #000; padding:2px 8px; border-radius:999px; font-weight:1000; }
+
+
+/* --- hero split with existing spotlight moved right (v16 refined) --- */
+.heroHeader{
+  display:grid;
+  grid-template-columns: 1.35fr 1.45fr; /* spotlight wider */
+  gap:40px;
+  align-items:start;
+}
+.heroLeft{min-width:0;}
+.heroRight{min-width:0;}
+.heroRight #spotlight{
+  margin:0 !important;
+}
+@media(max-width:980px){
+  .heroHeader{grid-template-columns:1fr; gap:22px;}
+}
+}
+}
+
+
+/* spotlight compact inside hero */
+.heroRight #spotlight .card{padding:14px !important;}
+.heroRight #spotlight .carousel{padding:12px !important;}
+
+
+/* --- spotlight vertical tightening --- */
+.heroRight #spotlight .spotlightHead{
+  margin-bottom:8px !important;
+}
+.heroRight #spotlight .carousel{
+  padding:10px 14px !important;
+}
+.heroRight #spotlight .card{
+  padding:12px !important;
+}
+.heroRight #spotlight .tags{
+  margin-top:6px !important;
+}
+
+
+/* --- spotlight height fix inside hero (v17) --- */
+.heroRight #spotlight .slide{
+  grid-template-columns: 140px 1fr !important;
+  padding:10px !important;
+}
+.heroRight #spotlight .slideMedia{
+  height:120px !important;
+  border-radius:12px !important;
+}
+.heroRight #spotlight .meta{padding:10px !important;}
+.heroRight #spotlight .tags{margin-top:6px !important;}
+
+
+
+
+
+/* --- spotlight hard cap (v19) --- */
+.heroRight .spotlightLabel{
+  font-weight:1000 !important;
+  letter-spacing:.08em !important;
+  font-size:12px !important;
+  color:rgba(0,0,0,.65) !important;
+  margin:0 0 10px !important;
+}
+.heroRight #spotlight{
+  max-height:280px !important;
+  overflow:visible !important;
+}
+.heroRight #spotlight .slideMedia{
+  height:60px !important;
+}
+.heroRight #spotlight .carousel{
+  padding:8px 12px !important;
+}
+
+/* --- hero vertical alignment fix (v20) --- */
+.heroHeader{
+  align-items:flex-start !important;
+}
+
+.heroRight{
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+
+.heroRight .spotlightLabel{
+  margin-top:0 !important;
+}
+
+.heroRight #spotlight{
+  margin-top:0 !important;
+}
+
+
+/* --- topbar nav removed (v22) --- */
+.topbar{
+  justify-content:flex-start !important;
+}
+
+
+/* --- raise featured spotlight (v23) --- */
+@media(min-width:981px){
+  .heroRight{
+    margin-top:-10px !important;
+  }
+}
+
+
+/* --- raise featured spotlight (v24b) --- */
+@media(min-width:700px){
+  .heroRight{
+    margin-top:-40px !important;
+  }
+}
+
+
+/* --- v30: restore layout + full-width boosts/tools --- */
+.heroBelow{
+  margin-top:22px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+}
+.heroBelow #boosts{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:34px;
+  width:100%;
+}
+.heroBelow .tools{
+  width:100%;
+  max-width:980px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+}
+.heroBelow .tools .search{
+  width:100%;
+  max-width:920px;
+}
+.heroBelow .tools .filterBar{
+  width:100%;
+  justify-content:center !important;
+}
+.heroRight{
+  margin-top:-70px !important; /* spotlight lowered 20px vs -90 */
+}
+.hero h1{
+  transition: color .2s ease;
+}
+.hero h1:hover{
+  color:#8ACE00 !important;
+  cursor:pointer;
+}
+.heroRight .spotlightLabel{
+  font-weight:1000 !important;
+  letter-spacing:.08em !important;
+  font-size:12px !important;
+  color:rgba(0,0,0,.65) !important;
+  margin:0 0 10px !important;
+}
+
+
+/* --- v31: boosts under spotlight + search inline with genres --- */
+.heroBelow{
+  margin-top:22px;
+  display:grid;
+  grid-template-columns: 1.35fr 1.45fr; /* match heroHeader proportions */
+  column-gap:40px;
+  row-gap:18px;
+  align-items:start;
+}
+.heroBelowBoosts{
+  grid-column:2;
+  display:flex;
+  justify-content:center;
+}
+.heroBelowBoosts #boosts{
+  width:100%;
+  max-width:760px; /* roughly spotlight width */
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:34px;
+}
+.heroBelowTools{
+  grid-column:1 / -1;
+  display:flex;
+  justify-content:center;
+}
+.heroBelowTools .tools{
+  width:100%;
+  max-width:980px;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+}
+.heroBelowTools .tools .search{
+  width:520px;
+  max-width:520px;
+}
+.heroBelowTools .tools .filterBar{
+  width:auto;
+  justify-content:center !important;
+}
+/* Let pills wrap nicely but stay inline with search */
+.heroBelowTools .tools .filterBar{
+  flex:1 1 auto;
+  flex-wrap:wrap;
+  gap:12px;
+}
+@media(max-width:980px){
+  .heroBelow{
+    grid-template-columns:1fr;
+    row-gap:18px;
+  }
+  .heroBelowBoosts{grid-column:1;}
+  .heroBelowTools .tools{
+    flex-direction:column;
+  }
+  .heroBelowTools .tools .search{
+    width:100%;
+    max-width:920px;
+  }
+  .heroBelowTools .tools .filterBar{
+    width:100%;
+  }
+}
+
+
+/* --- v32: boost row tighter + single-line --- */
+.heroBelowBoosts{
+  margin-top:-10px !important; /* move up 10px */
+}
+.heroBelowBoosts #boosts{
+  gap:17px !important;          /* half spacing */
+  flex-wrap:nowrap !important;  /* keep on one line */
+}
+.heroBelowBoosts #boosts a{
+  font-size:18px !important;    /* slightly smaller */
+  white-space:nowrap !important;
+}
+@media(max-width:980px){
+  .heroBelowBoosts #boosts{
+    flex-wrap:wrap !important;  /* allow wrap on mobile */
+  }
+}
+
+
+/* v89: drop search row down a touch */
+.heroBelowTools{ margin-top:10px !important; }
+
+/* --- v32: search + genres on one line --- */
+.heroBelowTools .tools{
+  flex-wrap:nowrap !important;
+}
+.heroBelowTools input.search{
+  width:420px !important;
+  max-width:420px !important;
+  flex:0 0 auto !important;
+}
+.heroBelowTools .filterBar{
+  flex:1 1 auto !important;
+}
+@media(max-width:980px){
+  .heroBelowTools input.search{
+    width:100% !important;
+    max-width:920px !important;
+  }
+  .heroBelowTools .tools{
+    flex-direction:column !important;
+    flex-wrap:wrap !important;
+  }
+}
+
+
+/* --- v33 tweaks: boosts smaller + tighter, remove corner mark, pull sections up --- */
+
+/* remove the little green square star in the corner */
+.topbar{display:none !important;}
+
+/* boost links under spotlight: smaller + half spacing + single line */
+.heroBelowBoosts{ margin-top:-10px !important; }
+.heroBelowBoosts #boosts{
+  gap:16px !important;
+  flex-wrap:nowrap !important;
+}
+.heroBelowBoosts #boosts .priceLink{
+  font-size:15px !important;
+  letter-spacing:-.01em !important;
+  white-space:nowrap !important;
+}
+
+/* keep mobile readable */
+@media(max-width:980px){
+  .heroBelowBoosts #boosts{ flex-wrap:wrap !important; }
+  .heroBelowBoosts #boosts .priceLink{ font-size:16px !important; }
+}
+
+/* move everything below the search row up 10px */
+.section.cluster#alt{ margin-top:-10px !important; }
+
+
+/* --- v34 adjustments --- */
+
+/* bring topbar back but hide only the green square star */
+.topbar{display:flex !important;}
+.brandMark{display:none !important;}
+
+/* boost links under spotlight: tighter + smaller */
+.heroBelowBoosts #boosts{
+  gap:8px !important;          /* cut spacing in half again */
+}
+.heroBelowBoosts #boosts .priceLink{
+  font-size:13px !important;   /* smaller font */
+  white-space:nowrap !important;
+}
+
+/* drop everything below search row down 10px */
+.section.cluster{
+  margin-top:10px !important;
+}
+
+
+/* --- v35 spacing corrections --- */
+
+/* extra space at very top of page */
+body{
+  padding-top:5px !important;
+}
+
+/* move boost links under spotlight up 5px */
+.heroBelowBoosts{
+  margin-top:-15px !important; /* was -10 */
+}
+
+/* move everything below search row down 10px properly */
+.section.cluster{
+  margin-top:20px !important; /* add more separation below search */
+}
+
+
+/* --- popstar v36 global spacing + topbar --- */
+body{ padding-top:10px !important; }
+.topbar{ display:flex !important; }
+.brandMark{ display:none !important; } /* hide green square/star */
+
+
+/* --- popstar v36 spotlight image no-crop --- */
+#spotlight .slideMedia{ background: rgba(0,0,0,.03) !important; }
+#spotlight .slideMedia img{
+  width:100% !important; height:100% !important;
+  object-fit:contain !important; object-position:center center !important;
+}
+
+
+/* --- popstar v36 spacing: search row to first genre section --- */
+.heroBelow{ margin-bottom:35px !important; }
+
+
+/* --- popstar v36 boosts under spotlight tighter --- */
+.heroBelowBoosts{ margin-top:-5px !important; }
+.heroBelowBoosts #boosts{ gap:8px !important; flex-wrap:nowrap !important; }
+.heroBelowBoosts #boosts .priceLink{ font-size:12px !important; white-space:nowrap !important; }
+@media(max-width:980px){
+  .heroBelowBoosts #boosts{ flex-wrap:wrap !important; }
+  .heroBelowBoosts #boosts .priceLink{ font-size:14px !important; }
+}
+
+
+/* --- popstar v36 search + genres inline --- */
+.heroBelowTools .tools{
+  flex-direction:row !important; align-items:center !important; justify-content:center !important;
+  flex-wrap:nowrap !important; gap:16px !important;
+}
+.heroBelowTools input.search{ width:420px !important; max-width:420px !important; flex:0 0 auto !important; }
+.heroBelowTools .filterBar{ flex:1 1 auto !important; width:auto !important; justify-content:center !important; }
+@media(max-width:980px){
+  .heroBelowTools .tools{ flex-direction:column !important; flex-wrap:wrap !important; }
+  .heroBelowTools input.search{ width:100% !important; max-width:920px !important; }
+  .heroBelowTools .filterBar{ width:100% !important; }
+}
+
+
+/* --- popstar v36 bio popover --- */
+.bioBtn{
+  border:1.5px solid rgba(0,0,0,.65);
+  border-radius:999px;
+  padding:6px 10px;
+  font-weight:900;
+  font-size:12px;
+  letter-spacing:.01em;
+  background:transparent;
+  color:#000;
+  cursor:pointer;
+  line-height:1;
+}
+.bioBtn:hover{
+  border-color:#8ACE00;
+  color:#8ACE00;
+}
+.bioPopover{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(320px, calc(100% - 24px));
+  background:#fff; border:2px solid #000; border-radius:18px;
+  box-shadow:0 18px 45px rgba(0,0,0,.18);
+  padding:14px; z-index:30; display:none;
+}
+.bioPopover .bioText{ font-weight:800; font-size:14px; line-height:1.35; color:#111; }
+.bioPopover .bioMeta{ margin-top:10px; display:flex; justify-content:flex-end; }
+.bioClose{ border:2px solid #000; border-radius:999px; padding:7px 10px; font-weight:1000; background:#fff; cursor:pointer; }
+.sellerCard{ position:relative; }
+
+
+/* --- popstar v39: requested tweaks --- */
+
+/* boost links under spotlight: move up more */
+.heroBelowBoosts{ margin-top:-22px !important; }
+.heroBelowBoosts #boosts{ gap:6px !important; }
+.heroBelowBoosts #boosts .priceLink{ font-size:12px !important; }
+
+/* search bar smaller */
+.heroBelowTools input.search{ width:460px !important; max-width:460px !important; }
+
+/* spotlight: bigger images without changing layout */
+#spotlight .slide{ grid-template-columns: 360px 1fr !important; }
+#spotlight .slideMedia{ height:260px !important; }
+#spotlight .slideMedia img{ object-fit:cover !important; }
+@media (max-width:520px){
+  #spotlight .slide{ grid-template-columns: 1fr !important; }
+  #spotlight .slideMedia{ height:220px !important; }
+}
+
+
+/* spotlight + boosted sticker smaller */
+.stickerSpotlight{ padding:4px 8px !important; font-size:10px !important; border-width:2px !important; }
+.stickerBoosted{ padding:4px 8px !important; font-size:10px !important; border-width:2px !important; }
+
+/* bio (no-js) */
+.bioDetails{ display:inline-block; position:relative; }
+.bioDetails > summary{
+  list-style:none;
+  display:inline-block;
+  cursor:pointer;
+  user-select:none;
+}
+.bioDetails > summary::-webkit-details-marker{ display:none; }
+.bioDetails[open] .bioBubble{ display:block; }
+.bioBubble{
+  display:none;
+  position:absolute;
+  left:50%;
+  top:calc(100% + 10px);
+  transform:translateX(-50%);
+  width:min(320px, calc(100vw - 40px));
+  background:#fff;
+  border:2px solid #000;
+  border-radius:18px;
+  box-shadow:0 18px 45px rgba(0,0,0,.18);
+  padding:14px;
+  z-index:50;
+}
+.bioBubble p{
+  margin:0;
+  font-weight:800;
+  font-size:14px;
+  line-height:1.35;
+  color:#111;
+}
+
+/* apply form: bio character counter */
+.textareaWrap{ position:relative; }
+.charCount{
+  position:absolute;
+  bottom:8px;
+  right:10px;
+  font-size:12px;
+  pointer-events:none;
+  opacity:.6;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+
+.heroRight #spotlight .slideMedia{ height:150px !important; }
+}
+
+/* --- v45 top bar redesign --- */
+header, .topBar {
+  background:#8ACE00 !important;
+}
+
+.scrollBar{
+  width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  background:#8ACE00;
+  border-top:1px solid rgba(0,0,0,0.2);
+}
+
+.scrollInner{
+  display:inline-block;
+  padding:8px 0;
+  font-weight:600;
+  color:#000;
+  animation:scrollMove 18s linear infinite;
+}
+
+@keyframes scrollMove{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
+
+/* --- v46 topbar + ticker --- */
+.topbar{
+  background:#8ACE00 !important;
+}
+.topbar .brandMark span{ color:#000 !important; }
+
+.scrollBar{
+  width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  background:#8ACE00;
+  border-top:1px solid rgba(0,0,0,0.25);
+}
+.scrollInner{
+  display:inline-block;
+  padding:10px 0 9px;
+  font-weight:700;
+  letter-spacing:.2px;
+  color:#000;
+  will-change:transform;
+  animation:scrollMove 18s linear infinite;
+}
+@keyframes scrollMove{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
+
+/* --- v46 bio button matches pills --- */
+button.pill.bioBtn{
+  border:0;
+  cursor:pointer;
+  font:inherit;
+  line-height:1;
+}
+button.pill.bioBtn:focus{ outline: none; }
+
+
+
+/* --- v52 topbar + ticker (fixed, full-bleed, no clipping, makes space for hero) --- */
+.topbar{
+  background:#8ACE00 !important;
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  width:100% !important;
+  margin:0 !important;
+  border-radius:0 !important;
+  z-index:60 !important;
+  padding-top: env(safe-area-inset-top) !important;
+}
+
+/* topbar layout: brand row + ticker row */
+.topbar{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:0 !important;
+  padding-bottom:0 !important;
+}
+.topbar .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  padding:14px 16px 10px !important;
+}
+.topbar .brandText{
+  font-weight:1000;
+  letter-spacing:-.03em;
+  color:#000;
+}
+.topbar .brandMark span{ color:#000 !important; }
+
+/* ticker row */
+.ticker{
+  width:100% !important;
+  overflow:hidden !important;
+  border-top:1px solid rgba(0,0,0,0.25) !important;
+  background:#8ACE00 !important;
+}
+
+.tickerItem{
+  flex:0 0 auto !important;
+  padding:8px 18px 7px !important;
+  font-weight:800 !important;
+  color:#000 !important;
+  white-space:nowrap !important;
+}
+
+/* seamless: 4 copies, shift by 25% */
+100%{ transform:translateX(-25%); }
+}
+
+/* reserve space so featured box isn't shoved/colliding */
+/* make sure no mysterious white strip above */
+html, body{ margin:0 !important; padding:0 !important; }
+
+/* --- bio modal --- */
+.bioModal{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:80;
+  background:rgba(0,0,0,.55);
+}
+.bioModal.hidden{ display:none; }
+.bioModalInner{
+  width:min(520px, 92vw);
+  max-height:70vh;
+  background:#fff;
+  border:2px solid #000;
+  border-radius:18px;
+  padding:14px 14px 16px;
+  box-shadow: 0 18px 45px rgba(0,0,0,.18);
+  display:flex;
+  flex-direction:column;
+}
+.bioModalText{
+  overflow:auto;
+  padding-right:6px;
+  max-height:calc(70vh - 140px);
+}
+
+.bioModalTitle{ font-weight:700; margin:6px 0 10px; color:#fff; }
+.bioModalText{ opacity:.92; line-height:1.35; font-size:14px; color:#fff; white-space:pre-wrap; }
+.bioModalClose{ float:right; padding:6px 10px; border-radius:999px; }
+
+.pill[data-bio-trigger="1"]{ cursor:pointer; user-select:none; }
+
+/* --- v53 topbar spacing uses measured spacer --- */
+#topbarSpacer{  }
+
+
+/* --- v57 modal brand styling --- */
+.bioModalInner{
+  border: 1px solid rgba(138,206,0,.45) !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,.55) !important;
+}
+.bioModalTitle{
+  color:#8ACE00 !important;
+  text-transform: lowercase;
+}
+.bioModalSub{
+  margin-top:-6px;
+  margin-bottom:12px;
+  font-size:12px;
+  opacity:.8;
+}
+.bioModalClose{
+  background: rgba(138,206,0,.14) !important;
+  border: 1px solid rgba(138,206,0,.35) !important;
+}
+
+/* --- v58 definitive topbar + hero fix --- */
+html, body { margin:0 !important; padding:0 !important; }
+body{ overflow-x:hidden; }
+
+/* Remove any accidental top padding from legacy tweaks */
+.wrap{ padding-top:0 !important; margin-top:0 !important; }
+
+/* One bar only: ticker full-bleed, flush to top */
+.topbar{
+  position:sticky !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  width:100vw !important;
+  margin:0 !important;
+  padding:0 !important;
+  border-radius:0 !important;
+  background:#8ACE00 !important;
+  z-index:80 !important;
+}
+
+/* Break out of any centered container */
+.topbar{
+  margin-left:calc(50% - 50vw) !important;
+  margin-right:calc(50% - 50vw) !important;
+}
+
+/* Ticker */
+.ticker{
+  display:block !important;
+  width:100% !important;
+  overflow:hidden !important;
+  border-top:0 !important;
+  background:#8ACE00 !important;
+}
+
+.tickerItem{
+  flex:0 0 auto !important;
+  padding:8px 18px 7px !important;
+  font-weight:900 !important;
+  color:#000 !important;
+  white-space:nowrap !important;
+}
+
+/* Seamless loop: we duplicate content exactly twice; translate by 50% */
+100%{ transform:translateX(-50%); }
+}
+
+/* Make room under sticky bar so hero doesn't feel cropped */
+.hero{ padding-top: 10px !important; }
+
+/* Spotlight: restore tall media like earlier builds */
+#spotlight .slideMedia{
+  height: 320px !important;
+  min-height: 320px !important;
+}
+@media (max-width:520px){
+  #spotlight .slideMedia{ height: 260px !important; min-height:260px !important; }
+}
+#spotlight .slideMedia img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+}
+
+/* card store + location */
+.storeName{
+  font-size:12px;
+  opacity:.82;
+  margin-top:2px;
+}
+.loc{
+  font-size:11px;
+  letter-spacing:.08em;
+  opacity:.6;
+  margin-top:2px;
+}
+
+/* --- v59 topbar height + spacing --- */
+.topbar{
+  padding-top:0 !important;
+}
+.tickerItem{
+  padding:8px 18px 7px !important;
+}
+
+
+.tickerItem{ margin:0 !important; }
+
+/* --- v59 hero spacing so spotlight isn't cut off --- */
+.hero{ padding-top: 14px !important; }
+
+.thumb{ position:relative; }
+.thumbLoc{
+  position:absolute;
+  left:10px;
+  bottom:10px;
+  font-size:11px;
+  letter-spacing:.08em;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(0,0,0,.55);
+  color:#fff;
+}
+
+/* --- v60 topbar: single slim ticker, no bubble, not fixed (prevents hero cutoff) --- */
+.topbar{
+  position: sticky !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  padding: 0 !important;
+  background: #8ACE00 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.topbar .brand{ display:none !important; }
+
+/* kill the "bubble" styling from the old ticker component */
+.ticker{
+  display:block !important;
+  margin:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background: transparent !important;
+  box-shadow:none !important;
+}
+
+
+.tickerItem{
+  padding: 7px 16px 6px !important;
+  border:0 !important;
+  background: transparent !important;
+}
+
+/* ensure there is no white strip above */
+html, body{ margin:0 !important; padding:0 !important; }
+
+:root{
+  --brand:#8ACE00;
+  --bg:#f5f5f2;
+  --ink:#0b0b0c;
+  --muted:rgba(11,11,12,.70);
+  --radius:18px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+html{scroll-behavior:smooth; scroll-padding-top: 100px;}
+.section,.hero,#spotlight,#apply{scroll-margin-top: 100px;}
+body{
+  margin:0;
+  background: var(--bg); /* solid brand background */
+  font-family:-apple-system,BlinkMacSystemFont,"sf pro text",system-ui;
+  color:var(--ink);
+  text-transform:lowercase;
+  overflow-x:hidden;
+}
+
+/* subtle grain */
+body:before{
+  content:"";
+  position:fixed; inset:0;
+  pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.10'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+  opacity:.20;
+}
+
+a{color:inherit}
+.wrap{max-width:1100px; margin:0 auto; padding:18px 16px 90px;}
+
+/* sticky nav */
+.topbar{position:relative; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:18px 6px; background: transparent; border-bottom:0;}
+.brand{display:flex; align-items:center; gap:10px; font-weight:1000; letter-spacing:-.03em;}
+.brandMark{
+  width:30px; height:30px; border-radius:10px;
+  background: var(--brand);
+  border:2px solid #000;
+  box-shadow: 0 10px 18px rgba(0,0,0,.16), 0 0 22px rgba(138,206,0,.35);
+  display:grid; place-items:center;
+  transform:none;
+  }
+.brandMark span{font-size:16px; font-weight:1000}
+.nav{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+.chip{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 12px; border-radius:999px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.88);
+  text-decoration:none; font-weight:950;
+  box-shadow: 0 10px 22px rgba(0,0,0,.08);
+  transition: transform .08s ease;
+  white-space:nowrap;
+}
+.chip:active{transform: translateY(1px) scale(.99)}
+
+/* ticker */
+.ticker{display:none; 
+  margin:12px 6px 0;
+  border:2px solid #000;
+  border-radius:14px;
+  background: rgba(255,255,255,.92);
+  overflow:hidden;
+  box-shadow: 0 10px 18px rgba(0,0,0,.10);
+}
+
+.tickerTrack span{opacity:.90}
+.tickerTrack b{
+  background: var(--brand);
+  padding:3px 8px;
+  border-radius:999px;
+  border:2px solid #000;
+}
+@keyframes scroll{ from{transform: translateX(0)} to{transform: translateX(-50%)} }
+
+/* hero */
+.hero{padding:26px 6px 10px;}
+h1{
+  margin:0 0 10px;
+  font-size: 82px; line-height:.95;
+  letter-spacing:-.05em; font-weight:1000;
+  text-shadow: none;
+}
+@media (max-width:520px){ h1{font-size:56px} }
+.sub{margin:0 0 14px; color:rgba(0,0,0,.72); font-weight:800; max-width: 70ch;}
+
+.btnRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  padding:12px 16px; border-radius:14px;
+  font-weight:1000; text-decoration:none;
+  border:2px solid #000;
+  transition: transform .08s ease;
+}
+.btn:active{transform: translateY(1px) scale(.99)}
+.btn.boost{background:#000; color:var(--brand); box-shadow: 0 12px 24px rgba(0,0,0,.10);}
+.btn.apply{background:#000; color:#fff; box-shadow: 0 12px 24px rgba(0,0,0,.10);}
+.pricing{margin-top:12px; font-weight:900; color:rgba(0,0,0,.70);}
+
+.tools{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns: 1fr auto;
+  gap:10px;
+}
+@media (max-width:720px){ .tools{grid-template-columns:1fr} }
+.search{
+  width:100%;
+  padding:12px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:850;
+  outline:none;
+  box-shadow: 0 10px 18px rgba(0,0,0,.10);
+}
+.filterBar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.fchip{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 12px;
+  border-radius:999px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:950;
+  cursor:pointer;
+  user-select:none;
+  box-shadow: 0 10px 18px rgba(0,0,0,.10);
+}
+.fchip.is-on{background: var(--brand);}
+
+/* spotlight carousel */
+.spotlight{
+  margin-top:18px;
+  border:2px solid #000;
+  border-radius:18px;
+  padding:12px;
+  background: rgba(255,255,255,.90);
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+}
+.spotlightHead{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-bottom:10px;
+}
+.spotlightTitle{font-weight:1000; letter-spacing:-.02em;}
+.spotlightNote{color:rgba(0,0,0,.70); font-weight:850; font-size:12px;}
+.carousel{
+  position:relative;
+  overflow:hidden;
+  border-radius:16px;
+  border:1px solid rgba(0,0,0,.14);
+  background:#fff;
+}
+.track{
+  display:flex;
+  width:100%;
+  transition: transform .45s cubic-bezier(.2,.9,.2,1);
+  will-change: transform;
+}
+.slide{
+  flex: 0 0 100%;
+  display:grid;
+  grid-template-columns: 170px 1fr;
+  gap:14px;
+  align-items:stretch;
+  text-decoration:none;
+  color:inherit;
+  padding:12px;
+}
+@media (max-width:520px){ .slide{grid-template-columns:1fr} }
+.slideMedia{
+  position:relative;
+  height:170px;
+  border-radius:14px;
+  overflow:hidden;
+  background: linear-gradient(135deg, rgba(138,206,0,.35), rgba(0,0,0,.06));
+}
+.slideMedia img{
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+  filter:saturate(1.10) contrast(1.05);
+}
+.stickerSpotlight{
+  position:absolute;
+  top:10px; left:10px;
+  background: var(--brand); color:#000;
+  padding:7px 11px;
+  border-radius:999px;
+  border:2px solid #000;
+  font-size:12px;
+  font-weight:1000;
+  transform: rotate(-7deg);
+  box-shadow: 0 10px 18px rgba(0,0,0,.12);
+}
+.slideMeta{display:flex; flex-direction:column; justify-content:center; padding:4px 4px 4px 0;}
+.slideName{font-weight:1000; letter-spacing:-.02em; font-size:20px;}
+.slideHandle{margin-top:6px; color:rgba(0,0,0,.72); font-weight:900; font-size:13px;}
+.slideTags{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+.pill{
+  display:inline-flex; align-items:center;
+  padding:7px 10px;
+  border-radius:999px;
+  font-weight:950;
+  font-size:12px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+}
+.pill.primary{background: var(--brand);}
+.pill.secondary{background: transparent;}
+
+.carouselControls{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px;}
+.dots{display:flex; gap:7px; align-items:center;}
+.dot{width:8px; height:8px; border-radius:999px; border:1px solid rgba(0,0,0,.35); background: rgba(0,0,0,.16);}
+.dot.is-on{background: var(--brand); border-color:#000;}
+.ctrl{display:flex; gap:8px;}
+.iconBtn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:34px;
+  border-radius:12px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:1000;
+  cursor:pointer;
+  box-shadow: 0 10px 18px rgba(0,0,0,.10);
+}
+.iconBtn:active{transform: translateY(1px)}
+
+/* magazine section dividers */
+.section{margin-top:54px; padding:0 6px;}
+.divider{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:10px; margin:0 0 14px;
+  padding-bottom:10px;
+  border-bottom:2px solid rgba(0,0,0,.18);
+  position:relative;
+}
+.divider:after{content:""; position:absolute; left:0; bottom:-2px; width:150px; height:3px; background: var(--brand); box-shadow: 0 0 18px rgba(138,206,0,.25);}
+h2{
+  margin:0;
+  font-size:28px;
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:-.04em;
+}
+.dividerHint{color:rgba(0,0,0,.70); font-weight:900; font-size:12px; text-align:right;}
+
+/* grids + cards */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap:14px;
+}
+@media (max-width:980px){ .grid{grid-template-columns: repeat(2, minmax(0, 1fr));} }
+@media (max-width:520px){ .grid{grid-template-columns: 1fr;} }
+
+.card{
+  background: rgba(255,255,255,.92);
+  border-radius: var(--radius);
+  overflow:hidden;
+  border:2px solid #000;
+  text-decoration:none;
+  color:inherit;
+  position:relative;
+  box-shadow: 0 10px 22px rgba(0,0,0,.10);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+}
+.thumb{
+  height:150px;
+  background: linear-gradient(135deg, rgba(138,206,0,.28), rgba(0,0,0,.04));
+}
+.thumb img{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1.10) contrast(1.05);}
+.meta{padding:12px;}
+.name{font-weight:1000; letter-spacing:-.02em; margin:0 0 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.handle{margin:0 0 10px; color:rgba(0,0,0,.72); font-weight:900; font-size:13px;}
+.tags{display:flex; gap:8px; flex-wrap:wrap;}
+
+.footer{margin-top:64px; padding:0 6px; color:rgba(0,0,0,.70); font-weight:850; font-size:12px; line-height:1.5;}
+.hidden{display:none !important;}
+
+/* popstar native form */
+.formWrap{
+  border:2px solid #000;
+  border-radius:18px;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+  overflow:hidden;
+}
+.formInner{padding:14px;}
+.formGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+}
+@media (max-width:720px){ .formGrid{grid-template-columns:1fr;} }
+
+label{display:block; font-weight:950; margin:0 0 6px;}
+.field{
+  width:100%;
+  padding:12px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.96);
+  font-weight:850;
+  outline:none;
+}
+.field:focus{box-shadow: 0 0 0 4px rgba(138,206,0,.28);}
+
+.help{margin-top:6px; color:rgba(0,0,0,.70); font-weight:850; font-size:12px; line-height:1.35;}
+.row{margin-bottom:12px;}
+.full{grid-column:1 / -1;}
+
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.choice{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  border-radius:999px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:950;
+  cursor:pointer;
+  user-select:none;
+}
+.choice input{display:none;}
+.choice.is-on{background: var(--brand);}
+
+.inline{
+  display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+}
+.checkbox{
+  display:inline-flex; align-items:center; gap:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:950;
+}
+
+.notice{
+  margin-top:10px;
+  padding:12px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.96);
+  font-weight:950;
+}
+.notice b{background: var(--brand); padding:2px 8px; border-radius:999px; border:2px solid #000;}
+.error{
+  margin-top:10px;
+  padding:12px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,0,0,.10);
+  font-weight:950;
+}
+.small{font-size:12px; color:rgba(0,0,0,.70); font-weight:900;}
+
+/* --- boosts layout (v5) --- */
+.pricingRow{
+  display:flex !important;
+  gap:24px !important;          /* half of the extreme spacing */
+  flex-wrap:wrap !important;
+  align-items:flex-start !important;
+}
+
+.sectionBoostRow{
+  margin: 20px 0 16px !important;  /* half vertical spacing */
+}
+
+.priceLink{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  font-weight:1000 !important;
+  padding: 10px 14px !important;
+  text-decoration:none !important;
+  color:#000 !important;             /* true black */
+  cursor:pointer !important;
+  transition: color .12s ease, transform .12s ease;
+}
+
+.priceLink:hover{
+  color: var(--brand) !important;    /* hover to green */
+}
+
+.priceLink:active{
+  transform: translateY(1px);
+}
+
+/* build marker: popstar premium v6 */
+
+/* --- hover states (v6) --- */
+/* hero buttons under title */
+.btn.boost:hover,
+.btn.apply:hover{
+  background: var(--brand) !important;
+  color:#000 !important;
+}
+
+/* white buttons */
+.chip:hover,
+.fchip:hover,
+.iconBtn:hover{
+  background: var(--brand) !important;
+  color:#000 !important;
+}
+
+
+/* --- overrides: popstar build v91 --- */
+.brandMark{ transform:none !important; }
+.brandMark span{ color:#000 !important; }
+
+/* center boosts */
+.pricingRow, .pricingBlock{
+  display:flex !important;
+  justify-content:center !important;
+  gap:24px !important;
+  flex-wrap:wrap !important;
+}
+.sectionBoostRow, .sectionPricing{
+  display:flex !important;
+  justify-content:center !important;
+  margin:20px 0 16px !important;
+}
+.priceLink{ color:#000 !important; font-weight:1000 !important; }
+.priceLink:hover{ color: var(--brand) !important; }
+
+/* influencer message */
+.influencerMsg{
+  margin:-6px 0 14px;
+  font-weight:900;
+  color:rgba(0,0,0,.68);
+}
+.influencerMsg.ok{ color:#000; }
+.influencerMsg.ok span{ background:var(--brand); border:2px solid #000; padding:2px 8px; border-radius:999px; font-weight:1000; }
+
+
+/* --- hero split with existing spotlight moved right (v16 refined) --- */
+.heroHeader{
+  display:grid;
+  grid-template-columns: 1.35fr 1.45fr; /* spotlight wider */
+  gap:40px;
+  align-items:start;
+}
+.heroLeft{min-width:0;}
+.heroRight{min-width:0;}
+.heroRight #spotlight{
+  margin:0 !important;
+}
+@media(max-width:980px){
+  .heroHeader{grid-template-columns:1fr; gap:22px;}
+}
+}
+}
+
+
+/* spotlight compact inside hero */
+.heroRight #spotlight .card{padding:14px !important;}
+.heroRight #spotlight .carousel{padding:12px !important;}
+
+
+/* --- spotlight vertical tightening --- */
+.heroRight #spotlight .spotlightHead{
+  margin-bottom:8px !important;
+}
+.heroRight #spotlight .carousel{
+  padding:10px 14px !important;
+}
+.heroRight #spotlight .card{
+  padding:12px !important;
+}
+.heroRight #spotlight .tags{
+  margin-top:6px !important;
+}
+
+
+/* --- spotlight height fix inside hero (v17) --- */
+.heroRight #spotlight .slide{
+  grid-template-columns: 140px 1fr !important;
+  padding:10px !important;
+}
+.heroRight #spotlight .slideMedia{
+  height:120px !important;
+  border-radius:12px !important;
+}
+.heroRight #spotlight .meta{padding:10px !important;}
+.heroRight #spotlight .tags{margin-top:6px !important;}
+
+
+
+
+
+/* --- spotlight hard cap (v19) --- */
+.heroRight .spotlightLabel{
+  font-weight:1000 !important;
+  letter-spacing:.08em !important;
+  font-size:12px !important;
+  color:rgba(0,0,0,.65) !important;
+  margin:0 0 10px !important;
+}
+.heroRight #spotlight{
+  max-height:280px !important;
+  overflow:visible !important;
+}
+.heroRight #spotlight .slideMedia{
+  height:60px !important;
+}
+.heroRight #spotlight .carousel{
+  padding:8px 12px !important;
+}
+
+/* --- hero vertical alignment fix (v20) --- */
+.heroHeader{
+  align-items:flex-start !important;
+}
+
+.heroRight{
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+
+.heroRight .spotlightLabel{
+  margin-top:0 !important;
+}
+
+.heroRight #spotlight{
+  margin-top:0 !important;
+}
+
+
+/* --- topbar nav removed (v22) --- */
+.topbar{
+  justify-content:flex-start !important;
+}
+
+
+/* --- raise featured spotlight (v23) --- */
+@media(min-width:981px){
+  .heroRight{
+    margin-top:-10px !important;
+  }
+}
+
+
+/* --- raise featured spotlight (v24b) --- */
+@media(min-width:700px){
+  .heroRight{
+    margin-top:-40px !important;
+  }
+}
+
+
+/* --- v30: restore layout + full-width boosts/tools --- */
+.heroBelow{
+  margin-top:22px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+}
+.heroBelow #boosts{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:34px;
+  width:100%;
+}
+.heroBelow .tools{
+  width:100%;
+  max-width:980px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+}
+.heroBelow .tools .search{
+  width:100%;
+  max-width:920px;
+}
+.heroBelow .tools .filterBar{
+  width:100%;
+  justify-content:center !important;
+}
+.heroRight{
+  margin-top:-70px !important; /* spotlight lowered 20px vs -90 */
+}
+.hero h1{
+  transition: color .2s ease;
+}
+.hero h1:hover{
+  color:#8ACE00 !important;
+  cursor:pointer;
+}
+.heroRight .spotlightLabel{
+  font-weight:1000 !important;
+  letter-spacing:.08em !important;
+  font-size:12px !important;
+  color:rgba(0,0,0,.65) !important;
+  margin:0 0 10px !important;
+}
+
+
+/* --- v31: boosts under spotlight + search inline with genres --- */
+.heroBelow{
+  margin-top:22px;
+  display:grid;
+  grid-template-columns: 1.35fr 1.45fr; /* match heroHeader proportions */
+  column-gap:40px;
+  row-gap:18px;
+  align-items:start;
+}
+.heroBelowBoosts{
+  grid-column:2;
+  display:flex;
+  justify-content:center;
+}
+.heroBelowBoosts #boosts{
+  width:100%;
+  max-width:760px; /* roughly spotlight width */
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:34px;
+}
+.heroBelowTools{
+  grid-column:1 / -1;
+  display:flex;
+  justify-content:center;
+}
+.heroBelowTools .tools{
+  width:100%;
+  max-width:980px;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+}
+.heroBelowTools .tools .search{
+  width:520px;
+  max-width:520px;
+}
+.heroBelowTools .tools .filterBar{
+  width:auto;
+  justify-content:center !important;
+}
+/* Let pills wrap nicely but stay inline with search */
+.heroBelowTools .tools .filterBar{
+  flex:1 1 auto;
+  flex-wrap:wrap;
+  gap:12px;
+}
+@media(max-width:980px){
+  .heroBelow{
+    grid-template-columns:1fr;
+    row-gap:18px;
+  }
+  .heroBelowBoosts{grid-column:1;}
+  .heroBelowTools .tools{
+    flex-direction:column;
+  }
+  .heroBelowTools .tools .search{
+    width:100%;
+    max-width:920px;
+  }
+  .heroBelowTools .tools .filterBar{
+    width:100%;
+  }
+}
+
+
+/* --- v32: boost row tighter + single-line --- */
+.heroBelowBoosts{
+  margin-top:-10px !important; /* move up 10px */
+}
+.heroBelowBoosts #boosts{
+  gap:17px !important;          /* half spacing */
+  flex-wrap:nowrap !important;  /* keep on one line */
+}
+.heroBelowBoosts #boosts a{
+  font-size:18px !important;    /* slightly smaller */
+  white-space:nowrap !important;
+}
+@media(max-width:980px){
+  .heroBelowBoosts #boosts{
+    flex-wrap:wrap !important;  /* allow wrap on mobile */
+  }
+}
+
+
+/* --- v32: search + genres on one line --- */
+.heroBelowTools .tools{
+  flex-wrap:nowrap !important;
+}
+.heroBelowTools input.search{
+  width:420px !important;
+  max-width:420px !important;
+  flex:0 0 auto !important;
+}
+.heroBelowTools .filterBar{
+  flex:1 1 auto !important;
+}
+@media(max-width:980px){
+  .heroBelowTools input.search{
+    width:100% !important;
+    max-width:920px !important;
+  }
+  .heroBelowTools .tools{
+    flex-direction:column !important;
+    flex-wrap:wrap !important;
+  }
+}
+
+
+/* --- v33 tweaks: boosts smaller + tighter, remove corner mark, pull sections up --- */
+
+/* remove the little green square star in the corner */
+.topbar{display:none !important;}
+
+/* boost links under spotlight: smaller + half spacing + single line */
+.heroBelowBoosts{ margin-top:-10px !important; }
+.heroBelowBoosts #boosts{
+  gap:16px !important;
+  flex-wrap:nowrap !important;
+}
+.heroBelowBoosts #boosts .priceLink{
+  font-size:15px !important;
+  letter-spacing:-.01em !important;
+  white-space:nowrap !important;
+}
+
+/* keep mobile readable */
+@media(max-width:980px){
+  .heroBelowBoosts #boosts{ flex-wrap:wrap !important; }
+  .heroBelowBoosts #boosts .priceLink{ font-size:16px !important; }
+}
+
+/* move everything below the search row up 10px */
+.section.cluster#alt{ margin-top:-10px !important; }
+
+
+/* --- v34 adjustments --- */
+
+/* bring topbar back but hide only the green square star */
+.topbar{display:flex !important;}
+.brandMark{display:none !important;}
+
+/* boost links under spotlight: tighter + smaller */
+.heroBelowBoosts #boosts{
+  gap:8px !important;          /* cut spacing in half again */
+}
+.heroBelowBoosts #boosts .priceLink{
+  font-size:13px !important;   /* smaller font */
+  white-space:nowrap !important;
+}
+
+/* drop everything below search row down 10px */
+.section.cluster{
+  margin-top:10px !important;
+}
+
+
+/* --- v35 spacing corrections --- */
+
+/* extra space at very top of page */
+body{
+  padding-top:5px !important;
+}
+
+/* move boost links under spotlight up 5px */
+.heroBelowBoosts{
+  margin-top:-15px !important; /* was -10 */
+}
+
+/* move everything below search row down 10px properly */
+.section.cluster{
+  margin-top:20px !important; /* add more separation below search */
+}
+
+
+/* --- popstar v36 global spacing + topbar --- */
+body{ padding-top:10px !important; }
+.topbar{ display:flex !important; }
+.brandMark{ display:none !important; } /* hide green square/star */
+
+
+/* --- popstar v36 spotlight image no-crop --- */
+#spotlight .slideMedia{ background: rgba(0,0,0,.03) !important; }
+#spotlight .slideMedia img{
+  width:100% !important; height:100% !important;
+  object-fit:contain !important; object-position:center center !important;
+}
+
+
+/* --- popstar v36 spacing: search row to first genre section --- */
+.heroBelow{ margin-bottom:35px !important; }
+
+
+/* --- popstar v36 boosts under spotlight tighter --- */
+.heroBelowBoosts{ margin-top:-5px !important; }
+.heroBelowBoosts #boosts{ gap:8px !important; flex-wrap:nowrap !important; }
+.heroBelowBoosts #boosts .priceLink{ font-size:12px !important; white-space:nowrap !important; }
+@media(max-width:980px){
+  .heroBelowBoosts #boosts{ flex-wrap:wrap !important; }
+  .heroBelowBoosts #boosts .priceLink{ font-size:14px !important; }
+}
+
+
+/* --- popstar v36 search + genres inline --- */
+.heroBelowTools .tools{
+  flex-direction:row !important; align-items:center !important; justify-content:center !important;
+  flex-wrap:nowrap !important; gap:16px !important;
+}
+.heroBelowTools input.search{ width:420px !important; max-width:420px !important; flex:0 0 auto !important; }
+.heroBelowTools .filterBar{ flex:1 1 auto !important; width:auto !important; justify-content:center !important; }
+@media(max-width:980px){
+  .heroBelowTools .tools{ flex-direction:column !important; flex-wrap:wrap !important; }
+  .heroBelowTools input.search{ width:100% !important; max-width:920px !important; }
+  .heroBelowTools .filterBar{ width:100% !important; }
+}
+
+
+/* --- popstar v36 bio popover --- */
+.bioBtn{
+  border:1.5px solid rgba(0,0,0,.65);
+  border-radius:999px;
+  padding:6px 10px;
+  font-weight:900;
+  font-size:12px;
+  letter-spacing:.01em;
+  background:transparent;
+  color:#000;
+  cursor:pointer;
+  line-height:1;
+}
+.bioBtn:hover{
+  border-color:#8ACE00;
+  color:#8ACE00;
+}
+.bioPopover{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(320px, calc(100% - 24px));
+  background:#fff; border:2px solid #000; border-radius:18px;
+  box-shadow:0 18px 45px rgba(0,0,0,.18);
+  padding:14px; z-index:30; display:none;
+}
+.bioPopover .bioText{ font-weight:800; font-size:14px; line-height:1.35; color:#111; }
+.bioPopover .bioMeta{ margin-top:10px; display:flex; justify-content:flex-end; }
+.bioClose{ border:2px solid #000; border-radius:999px; padding:7px 10px; font-weight:1000; background:#fff; cursor:pointer; }
+.sellerCard{ position:relative; }
+
+
+/* --- popstar v39: requested tweaks --- */
+
+/* boost links under spotlight: move up more */
+.heroBelowBoosts{ margin-top:-22px !important; }
+.heroBelowBoosts #boosts{ gap:6px !important; }
+.heroBelowBoosts #boosts .priceLink{ font-size:12px !important; }
+
+/* search bar smaller */
+.heroBelowTools input.search{ width:460px !important; max-width:460px !important; }
+
+/* spotlight: bigger images without changing layout */
+#spotlight .slide{ grid-template-columns: 360px 1fr !important; }
+#spotlight .slideMedia{ height:260px !important; }
+#spotlight .slideMedia img{ object-fit:cover !important; }
+@media (max-width:520px){
+  #spotlight .slide{ grid-template-columns: 1fr !important; }
+  #spotlight .slideMedia{ height:220px !important; }
+}
+
+
+/* spotlight + boosted sticker smaller */
+.stickerSpotlight{ padding:4px 8px !important; font-size:10px !important; border-width:2px !important; }
+.stickerBoosted{ padding:4px 8px !important; font-size:10px !important; border-width:2px !important; }
+
+/* bio (no-js) */
+.bioDetails{ display:inline-block; position:relative; }
+.bioDetails > summary{
+  list-style:none;
+  display:inline-block;
+  cursor:pointer;
+  user-select:none;
+}
+.bioDetails > summary::-webkit-details-marker{ display:none; }
+.bioDetails[open] .bioBubble{ display:block; }
+.bioBubble{
+  display:none;
+  position:absolute;
+  left:50%;
+  top:calc(100% + 10px);
+  transform:translateX(-50%);
+  width:min(320px, calc(100vw - 40px));
+  background:#fff;
+  border:2px solid #000;
+  border-radius:18px;
+  box-shadow:0 18px 45px rgba(0,0,0,.18);
+  padding:14px;
+  z-index:50;
+}
+.bioBubble p{
+  margin:0;
+  font-weight:800;
+  font-size:14px;
+  line-height:1.35;
+  color:#111;
+}
+
+/* apply form: bio character counter */
+.textareaWrap{ position:relative; }
+.charCount{
+  position:absolute;
+  bottom:8px;
+  right:10px;
+  font-size:12px;
+  pointer-events:none;
+  opacity:.6;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+
+.heroRight #spotlight .slideMedia{ height:150px !important; }
+}
+
+/* --- v45 top bar redesign --- */
+header, .topBar {
+  background:#8ACE00 !important;
+}
+
+.scrollBar{
+  width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  background:#8ACE00;
+  border-top:1px solid rgba(0,0,0,0.2);
+}
+
+.scrollInner{
+  display:inline-block;
+  padding:8px 0;
+  font-weight:600;
+  color:#000;
+  animation:scrollMove 18s linear infinite;
+}
+
+@keyframes scrollMove{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
+
+/* --- v46 topbar + ticker --- */
+.topbar{
+  background:#8ACE00 !important;
+}
+.topbar .brandMark span{ color:#000 !important; }
+
+.scrollBar{
+  width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  background:#8ACE00;
+  border-top:1px solid rgba(0,0,0,0.25);
+}
+.scrollInner{
+  display:inline-block;
+  padding:10px 0 9px;
+  font-weight:700;
+  letter-spacing:.2px;
+  color:#000;
+  will-change:transform;
+  animation:scrollMove 18s linear infinite;
+}
+@keyframes scrollMove{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
+
+/* --- v46 bio button matches pills --- */
+button.pill.bioBtn{
+  border:0;
+  cursor:pointer;
+  font:inherit;
+  line-height:1;
+}
+button.pill.bioBtn:focus{ outline: none; }
+
+
+
+/* --- v52 topbar + ticker (fixed, full-bleed, no clipping, makes space for hero) --- */
+.topbar{
+  background:#8ACE00 !important;
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  width:100% !important;
+  margin:0 !important;
+  border-radius:0 !important;
+  z-index:60 !important;
+  padding-top: env(safe-area-inset-top) !important;
+}
+
+/* topbar layout: brand row + ticker row */
+.topbar{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:0 !important;
+  padding-bottom:0 !important;
+}
+.topbar .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  padding:14px 16px 10px !important;
+}
+.topbar .brandText{
+  font-weight:1000;
+  letter-spacing:-.03em;
+  color:#000;
+}
+.topbar .brandMark span{ color:#000 !important; }
+
+/* ticker row */
+.ticker{
+  width:100% !important;
+  overflow:hidden !important;
+  border-top:1px solid rgba(0,0,0,0.25) !important;
+  background:#8ACE00 !important;
+}
+
+.tickerItem{
+  flex:0 0 auto !important;
+  padding:8px 18px 7px !important;
+  font-weight:800 !important;
+  color:#000 !important;
+  white-space:nowrap !important;
+}
+
+/* seamless: 4 copies, shift by 25% */
+100%{ transform:translateX(-25%); }
+}
+
+/* reserve space so featured box isn't shoved/colliding */
+/* make sure no mysterious white strip above */
+html, body{ margin:0 !important; padding:0 !important; }
+
+/* --- bio modal --- */
+.bioModal{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:80;
+  background:rgba(0,0,0,.55);
+}
+.bioModal.hidden{ display:none; }
+.bioModalInner{
+  width:min(520px, 100%);
+  background:#0f0f10;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:14px 14px 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.45);
+}
+.bioModalTitle{ font-weight:700; margin:6px 0 10px; color:#fff; }
+.bioModalText{ opacity:.92; line-height:1.35; font-size:14px; color:#fff; white-space:pre-wrap; }
+.bioModalClose{ float:right; padding:6px 10px; border-radius:999px; }
+
+.pill[data-bio-trigger="1"]{ cursor:pointer; user-select:none; }
+
+/* --- v53 topbar spacing uses measured spacer --- */
+#topbarSpacer{  }
+
+
+/* --- v57 modal brand styling --- */
+.bioModalInner{
+  border: 1px solid rgba(138,206,0,.45) !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,.55) !important;
+}
+.bioModalTitle{
+  color:#8ACE00 !important;
+  text-transform: lowercase;
+}
+.bioModalSub{
+  margin-top:-6px;
+  margin-bottom:12px;
+  font-size:12px;
+  opacity:.8;
+}
+.bioModalClose{
+  background: rgba(138,206,0,.14) !important;
+  border: 1px solid rgba(138,206,0,.35) !important;
+}
+
+/* --- v58 definitive topbar + hero fix --- */
+html, body { margin:0 !important; padding:0 !important; }
+body{ overflow-x:hidden; }
+
+/* Remove any accidental top padding from legacy tweaks */
+.wrap{ padding-top:0 !important; margin-top:0 !important; }
+
+/* One bar only: ticker full-bleed, flush to top */
+.topbar{
+  position:sticky !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  width:100vw !important;
+  margin:0 !important;
+  padding:0 !important;
+  border-radius:0 !important;
+  background:#8ACE00 !important;
+  z-index:80 !important;
+}
+
+/* Break out of any centered container */
+.topbar{
+  margin-left:calc(50% - 50vw) !important;
+  margin-right:calc(50% - 50vw) !important;
+}
+
+/* Ticker */
+.ticker{
+  display:block !important;
+  width:100% !important;
+  overflow:hidden !important;
+  border-top:0 !important;
+  background:#8ACE00 !important;
+}
+
+.tickerItem{
+  flex:0 0 auto !important;
+  padding:8px 18px 7px !important;
+  font-weight:900 !important;
+  color:#000 !important;
+  white-space:nowrap !important;
+}
+
+/* Seamless loop: we duplicate content exactly twice; translate by 50% */
+100%{ transform:translateX(-50%); }
+}
+
+/* Make room under sticky bar so hero doesn't feel cropped */
+.hero{ padding-top: 10px !important; }
+
+/* Spotlight: restore tall media like earlier builds */
+#spotlight .slideMedia{
+  height: 320px !important;
+  min-height: 320px !important;
+}
+@media (max-width:520px){
+  #spotlight .slideMedia{ height: 260px !important; min-height:260px !important; }
+}
+#spotlight .slideMedia img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+}
+
+/* card store + location */
+.storeName{
+  font-size:12px;
+  opacity:.82;
+  margin-top:2px;
+}
+.loc{
+  font-size:11px;
+  letter-spacing:.08em;
+  opacity:.6;
+  margin-top:2px;
+}
+
+/* --- v59 topbar height + spacing --- */
+.topbar{
+  padding-top:0 !important;
+}
+.tickerItem{
+  padding:8px 18px 7px !important;
+}
+
+
+.tickerItem{ margin:0 !important; }
+
+/* --- v59 hero spacing so spotlight isn't cut off --- */
+.hero{ padding-top: 14px !important; }
+
+.thumb{ position:relative; }
+.thumbLoc{
+  position:absolute;
+  left:10px;
+  bottom:10px;
+  font-size:11px;
+  letter-spacing:.08em;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(0,0,0,.55);
+  color:#fff;
+}
+
+/* --- v60 spotlight height restore --- */
+#spotlight .slideMedia{ height: 340px !important; min-height:340px !important; }
+@media (max-width:520px){ #spotlight .slideMedia{ height: 280px !important; min-height:280px !important; } }
+
+/* --- v60 city/state same line --- */
+.row2{ display:grid !important; grid-template-columns:1fr 1fr !important; gap:10px !important; }
+@media (max-width:520px){ .row2{ grid-template-columns:1fr !important; } }
+
+/* v60 chips */
+.chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  border-radius:999px;
+  padding:8px 12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.chip.is-on{
+  background:#8ACE00;
+}
+
+/* --- v61 seamless ticker (no gaps, never runs out) --- */
+.ticker{ overflow:hidden !important; }
+
+.tickerGroup{
+  flex:0 0 auto !important;
+  white-space:nowrap !important;
+  font-weight:900 !important;
+  color:#000 !important;
+  padding:7px 16px 6px !important;
+}
+@keyframes tickerSeamless{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
+
+/* --- v62 FIX: stop featured spotlight being shoved off-screen --- */
+.heroRight{ margin-top:0 !important; }
+
+/* --- v62 FIX: seamless ticker (no boundary gap, never runs out) --- */
+.ticker{ padding:0 16px !important; }
+
+.tickerGroup{
+  padding:0 !important;
+  margin:0 !important;
+  letter-spacing: .2px;
+}
+
+/* --- v63 ticker speed --- */
+
+
+/* --- v63 spotlight taller so photos are visible --- */
+#spotlight .slideMedia{ height: 400px !important; min-height:400px !important; }
+@media (max-width:520px){ #spotlight .slideMedia{ height: 300px !important; min-height:300px !important; } }
+#spotlight .slideMedia img{ width:100% !important; height:100% !important; object-fit:cover !important; }
+
+/* --- v64 ticker speed (definitive) --- */
+.tickerTrack{
+  animation: tickerSeamless 60s linear infinite !important;
+  -webkit-animation: tickerSeamless 60s linear infinite !important;
+  display:flex !important;
+  width:max-content !important;
+  will-change:transform !important;
+}
+
+/* --- v64 spotlight much taller --- */
+#spotlight .slideMedia{ height: 520px !important; min-height:520px !important; }
+@media (max-width:520px){ #spotlight .slideMedia{ height: 360px !important; min-height:360px !important; } }
+.heroRight{ margin-top:0 !important; }
+
+/* --- v64 city/state same line --- */
+.row2{ display:grid !important; grid-template-columns:1fr 1fr !important; gap:10px !important; }
+@media (max-width:520px){ .row2{ grid-template-columns:1fr !important; } }
+
+/* --- v65 spotlight: repair selectors (some older blocks accidentally became .x .x) --- */
+.carousel{
+  position:relative !important;
+  overflow:hidden !important;
+  border-radius:16px !important;
+  border:1px solid rgba(0,0,0,.14) !important;
+  background:#fff !important;
+}
+.track{
+  display:flex !important;
+  width:100% !important;
+  transition: transform .45s cubic-bezier(.2,.9,.2,1) !important;
+  will-change: transform !important;
+}
+.slide{
+  flex:0 0 100% !important;
+  display:grid !important;
+  grid-template-columns: 170px 1fr !important;
+  gap:14px !important;
+  align-items:stretch !important;
+  text-decoration:none !important;
+  color:inherit !important;
+  padding:12px !important;
+}
+@media (max-width:720px){
+  .slide{ grid-template-columns: 1fr !important; }
+}
+.slideMedia{
+  position:relative !important;
+  border-radius:14px !important;
+  overflow:hidden !important;
+  background: linear-gradient(135deg, rgba(138,206,0,.35), rgba(0,0,0,.06)) !important;
+}
+/* make it tall again */
+#spotlight .slideMedia{ height: 560px !important; min-height:560px !important; }
+@media (max-width:520px){ #spotlight .slideMedia{ height: 380px !important; min-height:380px !important; } }
+#spotlight .slideMedia img{ width:100% !important; height:100% !important; object-fit:cover !important; display:block !important; }
+
+/* controls layout */
+.carouselControls{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:12px !important;
+  margin-top:12px !important;
+}
+
+/* --- v65 ticker speed (definitive) --- */
+.tickerTrack{
+  animation-duration: 90s !important;
+}
+
+/* --- v65 prevent hero from being shoved up --- */
+.heroRight{ margin-top:0 !important; }
+.hero{ padding-top: 10px !important; }
+
+/* --- v66 tighten form vertical spacing --- */
+#applyForm .row{
+  margin-bottom: 10px !important;
+}
+#applyForm .row.full{
+  margin-bottom: 10px !important;
+}
+#applyForm label{
+  margin-bottom: 4px !important;
+  display:block;
+}
+#applyForm .field{
+  margin-top: 0 !important;
+}
+
+/* --- v67 location field (international) --- */
+#applyForm #location{ text-transform: lowercase; }
+
+/* --- v68 genre title links --- */
+.genreLink{
+  color:#000;
+  text-decoration:none;
+  transition:color .2s ease;
+}
+.genreLink:hover{
+  color:#8ACE00;
+}
+
+}
+
+/* --- v72 subgenre pills + inline bio --- */
+.subPill{
+  background:#8ACE00 !important;
+  color:#000 !important;
+  border:2px solid #000 !important;
+}
+.bioSnippet{
+  margin-top:8px;
+  font-size:12px;
+  line-height:1.35;
+  opacity:.85;
+}
+/* genre link hover affects star + title */
+.genreLink{ color:#000; text-decoration:none; transition:color .2s ease; }
+.genreLink:hover{ color:#8ACE00; }
+
+.tinyHelp{ font-size:12px; opacity:.75; margin-top:6px; }
+
+/* --- v73 spotlight: tall slide, shorter image frame --- */
+#spotlight .slideMedia{
+  height: 420px !important;
+  min-height: 420px !important;
+  padding: 14px !important;
+  box-sizing: border-box !important;
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+}
+#spotlight .slideMedia img{
+  height: 320px !important;
+  width: 100% !important;
+  
+  object-fit: cover !important;
+  object-position: center top !important;
+  border-radius: 14px !important;
+}
+@media (max-width:520px){
+  #spotlight .slideMedia{ height: 340px !important; min-height:340px !important; padding:12px !important; }
+  #spotlight .slideMedia img{ height: 240px !important;  }
+}
+
+/* --- v73 section spacing fixes (street + all) --- */
+section h2{ margin: 0 0 10px !important; }
+.dividerHint{ margin: 0 0 14px !important; }
+
+/* ensure card content breathes */
+a.card.seller{ padding-bottom: 12px !important; }
+a.card.seller .tags{ padding: 0 12px 0 !important; }
+a.card.seller .bioSnippet{
+  margin: 10px 12px 0 !important;
+  padding-bottom: 6px !important;
+}
+
+/* --- v73 form spacing polish --- */
+#applyForm .row{ margin-bottom: 10px !important; }
+#applyForm label{ margin: 0 0 5px !important; }
+#applyForm .field{ margin-top: 0 !important; }
+#applyForm .chips{ margin-top: 6px !important; margin-bottom: 6px !important; }
+#applyForm .tinyHelp{ margin-top: 4px !important; margin-bottom: 6px !important; }
+
+/* keep subcategory label tight above chips */
+#subChips{ padding:0 !important; }
+
+/* --- v74 spotlight image: full width, shorter height so text is visible --- */
+#spotlight .slideMedia{
+  height: 420px !important;
+  min-height: 420px !important;
+  padding: 14px !important;
+  box-sizing: border-box !important;
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+}
+#spotlight .slideMedia img{
+  width: 100% !important;
+  height: 240px !important;
+  object-fit: cover !important;
+  object-position: center top !important;
+  border-radius: 14px !important;
+  display:block !important;
+}
+@media (max-width:520px){
+  #spotlight .slideMedia{ height: 360px !important; min-height:360px !important; padding:12px !important; }
+  #spotlight .slideMedia img{ height: 200px !important; }
+}
+
+/* --- v74 section padding so titles don't touch edges --- */
+section{
+  padding-top: 18px !important;
+}
+section h2{
+  margin: 0 0 10px !important;
+}
+.dividerHint{
+  margin: 0 0 14px !important;
+}
+
+/* --- v74 form spacing polish --- */
+#applyForm .row{ margin-bottom: 10px !important; }
+#applyForm label{ margin: 0 0 5px !important; }
+#applyForm .chips{ margin-top: 6px !important; }
+
+/* --- v75 spotlight layout: image on top, info below --- */
+#spotlight .slide{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:10px !important;
+}
+#spotlight .slideMedia{
+  height:auto !important;
+  min-height:0 !important;
+  padding:0 !important;
+  border-radius:14px !important;
+  overflow:hidden !important;
+}
+#spotlight .slideMedia img{
+  width:100% !important;
+  height:220px !important;
+  object-fit:cover !important;
+  object-position:center top !important;
+  display:block !important;
+}
+@media (max-width:520px){
+  #spotlight .slideMedia img{ height:190px !important; }
+}
+#spotlight .slideMeta{ padding:0 4px 6px !important; }
+#spotlight .slideTags{ flex-wrap:wrap !important; gap:8px !important; }
+
+/* --- v75 uniform card pills + bio across categories --- */
+a.card.seller .tags{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  padding: 0 12px !important;
+}
+a.card.seller .pill{ white-space:nowrap !important; }
+a.card.seller .bioSnippet{
+  margin: 10px 12px 0 !important;
+  font-size:12px !important;
+  line-height:1.35 !important;
+  opacity:.85 !important;
+}
+.subPill{
+  background:#8ACE00 !important;
+  color:#000 !important;
+  border:2px solid #000 !important;
+}
+
+/* --- v75 section spacing: keep title + hint comfortable --- */
+section{ padding-top: 18px !important; }
+section h2{ margin: 0 0 10px !important; }
+.dividerHint{ margin: 0 0 14px !important; }
+
+/* --- v77 spotlight layout --- */
+#spotlight .carousel{ overflow:hidden !important; }
+#spotlight #track{
+  display:flex !important;
+  width:100% !important;
+  transition: transform .45s cubic-bezier(.2,.9,.2,1) !important;
+  will-change: transform !important;
+}
+#spotlight .slide{
+  flex:0 0 100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:10px !important;
+  padding:12px !important;
+  text-decoration:none !important;
+  color:inherit !important;
+}
+#spotlight .slideMedia{
+  border-radius:14px !important;
+  overflow:hidden !important;
+}
+#spotlight .slideMedia img{
+  width:100% !important;
+  height:220px !important;
+  object-fit:cover !important;
+  object-position:center top !important;
+  display:block !important;
+}
+#spotlight .slideMeta{ padding:0 4px 6px !important; }
+#spotlight .slideTop{ display:flex; justify-content:space-between; gap:10px; align-items:baseline; }
+#spotlight .slideStore{ font-weight:900; text-transform:lowercase; }
+#spotlight .slideHandle{ opacity:.75; font-weight:700; }
+#spotlight .slideTags{ display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+#spotlight .slideBio{ margin-top:10px; font-size:12px; line-height:1.35; opacity:.85; }
+#spotlight .slideLink{ margin-top:10px; font-weight:900; text-transform:lowercase; }
+#spotlight .dots{ display:flex; gap:8px; flex-wrap:wrap; }
+#spotlight .dot{
+  width:10px; height:10px; border-radius:999px;
+  border:2px solid #000; background:transparent;
+  cursor:pointer;
+}
+#spotlight .dot.is-on{ background:#000; }
+@media (max-width:520px){
+  #spotlight .slideMedia img{ height:190px !important; }
+}
+
+/* --- v78 hard override old spotlight rules inside heroRight --- */
+.heroRight #spotlight .slide{
+  display:flex !important;
+  flex-direction:column !important;
+  grid-template-columns: none !important;
+  gap:10px !important;
+  padding:12px !important;
+  height:auto !important;
+}
+.heroRight #spotlight .slideMedia{
+  height:auto !important;
+  min-height:0 !important;
+  border-radius:14px !important;
+  overflow:hidden !important;
+}
+.heroRight #spotlight .slideMedia img{
+  width:100% !important;
+  height:220px !important;
+  object-fit:cover !important;
+  object-position:center top !important;
+  display:block !important;
+}
+.heroRight #spotlight .slideMeta{
+  padding:0 4px 6px !important;
+}
+.heroRight #spotlight .slideTags{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  justify-content:flex-start !important;
+}
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia img{ height:190px !important; }
+}
+
+/* --- v78 form: uniform row spacing --- */
+#applyForm .row{ margin-bottom:10px !important; }
+#applyForm label{ margin:0 0 5px !important; }
+#applyForm .chips{ margin-top:6px !important; }
+#applyForm .chip{ text-align:left; } /* align left in form chips */
+
+/* remove any leftover helper copy spacing */
+#applyForm .tinyHelp{ display:none !important; }
+
+/* --- v78 section headers spacing + ensure divider line visible --- */
+section{ padding-top:18px !important; }
+section h2{ margin:0 0 10px !important; }
+.dividerHint{ margin:0 0 14px !important; display:block !important; }
+
+/* --- v78 card tags alignment --- */
+a.card.seller .tags{ justify-content:flex-start !important; }
+
+/* --- v79 spotlight square layout --- */
+.heroRight #spotlight .slideGrid{
+  display:grid;
+  grid-template-columns: 240px 1fr;
+  gap:20px;
+  align-items:start;
+}
+.heroRight #spotlight .slideMedia img{
+  width:240px;
+  height:240px;
+  object-fit:cover;
+  border-radius:14px;
+}
+.heroRight #spotlight .slideContent{
+  display:flex;
+  flex-direction:column;
+}
+.heroRight #spotlight .slideBio{
+  margin-top:10px;
+  font-size:12px;
+  line-height:1.4;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.heroRight #spotlight .slideTags{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.mainPill{
+  background:#000;
+  color:#fff;
+  border:2px solid #000;
+}
+#spotlight .carousel{
+  min-height:360px;
+}
+
+
+
+/* --- v82 space below top bar (content only) --- */
+section.hero{ margin-top: 20px !important; }
+
+
+/* --- v82 spotlight: just enough height so nothing clips --- */
+#spotlight .carousel{ min-height: 380px !important; height:auto !important; }
+#spotlight{ overflow: visible !important; }
+
+
+/* --- v82 uniform card layout --- */
+a.card.seller .tags{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  justify-content:flex-start !important;
+  padding:0 12px !important;
+}
+a.card.seller .bioSnippet{
+  margin: 10px 12px 0 !important;
+  font-size:12px !important;
+  line-height:1.35 !important;
+  opacity:.85 !important;
+}
+
+/* v88: tighten spacing between category labels and chip rows in the form */
+.row.tight{ margin-bottom:4px; }
+.row.tight + .chips{ margin-top:0; }
+
+/* v88: standardize seller card spacing, pills, and bio rhythm */
+.meta{ padding:12px; }
+.name{ margin:0 0 4px; }
+.handle{ margin:0 0 8px; }
+.tags{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-start;
+  margin:0 0 10px;
+}
+.bioSnippet{
+  margin-top:0;
+  line-height:1.35;
+  display:-webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow:hidden;
+}
+
+/* v88: featured spotlight containment + controls placement */
+.spotlight{ position:relative; overflow:hidden; box-sizing:border-box; }
+.carousel{ width:100%; box-sizing:border-box; }
+.carouselControls{
+  position:absolute;
+  left:12px; right:12px; bottom:12px;
+  margin-top:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  pointer-events:none;
+}
+.carouselControls .ctrl, .carouselControls .dots{ pointer-events:auto; }
+
+
+/* v91: layout spine + card rhythm fixes */
+.wrap{max-width:1100px; margin:0 auto; padding:18px 16px 90px;}
+/* keep ticker full-bleed only */
+.topbar{width:100vw;}
+/* seller cards: align everything to same gutter */
+a.card.seller .meta{ padding:12px !important; }
+a.card.seller .tagRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:0 0 10px !important;
+}
+a.card.seller .tags{
+  display:flex !important;
+  gap:8px !important;
+  flex-wrap:wrap !important;
+  justify-content:flex-start !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+a.card.seller .cardView{
+  font-weight:900;
+  font-size:14px;
+  white-space:nowrap;
+}
+a.card.seller .bioSnippet{
+  margin:0 !important;
+  font-size:12px !important;
+  line-height:1.35 !important;
+  opacity:.85 !important;
+  display:-webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 4 !important;
+  overflow:hidden !important;
+}
+
+
+
+/* v91: apply form vertical rhythm + containment */
+.formWrap{max-width: 980px; margin:0 auto; width:100%;}
+.formInner{width:100%;}
+.formGrid{display:grid; gap:18px;}
+.formGrid .row{margin:0 !important;}
+.formGrid label{display:block; margin:0 0 8px !important;}
+.formGrid .field{margin:0 !important;}
+.formGrid .chips{margin:0 0 6px !important; padding:0 !important;}
+.formGrid .row.full.tight{margin-top:0 !important;}
+
+
+/* --- v92: spine reset (keep topbar full-bleed, constrain everything else) --- */
+.wrap{
+  max-width: 1180px !important;
+  margin: 0 auto !important;
+  padding: 0 24px !important;
+  box-sizing: border-box !important;
+}
+@media(max-width:520px){
+  .wrap{ padding: 0 16px !important; }
+}
+
+/* Topbar stays full-bleed */
+.topbar{
+  width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+}
+
+/* Everything else must NOT breakout */
+.hero, .section, .footer, .buildBadge{
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Prevent any accidental 100vw breakouts below topbar */
+.hero *, .section *, .footer *{
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- v92: search + filter chips on one row --- */
+.heroBelowTools .tools{
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+}
+.heroBelowTools input.search{
+  width: 360px !important;
+  max-width: 360px !important;
+  flex: 0 0 auto !important;
+}
+.heroBelowTools .filterBar{
+  flex: 1 1 auto !important;
+  flex-wrap: nowrap !important;
+  gap: 10px !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.heroBelowTools .filterBar::-webkit-scrollbar{ height: 0; }
+
+/* Mobile: allow wrap */
+@media(max-width:980px){
+  .heroBelowTools .tools{ flex-direction: column !important; flex-wrap: wrap !important; }
+  .heroBelowTools input.search{ width: 100% !important; max-width: 920px !important; }
+  .heroBelowTools .filterBar{ width: 100% !important; flex-wrap: wrap !important; overflow: visible; }
+}
+
+/* --- v92: bio modal sizing + safe hidden state --- */
+.bioModal{
+  width: 520px !important;
+  max-width: calc(100vw - 32px) !important;
+}
+.bioModalInner{
+  max-height: 70vh !important;
+  overflow: auto !important;
+}
+.bioModal.hidden{ display:none !important; }
+
+/* --- v92: apply form spacing + containment --- */
+#apply .formWrap, #apply .formInner{
+  width: 100% !important;
+  max-width: 980px !important;
+  margin: 0 auto !important;
+}
+#apply .formGrid{
+  row-gap: 14px !important;
+}
+#apply .row{ margin: 0 !important; }
+#apply .row + .row{ margin-top: 12px !important; }
+#apply .row.tight{ margin-top: 8px !important; }
+#apply .row.tight + .chips{ margin-top: 6px !important; margin-bottom: 10px !important; }
+
+/* --- v92: card alignment + clamp consistency --- */
+a.card.seller .meta{ padding: 12px !important; }
+a.card.seller .tags{
+  padding: 0 !important;     /* remove old padding that misaligned */
+  margin: 0 0 10px !important;
+}
+a.card.seller .bioSnippet{
+  margin: 0 !important;
+  line-height: 1.35 !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 4 !important;
+  overflow: hidden !important;
+}
+
+
+/* force categories row to match main content width */
+.heroBelowTools .tools{
+  width:100% !important;
+  max-width:1100px !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+
+/* align boost buttons to right edge of spotlight */
+.heroBelowBoosts{
+  justify-content:flex-end !important;
+}
+
+.heroBelowBoosts #boosts{
+  justify-content:flex-end !important;
+}
+
+/* --- popstar: success pulse (form submit) --- */
+.successPulse{
+  animation: successPulse 0.7s ease-out;
+}
+@keyframes successPulse{
+  0%{ box-shadow: 0 0 0 0 rgba(138,206,0,0); }
+  40%{ box-shadow: 0 0 0 8px rgba(138,206,0,.35); }
+  100%{ box-shadow: 0 0 0 0 rgba(138,206,0,0); }
+}
+
+/* --- popstar apply spacing refinement --- */
+#apply .row {
+  margin-bottom: 14px;
+}
+
+#apply .row.full {
+  margin-bottom: 16px;
+}
+
+#apply .help {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+#apply button[type="submit"] {
+  margin-top: 6px;
+}
+
+#apply .inline,
+#apply .checkbox {
+  margin-bottom: 8px;
+}
+
+/* add breathing room below depop disclaimer */
+#depopDisclaimer{
+  margin-bottom: 40px !important;
+}
+
+
+
+/* --- hero media label --- */
+.mediaLabel{
+  font-weight:900;
+  font-size:14px;
+  margin-left:8px;
+  align-self:center;
+}
+
+
+/* --- media hover interactions --- */
+.mediaLabel{
+  text-decoration:none;
+  color:#000;
+  transition: color .15s ease;
+}
+
+.mediaLabel:hover{
+  color: var(--brand);
+}
+
+.mediaIconBtn svg polygon,
+.mediaIconBtn svg rect{
+  transition: fill .15s ease;
+}
+
+.mediaIconBtn:hover svg polygon,
+.mediaIconBtn:hover svg rect{
+  fill:#000;
+}
+
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v107: mini item strip auto-scroll (subtle) --- */
+.miniItems{
+  margin-top:12px;
+  overflow:hidden;               /* hide overflow for marquee */
+  padding-bottom:0;
+}
+
+.miniItemsTrack{
+  display:flex;
+  gap:8px;
+  width:max-content;
+  will-change: transform;
+  animation: miniScroll 14s linear infinite;
+}
+
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+/* Pause on hover (desktop) */
+@media (hover:hover){
+  .miniItems:hover .miniItemsTrack{ animation-play-state: paused; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .miniItemsTrack{ animation: none !important; }
+}
+
+@keyframes miniScroll{
+  0%{ transform: translateX(0); }
+  100%{ transform: translateX(-50%); }
+}
+
+
+/* --- v109: center spotlight pricing under new box width --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+}
+
+.heroBelowBoosts #boosts{
+  width:100% !important;
+  max-width:100% !important;
+  justify-content:center !important;
+  text-align:center !important;
+}
+
+
+/* --- v112: spotlight sticker for Featured Spotlight sellers --- */
+.stickerSpotlight{
+  position:absolute;
+  top:14px; left:14px;
+  background: var(--brand); color:#000;
+  padding:4px 8px;
+  border-radius:999px;
+  border:2px solid #000;
+  font-size:10px;
+  font-weight:1000;
+  transform: rotate(-8deg);
+  box-shadow: 0 10px 18px rgba(0,0,0,.12);
+  z-index:3;
+}
+
+
+/* --- v113: spotlight sticker slightly bigger + subtle glow animation --- */
+.stickerSpotlight{
+  padding:6px 10px !important;
+  font-size:11px !important;
+  box-shadow: 0 10px 18px rgba(0,0,0,.12), 0 0 0 rgba(138,206,0,.0) !important;
+  animation: spotlightGlow 2.4s ease-in-out infinite;
+}
+
+@keyframes spotlightGlow{
+  0%, 100%{
+    box-shadow: 0 10px 18px rgba(0,0,0,.12), 0 0 0 rgba(138,206,0,0);
+    filter: saturate(1);
+  }
+  50%{
+    box-shadow: 0 10px 18px rgba(0,0,0,.12), 0 0 18px rgba(138,206,0,.45);
+    filter: saturate(1.15);
+  }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .stickerSpotlight{ animation: none !important; }
+}
+
+/* --- v113: center spotlight pricing under spotlight column width --- */
+.heroBelowBoosts{
+  width:100% !important;
+  justify-content:stretch !important;
+}
+
+.heroBelowBoosts #boosts{
+  width:100% !important;
+  max-width:none !important;     /* remove old cap that can mis-align */
+  justify-content:center !important;
+}
+
+
+/* --- v114: reposition + larger + stronger glow --- */
+.stickerSpotlight{
+  top:8px !important;          /* closer to top edge */
+  left:8px !important;         /* closer to left edge */
+  padding:8px 14px !important; /* slightly bigger */
+  font-size:12px !important;
+  transform: rotate(-6deg) !important;
+  animation: spotlightGlowStrong 1.8s ease-in-out infinite !important;
+}
+
+@keyframes spotlightGlowStrong{
+  0%, 100%{
+    box-shadow: 0 10px 18px rgba(0,0,0,.18),
+                0 0 0 rgba(138,206,0,0);
+  }
+  50%{
+    box-shadow: 0 10px 18px rgba(0,0,0,.18),
+                0 0 28px rgba(138,206,0,.75),
+                0 0 45px rgba(138,206,0,.45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .stickerSpotlight{ animation:none !important; }
+}
+
+
+/* --- v115: spotlight sticker bigger (clean, no animation) --- */
+.stickerSpotlight{
+  top:6px !important;
+  left:6px !important;
+  padding:10px 18px !important;
+  font-size:13px !important;
+  font-weight:1000 !important;
+  transform: rotate(-5deg) !important;
+  box-shadow:
+    0 12px 22px rgba(0,0,0,.22),
+    0 0 18px rgba(138,206,0,.65) !important; /* visible green glow */
+}
+
+
+/* --- v116: spotlight sticker top-left + extreme pulsing glow --- */
+.stickerSpotlight{
+  top:2px !important;
+  left:2px !important;
+  padding:10px 18px !important; /* keep size from v115 */
+  font-size:13px !important;
+  transform: rotate(-5deg) !important;
+  /* use filter drop-shadows for more consistent glow */
+  box-shadow: 0 12px 22px rgba(0,0,0,.22) !important;
+  filter: drop-shadow(0 0 0 rgba(138,206,0,0));
+  animation: spotlightPulse 1.5s ease-in-out infinite !important;
+}
+
+@keyframes spotlightPulse{
+  0%,100%{
+    filter:
+      drop-shadow(0 0 6px rgba(138,206,0,.55))
+      drop-shadow(0 0 14px rgba(138,206,0,.45))
+      drop-shadow(0 0 26px rgba(138,206,0,.25));
+  }
+  50%{
+    filter:
+      drop-shadow(0 0 10px rgba(138,206,0,.95))
+      drop-shadow(0 0 22px rgba(138,206,0,.85))
+      drop-shadow(0 0 44px rgba(138,206,0,.55))
+      drop-shadow(0 0 72px rgba(138,206,0,.35));
+  }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .stickerSpotlight{ animation:none !important; }
+}
+
+
+/* --- v117: force spotlight sticker OVER image (not inside crop) --- */
+
+/* allow glow to overflow image bounds */
+.heroRight #spotlight .slideMedia{
+  position:relative !important;
+  overflow:visible !important;
+}
+
+/* ensure sticker layers above image */
+.stickerSpotlight{
+  position:absolute !important;
+  top:0px !important;
+  left:0px !important;
+  z-index:50 !important;
+}
+
+
+/* --- v118: remove spotlight glow (clean badge) --- */
+.stickerSpotlight{
+  animation:none !important;
+  filter:none !important;
+  box-shadow: 0 12px 22px rgba(0,0,0,.22) !important; /* subtle depth only */
+}
+
+
+/* --- v119: move spotlight sticker slightly more left --- */
+.stickerSpotlight{
+  left:-6px !important;  /* shift slightly further left */
+}
+
+
+/* --- v120: fix spotlight carousel edge bleed --- */
+
+/* ensure no next-slide peek */
+.heroRight #spotlight .carousel{
+  overflow:hidden !important;
+}
+
+.heroRight #spotlight .track{
+  width:100% !important;
+}
+
+.heroRight #spotlight .slide{
+  min-width:100% !important;
+  box-sizing:border-box !important;
+}
+
+
+/* --- v122: hide right-edge sliver WITHOUT moving sticker --- */
+
+/* keep sticker where it was (more left) */
+.stickerSpotlight{
+  top:2px !important;
+  left:-6px !important;
+}
+
+/* mask the far-right edge of the carousel so no next-slide artifacts show */
+#spotlight .carousel{
+  position:relative !important;
+  overflow:hidden !important;
+}
+#spotlight .carousel::after{
+  content:"";
+  position:absolute;
+  top:0;
+  right:0;
+  width:26px;              /* just enough to cover the sliver */
+  height:100%;
+  background:#fff;         /* matches carousel background */
+  pointer-events:none;
+  z-index:25;              /* above slide contents */
+}
+
+/* also mask far-left edge (optional safety) */
+#spotlight .carousel::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:2px;
+  height:100%;
+  background:#fff;
+  pointer-events:none;
+  z-index:25;
+}
+
+
+/* --- v125: restore arrows/dots (remove masking) + stop slide bleed cleanly --- */
+
+/* Remove the right-edge masking that hid dots */
+#spotlight .carousel::after,
+#spotlight .carousel::before{
+  content:none !important;
+  display:none !important;
+}
+
+/* Ensure nothing from the next slide can peek through */
+#spotlight .carousel{ overflow:hidden !important; }
+#spotlight .slide{ overflow:hidden !important; }
+#spotlight .slideMedia{ overflow:hidden !important; }
+
+/* Keep spotlight sticker over image but inside bounds (prevents next-slide edge peeks) */
+.stickerSpotlight{
+  top:4px !important;
+  left:4px !important;
+}
+
+
+/* --- v126: move spotlight sticker back (more left) --- */
+.stickerSpotlight{
+  top:2px !important;
+  left:-6px !important;   /* back to original more-left position */
+}
+
+
+/* --- v127: keep sticker visually left WITHOUT causing slide bleed --- */
+
+/* Ensure slide is clipped */
+#spotlight .slide,
+#spotlight .slideMedia{
+  overflow:hidden !important;
+  position:relative !important;
+}
+
+/* Keep sticker inside bounds but visually shifted left */
+.stickerSpotlight{
+  left:0 !important;              /* keep inside container */
+  top:2px !important;
+  transform: translateX(-6px) rotate(-5deg) !important;  /* visual shift only */
+}
+
+
+/* --- v128: final clean fix for right-edge bleed --- */
+
+/* Hard clip ONLY the carousel viewport (does not affect dots/arrows) */
+#spotlight .carousel{
+  overflow:hidden !important;
+  clip-path: inset(0 8px 0 0);  /* trims tiny right sliver */
+}
+
+/* Keep slide layout exact width */
+#spotlight .slide{
+  min-width:100% !important;
+  box-sizing:border-box !important;
+}
+
+/* Keep sticker visually left but contained */
+.stickerSpotlight{
+  left:0 !important;
+  transform: translateX(-6px) rotate(-5deg) !important;
+}
+
+
+/* --- v129: hide remaining 1px sliver --- */
+#spotlight .carousel{
+  clip-path: inset(0 16px 0 0) !important; /* slightly stronger right trim */
+}
+
+/* (fallback for browsers that ignore clip-path): */
+@supports not (clip-path: inset(0 0 0 0)){
+  #spotlight .carousel{ overflow:hidden !important; }
+  #spotlight .track{ transform: translateX(0) !important; }
+}
+
+
+.slideCta{font-weight:1000;}
+
+/* --- seller modal (items preview) --- */
+.sellerModal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:18px; z-index:90; background:rgba(0,0,0,.55); }
+.sellerModal.hidden{ display:none; }
+.sellerModalInner{
+  width:min(760px, 94vw);
+  max-height:82vh;
+  background:#fff;
+  border:2px solid #000;
+  border-radius:18px;
+  padding:14px 14px 16px;
+  box-shadow: 0 18px 45px rgba(0,0,0,.18);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.sellerModalTop{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.sellerModalTitle{ font-weight:1000; letter-spacing:-.02em; font-size:18px; }
+.sellerModalHandle{ margin-top:4px; font-weight:900; color:rgba(0,0,0,.70); font-size:13px; }
+.sellerModalClose{ border:2px solid #000; border-radius:999px; padding:7px 10px; font-weight:1000; background:#fff; cursor:pointer; }
+.sellerModalBody{ overflow:auto; padding-right:6px; }
+.sellerModalBio{ font-weight:850; line-height:1.35; margin:0 0 12px; }
+.itemGrid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; }
+@media(max-width:720px){ .itemGrid{ grid-template-columns:1fr; } }
+.itemGrid img{ width:100%; height:220px; object-fit:cover; border-radius:14px; border:2px solid #000; background:rgba(0,0,0,.04); }
+.sellerModalActions{ display:flex; justify-content:flex-end; }
+.sellerModalActions a{ text-decoration:none; }
+.sellerModalActions .btnShop{ display:inline-flex; align-items:center; justify-content:center; padding:10px 12px; border-radius:999px; border:2px solid #000; background:var(--brand); font-weight:1000; }
+
+
+/* spotlight location overlay */
+.spotLoc{
+  position:absolute;
+  left:10px;
+  bottom:10px;
+  padding:6px 9px;
+  border:2px solid #000;
+  border-radius:999px;
+  background:#fff;
+  font-weight:1000;
+  font-size:12px;
+  line-height:1;
+  max-width:calc(100% - 20px);
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.slideMedia{ position:relative; }
+
+
+/* spotlight item thumbnails */
+.spotItems{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+.spotItemImg{
+  width:68px;
+  height:68px;
+  object-fit:cover;
+  border-radius:14px;
+  border:2px solid #000;
+  background:rgba(0,0,0,.04);
+}
+@media(max-width:720px){
+  .spotItemImg{ width:64px; height:64px; }
+}
+
+
+/* --- FIX v116: spotlight collapsed --- */
+#spotlight{
+  max-height:none !important;
+  height:auto !important;
+  overflow:visible !important;
+}
+#spotlight .carousel{
+  overflow:hidden !important; /* keep slide crop within carousel */
+}
+#spotlight .slide{
+  min-height: unset !important;
+}
+#spotlight .slideMedia{
+  height:320px !important;
+  min-height:320px !important;
+}
+@media (max-width:520px){
+  #spotlight .slideMedia{
+    height:260px !important;
+    min-height:260px !important;
+  }
+}
+/* If spotlight is placed inside heroRight, also remove any caps */
+.heroRight #spotlight{
+  max-height:none !important;
+  overflow:visible !important;
+}
+.heroRight #spotlight .slideMedia{
+  height:320px !important;
+  min-height:320px !important;
+}
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height:260px !important;
+    min-height:260px !important;
+  }
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<link href="favicon.ico" rel="icon" sizes="any"/>
+<link href="favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="favicon-192.png" rel="icon" sizes="192x192" type="image/png"/>
+<link href="apple-touch-icon.png" rel="apple-touch-icon"/>
+<style>
+/* --- v93 overrides: tighter spine + modal overflow + form rhythm --- */
+
+/* Keep topbar full-bleed only */
+.topbar{
+  width:100vw !important;
+  margin-left:calc(50% - 50vw) !important;
+  margin-right:calc(50% - 50vw) !important;
+}
+
+/* Tight centered spine (matches "good" build feel) */
+.wrap{
+  max-width: 1080px !important;
+  margin: 0 auto !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  box-sizing: border-box !important;
+}
+@media(max-width:520px){
+  .wrap{ padding-left: 14px !important; padding-right: 14px !important; }
+}
+
+/* Prevent breakout widths below topbar */
+.hero, .section, .footer{ width:100% !important; }
+.hero, .section, .footer{
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* --- Bio modal: stop overflow + keep size sane --- */
+.bioModal{ padding:18px !important; }
+.bioModalInner{
+  width: min(520px, 92vw) !important;
+  max-height: 70vh !important;
+  overflow: hidden !important;
+}
+.bioModalText{
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+/* --- Hero search: slightly narrower so chips stay one row --- */
+.heroBelowTools input.search{
+  width: 360px !important;
+  max-width: 360px !important;
+}
+
+/* --- Apply form: consistent vertical rhythm --- */
+#apply .formWrap, #apply .formInner{
+  max-width: 980px !important;
+  margin: 0 auto !important;
+}
+#apply .formGrid{
+  gap: 14px !important;
+}
+#apply .row{ margin:0 !important; }
+#apply .row.full{ grid-column: 1 / -1 !important; }
+#apply .chips.full{ grid-column: 1 / -1 !important; }
+#apply .row.tight{ margin-bottom: 0 !important; }
+#apply .row.tight + .chips{ margin-top: -6px !important; } /* pull chips closer to label */
+#apply .chips{ margin-bottom: 6px !important; }           /* keep next field consistent */
+
+/* --- Seller cards: align pills/bio with name/handle --- */
+a.card.seller .tags{ padding:0 !important; margin:0 0 10px !important; }
+a.card.seller .bioSnippet{
+  margin:0 !important;
+  display:-webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 4 !important;
+  overflow:hidden !important;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style id="popstar-disclaimer-align-to-formwrap">
+/* align ONLY the depop disclaimer to the apply form box width */
+#depopDisclaimer{
+  max-width:980px !important;
+  margin:18px auto 0 !important;
+  width:100% !important;
+  padding:0 !important;
+  text-align:left !important;
+  box-sizing:border-box !important;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style id="popstar-disclaimer-bottom-padding">
+/* ensure space under disclaimer (avoid margin-collapse at page bottom) */
+#depopDisclaimer{
+  display:block !important;
+  padding-bottom:40px !important;
+  margin-bottom:0 !important;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+</head>
+<body>
+<div class="topbar">
+<div aria-label="categories" class="ticker"><div class="tickerTrack"><div aria-hidden="true" class="tickerGroup">alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ </div><div aria-hidden="true" class="tickerGroup">alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ </div></div></div></div><div class="wrap">
+<section class="hero">
+<div class="heroHeader">
+<div class="heroLeft">
+<h1>popstar ★</h1>
+<p class="sub">promote your depop. get discovered.</p>
+<div class="btnRow">
+<a class="btn boost" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" id="boostSpotlightBtn_disabled" rel="noopener" target="_blank">★ feature my shop</a>
+<a class="btn apply" href="#apply" id="applyBtn">✦ submit your shop</a>
+</div>
+<div class="mediaControls">
+<button aria-label="play" class="mediaIconBtn" id="playBtn">
+<svg height="28" viewbox="0 0 100 100" width="28">
+<polygon fill="var(--brand)" points="25,15 85,50 25,85"></polygon>
+</svg>
+</button>
+<button aria-label="pause" class="mediaIconBtn" id="pauseBtn">
+<svg height="28" viewbox="0 0 100 100" width="28">
+<rect fill="var(--brand)" height="60" width="18" x="25" y="20"></rect>
+<rect fill="var(--brand)" height="60" width="18" x="57" y="20"></rect>
+</svg>
+</button>
+<a class="mediaLabel" href="https://open.spotify.com/track/2gMtW38lYFYh1XHuKrzbpx" id="trackLink" rel="noopener" target="_blank">crunk that -- lanea ft lokadonna</a>
+</div>
+<!-- spotlight -->
+<!-- spotlight moved into hero -->
+</div>
+<div class="heroRight"><div class="spotlight" id="spotlight">
+<div aria-label="featured spotlight carousel" class="carousel">
+<div class="track" id="track"></div>
+</div>
+<div class="carouselControls">
+<div class="ctrl">
+<button aria-label="previous" class="iconBtn" id="prevBtn">‹</button>
+<button aria-label="next" class="iconBtn" id="nextBtn">›</button>
+</div>
+<div class="dots" id="dots"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="heroBelow">
+<div class="heroBelowBoosts">
+<div class="pricing pricingRow" id="boosts">
+<a class="priceLink" href="https://buy.stripe.com/8x2bJ298yepV1od1be43S0f" rel="noopener" target="_blank">★ 24 hour spotlight — $20</a>
+<a class="priceLink" href="https://buy.stripe.com/4gM9AUgB02Hd1odbPS43S0g" rel="noopener" target="_blank">★ 7 day spotlight — $40</a>
+<a class="priceLink" href="https://buy.stripe.com/4gM3cw70q6XtaYNg6843S0h" rel="noopener" target="_blank">★ 30 day spotlight — $99</a>
+</div>
+</div>
+<div class="heroBelowTools">
+<div class="tools">
+<input class="search" id="search" placeholder="search by @handle or shop name…"/>
+<div class="filterBar" id="filterBar">
+<div class="fchip is-on" data-filter="all">all</div>
+<div class="fchip" data-filter="alt">alt</div>
+<div class="fchip" data-filter="y2k">y2k</div>
+<div class="fchip" data-filter="street">street</div>
+<div class="fchip" data-filter="vintage">vintage</div>
+<div class="fchip" data-filter="archive">archive</div>
+<div class="fchip" data-filter="clean">clean</div>
+</div></div></div>
+</div>
+</section></div>
+<!-- clusters -->
+<section class="section cluster" data-cluster="alt" id="alt">
+<div class="divider">
+<h2><a class="genreLink" href="#alt">★ alt</a></h2>
+<div class="dividerHint">grunge • emo • goth • opium</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour alt feature — $5</a>
+<a class="priceLink" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day alt feature — $15</a>
+<a class="priceLink" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day alt feature — $39</a>
+</div>
+<div class="grid" id="altGrid"><div class="loading">Loading…</div></div></section>
+<section class="section cluster" data-cluster="y2k" id="y2k">
+<div class="divider">
+<h2><a class="genreLink" href="#y2k">★ y2k</a></h2>
+<div class="dividerHint">baggy • surf • blingy • cute</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour y2k feature — $5</a>
+<a class="priceLink" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day y2k feature — $15</a>
+<a class="priceLink" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day y2k feature — $39</a>
+</div>
+<div class="grid" id="y2kGrid"><div class="empty">loading y2k sellers…</div></div>
+</section>
+<section class="section cluster" data-cluster="street" id="street">
+<div class="divider">
+<h2><a class="genreLink" href="#street">★ street</a></h2>
+<div class="dividerHint">skate • workwear • gorp • flashy</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink" href="#">★ 24 hour street feature — $5</a>
+<a class="priceLink" href="#">★ 7 day street feature — $15</a>
+<a class="priceLink" href="#">★ 30 day street feature — $39</a>
+</div>
+<div class="grid" id="streetGrid"><div class="loading">Loading…</div></div></section>
+<section class="section cluster" data-cluster="vintage" id="vintage">
+<div class="divider">
+<h2><a class="genreLink" href="#vintage">★ vintage</a></h2>
+<div class="dividerHint">true vintage • 80s • 90s • band tees</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour vintage feature — $5</a>
+<a class="priceLink" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day vintage feature — $15</a>
+<a class="priceLink" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day vintage feature — $39</a>
+</div>
+<div class="grid" id="vintageGrid"><div class="empty">loading vintage sellers…</div></div>
+</section>
+<section class="section cluster" data-cluster="archive" id="archive">
+<div class="divider">
+<h2><a class="genreLink" href="#archive">★ archive</a></h2>
+<div class="dividerHint">designer • avant-garde • runway • rare</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour archive feature — $5</a>
+<a class="priceLink" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day archive feature — $15</a>
+<a class="priceLink" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day archive feature — $39</a>
+</div>
+<div class="grid" id="archiveGrid"><div class="empty">loading archive sellers…</div></div>
+</section>
+<section class="section cluster" data-cluster="clean" id="clean">
+<div class="divider">
+<h2><a class="genreLink" href="#clean">★ clean</a></h2>
+<div class="dividerHint">prep • neutral • fitness • basics</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour clean feature — $5</a>
+<a class="priceLink" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day clean feature — $15</a>
+<a class="priceLink" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day clean feature — $39</a>
+</div>
+<div class="grid" id="cleanGrid"><div class="empty">loading clean sellers…</div></div>
+</section>
+<!-- apply (apply -> formspree) -->
+<section class="section cluster" id="apply">
+<div class="divider">
+<h2><a class="genreLink" href="#apply">✦ apply</a></h2>
+<div class="dividerHint">submit to be featured</div>
+</div>
+<div class="formWrap">
+<div class="formInner">
+<form action="https://formsubmit.co/popstarthewebsite@gmail.com" id="applyForm" method="POST" novalidate="">
+<input name="_captcha" type="hidden" value="false"/>
+<input name="_honey" style="display:none" type="text"/>
+<input id="mainCategory" name="main_category" type="hidden"/><input id="subTag2Hidden" name="sub_tag_2" type="hidden"/><input id="subTag1Hidden" name="sub_tag_1" type="hidden"/>
+<div class="formGrid">
+<div class="row2 full">
+<div class="row">
+<label for="depopUrl">depop url *</label>
+<input class="field" id="depopUrl" name="depop_url" placeholder="https://depop.com/@username" required=""/>
+<div class="help"></div>
+</div>
+<div class="row">
+<label for="handle">depop @username *</label>
+<input class="field" id="handle" name="depop_handle" placeholder="@username" required=""/>
+<div class="help"></div>
+</div>
+</div>
+<div class="row full">
+<label for="shopName">shop name *</label>
+<input class="field" id="shopName" name="shop_name" placeholder="shop name" required=""/>
+</div><div class="row" full=""><label for="location">location *</label><input class="field" id="location" name="location" placeholder="city, country (e.g. london, uk)" required="required"/></div>
+<div class="row full tight"><label for="mainCategory">main category *</label></div>
+<div class="chips full" id="primaryChips"></div>
+<div class="row full tight"><label for="subChips">subcategories (choose two) *</label></div>
+<div class="chips full" id="subChips"></div>
+<div class="row full bioRow">
+<label for="pitch">bio (160 characters max) *</label><div class="textareaWrap"><textarea class="field" id="pitch" maxlength="160" name="pitch" placeholder="tell us a little bit about yourself and your shop" required="" rows="4"></textarea><div class="charCount"><span id="bioCount">0</span>/160</div></div>
+</div>
+<div class="row full"><label>best item links (up to 3)</label>
+<div style="margin-top:10px; display:flex; flex-direction:column; gap:10px;">
+<input class="field" name="best_item_link_1" placeholder="paste depop listing link 1"/>
+<input class="field" name="best_item_link_2" placeholder="paste depop listing link 2"/>
+<input class="field" name="best_item_link_3" placeholder="paste depop listing link 3"/>
+</div>
+<div class="help">paste up to 3 depop listing links</div></div>
+<div class="row full">
+<label for="imageLink">image link (optional)</label>
+<input class="field" id="imageLink" name="image_link" placeholder="link to the image you want used"/>
+<div class="help">instagram post link, imgur, google drive share link (anyone with link), etc.</div>
+</div>
+<div id="influencerSection">
+<div class="row full">
+<div class="inline">
+<label class="checkbox">
+<input id="hasCode" type="checkbox"/>
+                  i have an influencer code
+                </label>
+<div class="small">codes unlock free featured placement (optional)</div>
+</div>
+</div>
+<div class="row full" id="codeRow" style="display:none;">
+<label for="influencerCode">influencer code</label>
+<input class="field" id="influencerCode" name="influencer_code" placeholder=""/>
+<div class="help">if you don’t have one, leave it blank and submit normally.</div>
+</div></div>
+<div class="row full">
+<div class="row full">
+<label for="contactEmail">contact email *</label>
+<input class="field" id="contactEmail" name="email" placeholder="you@example.com" required="" type="email"/>
+<div class="help">we’ll only use this to contact you if there’s an issue with your submission.</div>
+</div>
+<button class="btn apply" id="submitBtn" type="submit">✦ submit</button>
+<div class="help">by submitting you agree your profile may be displayed on popstar.</div>
+</div>
+<div class="row full hidden" id="formSuccess">
+<div class="notice successPulse"><b>★</b> submitted. review within 24 hours.</div>
+</div>
+<div class="row full hidden" id="formError">
+<div class="error" id="formErrorText">something went wrong. try again.</div>
+</div>
+</div>
+</form>
+</div>
+</div>
+<p class="sub" style="margin:12px 0 0;">
+</p>
+</section>
+<div class="footer">
+<div id="depopDisclaimer"><b>not affiliated with depop.</b> popstar is an independent promotion platform for depop sellers.</div>
+</div>
+<div aria-hidden="true" class="bioModal hidden" id="bioModal"><div aria-modal="true" class="bioModalInner" role="dialog"><button aria-label="close bio" class="btn bioModalClose" type="button">✕</button><div class="bioModalTitle">bio</div><div class="bioModalSub" id="bioModalSub"></div><div class="bioModalText" id="bioModalText"></div></div></div><script>
+</script><script>
+// v57: bio modal opens from bio pills (prevents card navigation)
+(function(){
+  function openBio(host){
+    const modal = document.getElementById("bioModal");
+    const title = modal && modal.querySelector(".bioModalTitle");
+    const sub = document.getElementById("bioModalSub");
+    const text = document.getElementById("bioModalText");
+    if (!modal || !text) return;
+
+    const handle = (host && host.getAttribute("data-handle")) || "@seller";
+    const loc = (host && host.getAttribute("data-location")) || "";
+    const bio = (host && host.getAttribute("data-bio")) || "no bio available.";
+
+    if (title) title.textContent = handle;
+    if (sub) sub.textContent = loc ? loc : "";
+    text.textContent = bio;
+
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
+  }
+  function closeBio(){
+    const modal = document.getElementById("bioModal");
+    if (!modal) return;
+    modal.classList.add("hidden");
+    modal.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+  }
+
+  document.addEventListener("click", (e) => {
+    const pill = e.target.closest && e.target.closest('[data-bio-trigger="1"]');
+    if (!pill) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const host = pill.closest("[data-bio]");
+    openBio(host);
+  }, true);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const pill = e.target.closest && e.target.closest('[data-bio-trigger="1"]');
+    if (!pill) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const host = pill.closest("[data-bio]");
+    openBio(host);
+  }, true);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("bioModal");
+    const close = modal && modal.querySelector(".bioModalClose");
+    if (close) close.addEventListener("click", closeBio);
+    if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) closeBio(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeBio(); });
+  });
+})();
+</script><script>
+// v110 spotlight: dynamic (spotlight=true) with demo fallback
+document.addEventListener("DOMContentLoaded", () => {
+  const demo = [
+    { handle: "@cybercloset", store: "cyber closet", main: "alt", subs: ["goth","metal"], bio: "cyber + archival finds, curated fits, worldwide shipping. dm for bundles + holds. daily drops + spicy one-offs.", seed: "cybercloset" },
+    { handle: "@archiveangel", store: "archive angel", main: "archive", subs: ["designer","runway"], bio: "archive silhouettes + runway energy. clean photos, fast ship, rare pieces only. offers welcome if you’re serious.", seed: "archiveangel" },
+    { handle: "@neonmarket", store: "neon market", main: "y2k", subs: ["blingy","cute"], bio: "loud color, shiny details, y2k heat. baggy to blingy. bundles encouraged. ships next day most orders.", seed: "neonmarket" },
+    { handle: "@softgrunge.shop", store: "soft grunge shop", main: "vintage", subs: ["true vintage","band tees"], bio: "soft grunge + worn-in tees. true vintage when it hits. cozy layering staples. friendly prices + fast replies.", seed: "softgrunge" }
+  ].map(s => {
+    const seed = (s.seed || s.handle).replace(/[^a-z0-9]/gi,"");
+    return {
+      handle: s.handle,
+      store: s.store,
+      main: s.main,
+      bio: (s.bio || "").slice(0,160),
+      subs: (s.subs || []).slice(0,2),
+      img: "https://picsum.photos/seed/" + seed + "/800/800",
+      href: "https://www.depop.com/" + (s.handle||"").replace("@","") + "/"
+    };
+  });
+
+  const track = document.getElementById("track");
+  const dots = document.getElementById("dots");
+  const prev = document.getElementById("prevBtn");
+  const next = document.getElementById("nextBtn");
+  if (!track || !dots || !prev || !next) return;
+
+  function cleanHandle(v){
+    const h = String(v || "").trim();
+    if (!h) return "";
+    return h.startsWith("@") ? h : "@"+h;
+  }
+  function seedFrom(v){ return String(v||"").replace(/[^a-z0-9]/gi,""); }
+  function truthy(v){ return v === true || v === "true" || v === 1 || v === "1"; }
+
+  async function getSpotlightData(){
+    // If Supabase keys aren’t configured, use demo data
+    if (typeof window.missingKeys === "function" && window.missingKeys()) return demo;
+    if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) return demo;
+
+    try{
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data, error } = await supabase
+        .from("seller_profiles")
+        .select("*")
+        .eq("status","approved")
+        .eq("spotlight", true)
+        .order("created_at", { ascending: false })
+        .limit(12);
+
+      if (error) throw error;
+
+      const rows = (data || []);
+      if (!rows.length) return demo;
+
+      return rows.map(p => {
+        const handleRaw = (p.depop_username || p.handle || p.username || "");
+        const handle = cleanHandle(handleRaw);
+        const store = (p.shop_name || p.store || p.shop || "shop").toLowerCase();
+        const main = String(p.genre || "alt").toLowerCase();
+        const subs = Array.isArray(p.subcategories) ? p.subcategories.slice(0,2) : [];
+        const bio = String(p.bio || "").slice(0,160);
+
+        
+        const city = String(p.city || "").trim();
+        const country = String(p.country || "").trim();
+        const state = String(p.state || "").trim();
+        const locRaw = String(p.location || p.city_country || p.city_state || "").trim();
+        const loc = locRaw || [city, state, country].filter(Boolean).join(", ");
+
+        const items = Array.isArray(p.item_images) ? p.item_images.filter(Boolean).slice(0,3).map(x=>String(x).trim()).filter(Boolean) : [];
+const href = p.shop_url || (handle ? ("https://www.depop.com/" + handle.replace("@","") + "/") : "#");
+        const img = p.avatar_url ? p.avatar_url : ("https://picsum.photos/seed/" + seedFrom(handle || store) + "/800/800");
+
+        return { handle, store, main, subs, bio, loc, items, href, img };
+      });
+    } catch(e){
+      console.error(e);
+      return demo;
+    }
+  }
+
+  function escapeHtml(str){
+  return String(str ?? "").replace(/[&<>"\']/g, (m)=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","\'":"&#39;"
+  }[m]));
+}
+
+function slideTemplate(s) {
+    const main = '<span class="pill mainPill">' + (s.main || "") + '</span>';
+    const subs = (s.subs || []).map(w => '<span class="pill subPill">' + w + '</span>').join("");
+    return (
+      '<a class="slide" href="' + (s.href || "#") + '" target="_blank" rel="noopener">' +
+        '<div class="slideGrid">' +
+          '<div class="slideMedia">' +
+            '<div class="stickerSpotlight">spotlight ★</div>' +
+            '<img alt="' + (s.store || "shop") + '" src="' + (s.img || "") + '"/>' +
+            ((s.loc && String(s.loc).trim()) ? ('<div class="spotLoc">'+ escapeHtml(String(s.loc)) +'</div>') : '') +
+            ' +
+          '</div>' +
+          '<div class="slideMeta">' +
+            '<div class="slideName">' + (s.store || "") + '</div>' +
+            '<div class="slideHandle">' + (s.handle || "") + '</div>' +
+            '<div class="slideTags">' + main + subs + '</div>' +
+            '<div class="slideBio">' + (s.bio || "") + '</div>' +
+            '<div class="slideCta">view shop →</div>' +
+          '</div>' +
+        '</div>' +
+      '</a>'
+    );
+  }
+
+  function renderCarousel(data){
+    const list = data || [];
+    track.innerHTML = list.map(slideTemplate).join("");
+    const dotCount = 5;
+    dots.innerHTML = Array.from({length: dotCount}).map((_,i)=>{
+      const on = (i===0);
+      const ghost = (i >= list.length);
+      return '<span class="dot'+(on?' is-on':'')+(ghost?' is-ghost':'')+'" data-i="'+i+'"></span>';
+    }).join("");
+
+    let idx = 0;
+    const total = list.length;
+
+    function go(i){
+      idx = (i + total) % total;
+      track.style.transform = "translateX(-" + (idx * 100) + "%)";
+      Array.from(dots.children).forEach((d,di)=>d.classList.toggle("is-on", di===idx));
+    }
+
+    prev.onclick = () => go(idx-1);
+    next.onclick = () => go(idx+1);
+    dots.onclick = (e) => {
+      const t = e.target;
+      if (t && t.dataset && t.dataset.i) go(parseInt(t.dataset.i,10));
+    };
+  }
+
+  (async () => {
+    const data = await getSpotlightData();
+    // Always render something so the spotlight box never collapses.
+    renderCarousel((data && data.length) ? data : demo);
+  })();
+});
+</script><script>
+// v82 form: main category + subcategories (choose up to 2)
+document.addEventListener("DOMContentLoaded", () => {
+  const MAIN = ['alt', 'y2k', 'street', 'vintage', 'archive', 'clean'];
+  const SUBS = {'alt': ['goth', 'punk', 'emo', 'metal'], 'y2k': ['baggy', 'surf', 'blingy', 'cute'], 'vintage': ['true vintage', '80s', '90s', 'band tees'], 'archive': ['designer', 'runway', 'rare', 'experimental'], 'clean': ['prep', 'neutral', 'fitness', 'basics'], 'street': ['skate', 'workwear', 'gorp', 'flashy']};
+
+  const mainWrap = document.getElementById("primaryChips");
+  const mainHidden = document.getElementById("mainCategory");
+  const subWrap = document.getElementById("subChips");
+  const sub1 = document.getElementById("subTag1Hidden");
+  const sub2 = document.getElementById("subTag2Hidden");
+  if (!mainWrap || !mainHidden || !subWrap || !sub1 || !sub2) return;
+
+  function renderSub(g){
+    subWrap.innerHTML = "";
+    (SUBS[g] || []).forEach(w => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.dataset.word = w;
+      b.textContent = w;
+      b.addEventListener("click", () => {
+        b.classList.toggle("is-on");
+        const on = [...subWrap.querySelectorAll(".chip.is-on")];
+        if (on.length > 2) {
+          b.classList.remove("is-on");
+          return;
+        }
+        const words = on.map(x => x.dataset.word);
+        sub1.value = words[0] || "";
+        sub2.value = words[1] || "";
+      });
+      subWrap.appendChild(b);
+    });
+    sub1.value = "";
+    sub2.value = "";
+  }
+
+  function setMain(g){
+    mainHidden.value = g;
+    mainWrap.querySelectorAll(".chip").forEach(x => x.classList.remove("is-on"));
+    const btn = mainWrap.querySelector(`.chip[data-genre="${g}"]`);
+    if (btn) btn.classList.add("is-on");
+    renderSub(g);
+  }
+
+  mainWrap.innerHTML = "";
+  MAIN.forEach(g => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.dataset.genre = g;
+    b.textContent = g;
+    b.addEventListener("click", () => setMain(g));
+    mainWrap.appendChild(b);
+  });
+
+  setMain("y2k");
+});
+</script>
+<script>
+/* v90: safety - keep bio modal closed on load */
+document.addEventListener("DOMContentLoaded", () => {
+  const m = document.getElementById("bioModal");
+  if (m){
+    m.classList.add("hidden");
+    m.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+  }
+});
+</script>
+
+<script>
+/* --- v92: ensure bio modal is closed on load --- */
+document.addEventListener("DOMContentLoaded", () => {
+  const m = document.getElementById("bioModal");
+  if (m){
+    m.classList.add("hidden");
+    m.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+  }
+});
+</script>
+<style>
+/* v97 override: align boost buttons to right edge of featured box (wins vs .pricingRow justify-content:center !important) */
+.heroBelowBoosts{
+  justify-content:flex-end !important;
+}
+.heroBelowBoosts #boosts{
+  justify-content:flex-end !important;
+  max-width:100% !important; /* remove the 760px cap so right edge matches spotlight column */
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v99 override: snap search+categories to same 2-col grid as hero (so chips align with featured box right edge) */
+.heroBelowTools .tools{
+  display:grid !important;
+  grid-template-columns: 1.35fr 1.45fr !important; /* match .heroBelow proportions */
+  column-gap:40px !important;
+  align-items:center !important;
+  justify-content:unset !important;
+  width:100% !important;
+  max-width:1100px !important; /* same spine as title/featured */
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* place search left, chips right */
+.heroBelowTools #search{
+  grid-column:1 !important;
+  justify-self:start !important;
+}
+
+.heroBelowTools #filterBar{
+  grid-column:2 !important;
+  justify-self:stretch !important;
+  justify-content:flex-end !important;
+}
+
+/* keep chips from centering via old rules */
+.heroBelowTools .tools .filterBar{
+  justify-content:flex-end !important;
+}
+
+/* Mobile: keep the existing stacked behavior */
+@media(max-width:980px){
+  .heroBelowTools .tools{
+    display:flex !important;
+    flex-direction:column !important;
+    flex-wrap:wrap !important;
+    gap:16px !important;
+    max-width:980px !important;
+  }
+  .heroBelowTools #filterBar,
+  .heroBelowTools .tools .filterBar{
+    justify-content:center !important;
+    width:100% !important;
+  }
+  .heroBelowTools #search{
+    width:100% !important;
+    max-width:920px !important;
+  }
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v100 fix: prevent first chip ("all") from being clipped on the left */
+.heroBelowTools #filterBar,
+.heroBelowTools .filterBar{
+  padding-left:10px !important;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v101 fix: keep filter chips from tucking under the featured spotlight card */
+.heroBelowTools{
+  margin-top:28px !important;
+}
+
+/* v101 fix: modal text visibility (was white on white) */
+.bioModalText{
+  color:#111 !important;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v102 fix: remove forced min-height on spotlight carousel (was creating giant empty "modal-like" box) */
+#spotlight .carousel{
+  min-height:unset !important;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v103: restore boosts to centered like before */
+.heroBelowBoosts{
+  justify-content:center !important;
+}
+.heroBelowBoosts #boosts{
+  justify-content:center !important;
+  max-width:760px !important;
+}
+
+/* v103: undo the grid override that shifted the filter chips left */
+.heroBelowTools .tools{
+  display:flex !important;
+  flex-direction:row !important;
+  justify-content:center !important;
+}
+
+/* ensure first chip isn't pushed off-screen */
+.heroBelowTools .filterBar{
+  padding-left:0 !important;
+  margin-left:0 !important;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v108: keep carousel functionality but remove the inner "box" that's overlapping the featured outline */
+#spotlight .carousel{
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  padding:0 !important;
+}
+#spotlight .slide{
+  padding:0 !important; /* removes extra inner card padding/height */
+}
+/* keep content spacing inside without the extra container padding */
+#spotlight .slideMeta{
+  padding:12px 12px 12px 14px !important;
+}
+/* ensure media still has rounded corners */
+#spotlight .slideMedia{
+  border-radius:14px !important;
+  overflow:hidden !important;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v119: keep the first-row depop fields aligned */
+#applyForm .formGrid{ align-items:start !important; }
+#applyForm .formGrid > .row{ align-self:start !important; }
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v121: hard-fix alignment for depop url + depop @username row */
+#applyForm .formGrid{ align-items:start !important; }
+
+#applyForm label[for="depopUrl"],
+#applyForm label[for="handle"]{
+  white-space:nowrap !important;
+  display:block !important;
+  height:18px !important;       /* same fixed label height so inputs start aligned */
+  line-height:18px !important;
+  margin-bottom:6px !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+#applyForm #depopUrl,
+#applyForm #handle{
+  margin-top:0 !important;
+}
+
+#applyForm .formGrid > .row:nth-child(1) .help,
+#applyForm .formGrid > .row:nth-child(2) .help{
+  min-height:18px !important;   /* reserve same helper height */
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v122: enforce perfect alignment for depop url + depop @username by using row2 grid */
+#applyForm .formGrid .row2.full{
+  grid-column:1 / -1 !important;
+  display:grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap:18px !important;
+  align-items:start !important;
+}
+#applyForm .formGrid .row2.full > .row{
+  margin:0 !important;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v124: keep 4-col grid, but add side padding so seller cards don't hit page edges */
+.section.cluster{
+  width:100% !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+}
+.section.cluster .grid{
+  padding-left:16px !important;
+  padding-right:16px !important;
+  box-sizing:border-box !important;
+}
+@media(max-width:520px){
+  .section.cluster .grid{
+    padding-left:14px !important;
+    padding-right:14px !important;
+  }
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v126: bring seller cards AND genre title bars inward equally */
+
+.section.cluster{
+  padding-left:40px !important;
+  padding-right:40px !important;
+  box-sizing:border-box !important;
+}
+
+/* remove earlier grid-only padding so spacing is uniform */
+.section.cluster .grid{
+  padding-left:0 !important;
+  padding-right:0 !important;
+}
+
+/* ensure the genre header row (title bar) follows same inward spacing */
+.section.cluster .head,
+.section.cluster .titleRow{
+  padding-left:0 !important;
+  padding-right:0 !important;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<style>
+/* v132: seller cards turn brand green on hover */
+.section.cluster .card:hover{
+  background: var(--brand) !important;
+  transition: background 0.18s ease;
+}
+
+/* keep text readable when background turns green */
+.section.cluster .card:hover *{
+  color:#000 !important;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+/* remove any previous height caps */
+.heroRight #spotlight{
+  max-height: none !important;
+}
+
+/* slightly less tall */
+.heroRight #spotlight .slideMedia{
+  height: 310px !important;
+  min-height: 310px !important;
+}
+
+@media (max-width:520px){
+  .heroRight #spotlight .slideMedia{
+    height: 220px !important;
+    min-height: 220px !important;
+  }
+}
+
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+
+/* --- v106: spotlight mini item slideshow --- */
+.miniItems{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling: touch;
+}
+.miniItems img{
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+
+
+/* --- v118: keep spotlight from collapsing when carousel is empty/loading --- */
+#spotlight{ min-height: 260px !important; }
+#spotlight .carousel{ min-height: 240px !important; }
+#spotlight .track{ min-height: 240px !important; }
+
+</style>
+<script>/* SUCCESS CONFIRMATION (REPLACES FORM COMPLETELY) */
+(function() {
+  const form = document.getElementById('applyForm');
+  if(!form) return;
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const data = new FormData(form);
+
+    try {
+      const response = await fetch(form.action, {
+        method: form.method,
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if(response.ok) {
+        const successHTML = `
+          <div class="successPulse" style="margin-top:28px; border:2px solid #000; border-radius:18px; padding:28px; background:rgba(255,255,255,.92); box-shadow:0 16px 34px rgba(0,0,0,.14); text-align:center;">
+            <div style="font-weight:1000; font-size:28px; letter-spacing:-.02em; margin-bottom:18px;">
+              thank you for submitting to
+            </div>
+            <h1 style="margin:0;">
+              popstar ★
+            </h1>
+          </div>
+        `;
+        form.outerHTML = successHTML;
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
+    } catch (err) {
+      // leave form in place if submit fails
+    }
+  });
+})();</script><script>/* POPSTAR_INFLUENCER_TOGGLE_V2 */
+(function(){
+  const hasCode = document.getElementById('hasCode');
+  const codeRow = document.getElementById('codeRow');
+  const codeInput = document.getElementById('influencerCode');
+  if(!hasCode || !codeRow) return;
+
+  function sync(){
+    const on = !!hasCode.checked;
+    codeRow.style.display = on ? '' : 'none';
+    if(codeInput){
+      if(on) codeInput.setAttribute('required','');
+      else {
+        codeInput.removeAttribute('required');
+        codeInput.value = '';
+      }
+    }
+  }
+
+  hasCode.addEventListener('change', sync);
+  sync();
+})();</script>
+<audio id="heroAudio" preload="none" src="crunk_that_ft_lokadonna.mp3"></audio>
+<script>
+// --- hero audio controls (manual play, no loop) ---
+(function(){
+  const audio = document.getElementById("heroAudio");
+  const playBtn = document.getElementById("playBtn");
+  const pauseBtn = document.getElementById("pauseBtn");
+  if(!audio || !playBtn || !pauseBtn) return;
+
+  audio.loop = false;
+  audio.autoplay = false;
+
+  playBtn.addEventListener("click", function(){
+    audio.play();
+  });
+
+  pauseBtn.addEventListener("click", function(){
+    audio.pause();
+  });
+
+  // When song ends, reset to beginning
+  audio.addEventListener("ended", function(){
+    audio.currentTime = 0;
+  });
+})();
+</script>
+
+<script>
+(function () {
+  // If we landed here with #apply, scroll after layout settles
+  if (window.location.hash === "#apply") {
+    const tryScroll = () => {
+      const el = document.getElementById("apply");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    // run soon and also after full load (covers slow assets/fonts)
+    setTimeout(tryScroll, 80);
+    window.addEventListener("load", () => setTimeout(tryScroll, 80));
+  }
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* Hide influencer code fields when in buyer mode (?buyer=1) */
+document.addEventListener("DOMContentLoaded", function(){
+  try{
+    var params = new URLSearchParams(window.location.search || "");
+    var isBuyer = params.get("buyer") === "1";
+    if(isBuyer){
+      var el = document.getElementById("influencerSection");
+      if(el) el.style.display = "none";
+    }
+  }catch(e){}
+});
+</script>
+
+<script>
+/* v104: simple chips + search for dynamic cards */
+document.addEventListener("DOMContentLoaded", () => {
+  const search = document.getElementById("search");
+  const chips = Array.from(document.querySelectorAll("#filterBar .fchip"));
+  let active = "all";
+
+  function normalize(s){ return (s||"").toLowerCase(); }
+
+  function apply(){
+    const q = normalize(search ? search.value : "").trim();
+    const sections = Array.from(document.querySelectorAll("section.cluster[data-cluster]"));
+    // show/hide sections by active genre (never hide everything on all)
+    sections.forEach(sec => {
+      const g = sec.getAttribute("data-cluster");
+      sec.style.display = (active === "all" || g === active) ? "" : "none";
+    });
+
+    // filter cards by query within visible sections
+    const cards = Array.from(document.querySelectorAll("a.card"));
+    cards.forEach(card => {
+      // only filter cards inside visible sections
+      const sec = card.closest("section.cluster");
+      if (sec && sec.style.display === "none") { card.style.display = "none"; return; }
+
+      const hay =
+        normalize(card.getAttribute("data-handle")) + " " +
+        normalize(card.getAttribute("data-store")) + " " +
+        normalize(card.getAttribute("data-name")) + " " +
+        normalize(card.getAttribute("data-sub1")) + " " +
+        normalize(card.getAttribute("data-sub2"));
+      const match = !q || hay.includes(q);
+      card.style.display = match ? "" : "none";
+    });
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      active = chip.getAttribute("data-filter") || "all";
+      chips.forEach(c => c.classList.toggle("is-on", c === chip));
+      apply();
+      if (active !== "all"){
+        const target = document.getElementById(active);
+        if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
+        history.replaceState(null, "", "#" + active);
+      } else {
+        history.replaceState(null, "", "#");
+      }
+    });
+  });
+
+  if (search){
+    search.addEventListener("input", apply);
+  }
+
+  // expose for loaders
+  window.refreshSellerFilters = apply;
+
+  apply();
+});
+</script>
+<script>
+/* Street dynamic render (single-section test) */
+(function(){  
+const SUPABASE_URL = "https://otvznctmwutbwulbhfvx.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90dnpuY3Rtd3V0Ynd1bGJoZnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNzc3MzcsImV4cCI6MjA4NzY1MzczN30.txShYO4rqLSMHeLuN_2rzRmvXZK3mnPsaabFtTa8Ph8";
+
+  
+  window.SUPABASE_URL = SUPABASE_URL;
+  window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
+function missingKeys(){
+    return !SUPABASE_URL || SUPABASE_URL.startsWith("PASTE_") ||
+           !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.startsWith("PASTE_");
+  }
+
+  function first(obj, keys){
+    for (const k of keys){
+      if (obj && obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== "") return obj[k];
+    }
+    return "";
+  }
+
+  function normText(v){ return String(v ?? "").trim(); }
+
+  function toArray(v){
+    if (!v) return [];
+    if (Array.isArray(v)) return v.filter(Boolean).map(normText);
+    // support comma separated strings
+    return String(v).split(",").map(s=>s.trim()).filter(Boolean);
+  }
+
+  function escapeHtml(str){
+    return String(str ?? "").replace(/[&<>"']/g, (m)=>({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+  }
+
+  function renderSellerCard(p){
+    const shop = first(p, ["shop_name","shop","store","store_name","name"]);
+    const handleRaw = first(p, ["handle","username","depop_handle","depop_username"]);
+    const handle = handleRaw ? (handleRaw.startsWith("@") ? handleRaw : "@"+handleRaw) : "";
+    const city = first(p, ["city"]);
+    const country = first(p, ["country"]);
+    const state = first(p, ["state"]);
+    const locationRaw = first(p, ["location","city_country","city_state","cityState","city_country_state"]);
+    const location = locationRaw || [city, state, country].filter(Boolean).join(", ");
+const bio = first(p, ["bio","about"]);
+    const genre = (first(p, ["genre","primary","main_category"]) || "street").toLowerCase();
+    const subs = toArray(first(p, ["subcategories","subs","subcategory_list"]));
+    const items = Array.isArray(p.item_images) ? p.item_images.filter(Boolean).slice(0,3).map(normText) : [];
+    const isFeatured = !!first(p, ["featured"]);
+    const sub1 = subs[0] || "";
+    const sub2 = subs[1] || "";
+    const url = first(p, ["depop_url","store_url","url","link"]) || (handleRaw ? ("https://www.depop.com/" + handleRaw.replace(/^@/,"") + "/") : "#");
+    const avatar = first(p, ["avatar_url","avatar","image_url","photo_url","pfp_url"]) || (handleRaw ? ("https://picsum.photos/seed/" + encodeURIComponent(handleRaw.replace(/^@/,"")) + "/1200/1200") : "https://picsum.photos/seed/popstar/1200/1200");
+    const alt = handleRaw ? (handleRaw.replace(/^@/,"") + " profile photo") : "profile photo";
+
+    return `
+      <a class="card seller"
+         href="${escapeHtml(url)}"
+         target="_blank" rel="noopener"
+         data-store="${escapeHtml(shop)}"
+         data-handle="${escapeHtml(handle)}"
+         data-location="${escapeHtml(location)}"
+         data-primary="${escapeHtml(genre)}"
+         data-sub1="${escapeHtml(sub1)}"
+         data-sub2="${escapeHtml(sub2)}"
+         data-bio="${escapeHtml(bio)}" data-items="${escapeHtml(JSON.stringify(items))}">
+        <div class="thumb">
+          ${isFeatured ? `<div class="stickerBoosted">featured ★</div>` : ``}
+          <img alt="${escapeHtml(alt)}" src="${escapeHtml(avatar)}"/>
+          ${location ? `<div class="thumbLoc">${escapeHtml(location)}</div>` : ``}
+        </div>
+        <div class="meta">
+          <div class="name">${escapeHtml(shop)}</div>
+          <div class="handle">${escapeHtml(handle)}</div>
+          <div class="tagRow">
+            <div class="tags">
+              ${sub1 ? `<span class="pill subPill">${escapeHtml(sub1)}</span>` : ``}
+              ${sub2 ? `<span class="pill subPill">${escapeHtml(sub2)}</span>` : ``}
+            </div>
+            <div class="cardView">view shop →</div>
+          </div>
+          <div class="bioSnippet">${escapeHtml(bio)}</div>
+        </div>
+      </a>`;
+  }
+
+  async function loadStreet(){
+    const grid = document.getElementById("streetGrid");
+    if (!grid) return;
+
+    if (missingKeys()){
+      grid.innerHTML = '<div class="error">Street dynamic is set up, but Supabase keys are not pasted yet.</div>';
+      return;
+    }
+
+    try{
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data, error } = await supabase
+        .from("seller_profiles")
+        .select("*")
+        .eq("status","approved")
+        .in("genre", ["street","Street","STREET"])
+        .order("created_at", { ascending: false })
+        .limit(24);
+
+      if (error) throw error;
+
+      grid.innerHTML = (data || []).map(renderSellerCard).join("") || '<div class="empty">no street sellers yet — be the first ★</div>';
+
+      // If your existing search/filter uses a function to refresh, call it safely:
+      if (typeof window.refreshSellerFilters === "function") {
+        window.refreshSellerFilters();
+      }
+    } catch(e){
+      console.error(e);
+      grid.innerHTML = '<div class="error">Unable to load Street sellers.</div>';
+    }
+  }
+
+  
+  async function loadAlt(){
+    const grid = document.getElementById("altGrid");
+    if (!grid) return;
+
+    if (missingKeys()){
+      grid.innerHTML = '<div class="error">Alt dynamic is set up, but Supabase keys are not pasted yet.</div>';
+      return;
+    }
+
+    try{
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data, error } = await supabase
+        .from("seller_profiles")
+        .select("*")
+        .eq("status","approved")
+        .in("genre", ["alt","Alt","ALT"])
+        .order("created_at", { ascending: false })
+        .limit(24);
+
+      if (error) throw error;
+
+      grid.innerHTML = (data || []).map(renderSellerCard).join("") || '<div class="empty">no alt sellers yet — be the first ★</div>';
+
+      if (typeof window.refreshSellerFilters === "function") {
+        window.refreshSellerFilters();
+      }
+    } catch(e){
+      console.error(e);
+      grid.innerHTML = '<div class="error">Unable to load Alt sellers.</div>';
+    }
+  }
+
+  
+  async function loadY2K(){
+    const grid = document.getElementById("y2kGrid");
+    if (!grid) return;
+
+    if (missingKeys()){
+      grid.innerHTML = '<div class="error">Y2K dynamic is set up, but Supabase keys are not pasted yet.</div>';
+      return;
+    }
+
+    try{
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data, error } = await supabase
+        .from("seller_profiles")
+        .select("*")
+        .eq("status","approved")
+        .in("genre", ["y2k","Y2k","Y2K"])
+        .order("created_at", { ascending: false })
+        .limit(24);
+
+      if (error) throw error;
+
+      grid.innerHTML = (data || []).map(renderSellerCard).join("") || '<div class="empty">no y2k sellers yet — be the first ★</div>';
+
+      if (typeof window.refreshSellerFilters === "function") {
+        window.refreshSellerFilters();
+      }
+    } catch(e){
+      console.error(e);
+      grid.innerHTML = '<div class="error">Unable to load Y2K sellers.</div>';
+    }
+  }
+
+  
+  async function loadY2k(){
+    const grid = document.getElementById("y2kGrid");
+    if (!grid) return;
+
+    if (missingKeys()){
+      grid.innerHTML = '<div class="error">Y2K dynamic is set up, but Supabase keys are not pasted yet.</div>';
+      return;
+    }
+
+    try{
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data, error } = await supabase
+        .from("seller_profiles")
+        .select("*")
+        .eq("status","approved")
+        .in("genre", ["y2k","Y2K","y2K","Y2k"])
+        .order("created_at", { ascending: false })
+        .limit(24);
+
+      if (error) throw error;
+
+      grid.innerHTML = (data || []).map(renderSellerCard).join("") || '<div class="empty">no y2k sellers yet — be the first ★</div>';
+
+      if (typeof window.refreshSellerFilters === "function") {
+        window.refreshSellerFilters();
+      }
+    } catch(e){
+      console.error(e);
+      grid.innerHTML = '<div class="error">Unable to load Y2K sellers.</div>';
+    }
+  }
+
+async function loadVintage(){
+    const grid = document.getElementById("vintageGrid");
+    if (!grid) return;
+
+    if (missingKeys()){
+      grid.innerHTML = '<div class="error">Vintage dynamic is set up, but Supabase keys are not pasted yet.</div>';
+      return;
+    }
+
+    try{
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data, error } = await supabase
+        .from("seller_profiles")
+        .select("*")
+        .eq("status","approved")
+        .in("genre", ["vintage","Vintage","VINTAGE"])
+        .order("created_at", { ascending: false })
+        .limit(24);
+
+      if (error) throw error;
+
+      grid.innerHTML = (data || []).map(renderSellerCard).join("") || '<div class="empty">no vintage sellers yet — be the first ★</div>';
+
+      if (typeof window.refreshSellerFilters === "function") {
+        window.refreshSellerFilters();
+      }
+    } catch(e){
+      console.error(e);
+      grid.innerHTML = '<div class="error">Unable to load Vintage sellers.</div>';
+    }
+  }
+
+  async function loadArchive(){
+    const grid = document.getElementById("archiveGrid");
+    if (!grid) return;
+
+    if (missingKeys()){
+      grid.innerHTML = '<div class="error">Archive dynamic is set up, but Supabase keys are not pasted yet.</div>';
+      return;
+    }
+
+    try{
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data, error } = await supabase
+        .from("seller_profiles")
+        .select("*")
+        .eq("status","approved")
+        .in("genre", ["archive","Archive","ARCHIVE"])
+        .order("created_at", { ascending: false })
+        .limit(24);
+
+      if (error) throw error;
+
+      grid.innerHTML = (data || []).map(renderSellerCard).join("") || '<div class="empty">no archive sellers yet — be the first ★</div>';
+
+      if (typeof window.refreshSellerFilters === "function") {
+        window.refreshSellerFilters();
+      }
+    } catch(e){
+      console.error(e);
+      grid.innerHTML = '<div class="error">Unable to load Archive sellers.</div>';
+    }
+  }
+
+  async function loadClean(){
+    const grid = document.getElementById("cleanGrid");
+    if (!grid) return;
+
+    if (missingKeys()){
+      grid.innerHTML = '<div class="error">Clean dynamic is set up, but Supabase keys are not pasted yet.</div>';
+      return;
+    }
+
+    try{
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const { data, error } = await supabase
+        .from("seller_profiles")
+        .select("*")
+        .eq("status","approved")
+        .in("genre", ["clean","Clean","CLEAN"])
+        .order("created_at", { ascending: false })
+        .limit(24);
+
+      if (error) throw error;
+
+      grid.innerHTML = (data || []).map(renderSellerCard).join("") || '<div class="empty">no clean sellers yet — be the first ★</div>';
+
+      if (typeof window.refreshSellerFilters === "function") {
+        window.refreshSellerFilters();
+      }
+    } catch(e){
+      console.error(e);
+      grid.innerHTML = '<div class="error">Unable to load Clean sellers.</div>';
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => { loadStreet(); loadAlt(); loadY2K(); loadVintage(); loadArchive(); loadClean(); });
+
+})();
+</script>
+
+<div id="sellerModal" class="sellerModal hidden" aria-hidden="true">
+  <div class="sellerModalInner" role="dialog" aria-modal="true">
+    <div class="sellerModalTop">
+      <div>
+        <div class="sellerModalTitle" id="sellerModalTitle"></div>
+        <div class="sellerModalHandle" id="sellerModalHandle"></div>
+      </div>
+      <button class="sellerModalClose" id="sellerModalClose" type="button">close</button>
+    </div>
+    <div class="sellerModalBody">
+      <p class="sellerModalBio" id="sellerModalBio"></p>
+      <div class="itemGrid" id="sellerModalItems"></div>
+    </div>
+    <div class="sellerModalActions">
+      <a class="btnShop" id="sellerModalShop" href="#" target="_blank" rel="noopener">view shop →</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 refined -->
+<!-- build marker: popstar build v91 spotlight height fix -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
