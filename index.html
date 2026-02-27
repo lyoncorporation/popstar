@@ -5719,7 +5719,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (error) throw error;
 
-      grid.innerHTML = (data || []).map(renderSellerCard).join("") || '<div class="empty">No approved Street sellers yet.</div>';
+      grid.innerHTML = (data || []).map(renderSellerCard).join("") || '<div class="empty">no street sellers yet — be the first ★</div>';
 
       // If your existing search/filter uses a function to refresh, call it safely:
       if (typeof window.refreshSellerFilters === "function") {
