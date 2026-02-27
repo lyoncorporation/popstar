@@ -4819,7 +4819,7 @@ a.card.seller .bioSnippet{
 </div>
 <div aria-hidden="true" class="bioModal hidden" id="bioModal"><div aria-modal="true" class="bioModalInner" role="dialog"><button aria-label="close bio" class="btn bioModalClose" type="button">✕</button><div class="bioModalTitle">bio</div><div class="bioModalSub" id="bioModalSub"></div><div class="bioModalText" id="bioModalText"></div></div></div><script>
 
-const BUILD = "index-v161-spotlight-carousel-raf-loop-2026-02-27";
+const BUILD = "index-v162-spotlight-carousel-raf-important-transform-2026-02-27";
 </script><script>
 // v57: bio modal opens from bio pills (prevents card navigation)
 (function(){
@@ -6871,7 +6871,7 @@ async function loadVintage(){
       const elapsed = now - t0;
       const phase = (elapsed % dur) / dur;      // 0..1
       const x = -Math.round(phase * half);      // pixel-snapped to avoid shimmer
-      track.style.transform = `translate3d(${x}px,0,0)`;
+      track.style.setProperty('transform', `translate3d(${x}px,0,0)`, 'important');
       rafId = requestAnimationFrame(tick);
     }
     rafId = requestAnimationFrame(tick);
@@ -6894,6 +6894,14 @@ async function loadVintage(){
   window.addEventListener('load', () => setTimeout(startRAF, 80));
 })();
 </script>
+
+
+<style id="spotlight-raf-transform-unlock-v162">
+/* v162 — remove any CSS `transform: translate3d(0,0,0) !important` locks on the track */
+#spotlight .itemMarqueeTrack{
+  transform: none !important; /* JS sets transform each frame with !important */
+}
+</style>
 
 </body>
 </html>
