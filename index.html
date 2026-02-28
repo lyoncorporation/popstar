@@ -4795,6 +4795,90 @@ a.card.seller .bioSnippet{
 </style>
 
 
+
+<style>
+/* ============================= */
+/* CLEAN SPOTLIGHT REBUILD */
+/* ============================= */
+
+/* Reset spotlight container */
+#spotlight {
+  position: relative;
+}
+
+/* Clean carousel structure */
+#spotlight .carousel {
+  overflow: hidden !important;
+}
+
+#spotlight .slide {
+  display: grid !important;
+  grid-template-columns: 360px 1fr !important;
+  gap: 16px !important;
+}
+
+@media (max-width: 520px){
+  #spotlight .slide {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Media container */
+#spotlight .slideMedia {
+  position: relative !important;
+  height: 260px !important;
+  border-radius: 16px !important;
+  overflow: visible !important;
+}
+
+#spotlight .slideMedia img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Spotlight sticker */
+#spotlight .stickerSpotlight {
+  position: absolute !important;
+  top: 14px !important;
+  left: 14px !important;
+  z-index: 1000 !important;
+}
+
+/* Boosted sticker */
+#spotlight .stickerBoosted {
+  position: absolute !important;
+  top: 14px !important;
+  left: 14px !important;
+  z-index: 1000 !important;
+}
+
+/* Sale sticker */
+#spotlight .stickerSale {
+  position: absolute !important;
+  top: 14px !important;
+  left: 14px !important;
+  background: #ff3b30 !important;
+  color: #fff !important;
+  padding: 6px 10px !important;
+  border-radius: 999px !important;
+  border: 2px solid #000 !important;
+  font-size: 10px !important;
+  font-weight: 1000 !important;
+  transform: rotate(-8deg) !important;
+  z-index: 2000 !important;
+}
+
+/* Force pills single line everywhere */
+#spotlight .slideTags,
+#spotlight .tags {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+}
+</style>
+
 </head>
 <body>
 
