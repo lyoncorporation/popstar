@@ -4011,7 +4011,7 @@ const BUILD = "index-v172-spotlight-demo-spread-fix-2026-03-01";
 })();
 </script><script>
 // Spotlight box rebuild (step 1): show ONLY the style icon quote for the FSU profile
-document.addEventListener("DOMContentLoaded", () => {
+window.__renderSpotlight = () => {
   const spotlight = document.getElementById("spotlight");
   if (!spotlight) return;
 
@@ -4507,7 +4507,15 @@ viewShop.style.alignSelf = "end";
 inner.appendChild(viewShop);
 requestAnimationFrame(fit);
   window.addEventListener("resize", fit, { passive: true });
-});</script><script>
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  try{ window.__renderSpotlight && window.__renderSpotlight(); }catch(e){ console.error(e); }
+});
+window.addEventListener("popstar:supabase_ready", () => {
+  try{ window.__renderSpotlight && window.__renderSpotlight(); }catch(e){ console.error(e); }
+});
+</script><script>
 // v82 form: main category + subcategories (choose up to 2)
 document.addEventListener("DOMContentLoaded", () => {
   const MAIN = ['alt', 'y2k', 'street', 'vintage', 'archive', 'clean'];
@@ -5030,6 +5038,10 @@ const DEMO = {
 
     // expose pool to spotlight renderer
     window.__POPSTAR_SPOTLIGHT_POOL = shuffle(spotlightPool);
+
+    // notify spotlight renderer that Supabase data is ready
+    try{ window.dispatchEvent(new CustomEvent("popstar:supabase_ready", { detail:{ spotlightPool: window.__POPSTAR_SPOTLIGHT_POOL } })); }catch(e){}
+
 
     // features per genre (most recent first)
     const featurePlacements = (featsRes && featsRes.data) ? featsRes.data : [];
