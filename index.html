@@ -1,0 +1,5465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>popstar</title>
+<style>
+:root{
+  --brand:#8ACE00;
+  --bg:#f5f5f2;
+  --ink:#0b0b0c;
+  --muted:rgba(11,11,12,.70);
+  --radius:18px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+html{scroll-behavior:smooth; scroll-padding-top: 100px;}
+body{
+  margin:0;
+  background: var(--bg); /* solid brand background */
+  font-family:-apple-system,BlinkMacSystemFont,"sf pro text",system-ui;
+  color:var(--ink);
+  text-transform:lowercase;
+  overflow-x:hidden;
+}
+
+/* subtle grain */
+body:before{
+  content:"";
+  position:fixed; inset:0;
+  pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.10'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+  opacity:.20;
+}
+
+a{color:inherit}
+.wrap{max-width:1100px; margin:0 auto; padding:18px 16px 90px;}
+
+/* sticky nav */
+.topbar{position:relative; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:18px 6px; background: transparent; border-bottom:0 !important;}
+.brand{display:flex; align-items:center; gap:10px; font-weight:1000; letter-spacing:-.03em;}
+.brandMark{
+  width:30px; height:30px; border-radius:10px;
+  background: var(--brand);
+  border:2px solid #000;
+  box-shadow: 0 10px 18px rgba(0,0,0,.16), 0 0 22px rgba(138,206,0,.35);
+  display:grid; place-items:center;
+  transform:none;
+  }
+.brandMark span{font-size:13px; font-weight:1000}
+.nav{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+.chip{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 12px; border-radius:999px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.88);
+  text-decoration:none; font-weight:950;
+  box-shadow: 0 10px 22px rgba(0,0,0,.08);
+  transition: transform .08s ease;
+  white-space:nowrap;
+}
+.chip:active{transform: translateY(1px) scale(.99)}
+
+/* ticker */
+.ticker{display:none; 
+  margin:12px 6px 0;
+  border:2px solid #000;
+  border-radius:14px;
+  background: rgba(255,255,255,.92);
+  overflow:hidden;
+  box-shadow: 0 10px 18px rgba(0,0,0,.10);
+}
+
+.tickerTrack span{opacity:.90}
+.tickerTrack b{
+  background: var(--brand);
+  padding:3px 8px;
+  border-radius:999px;
+  border:2px solid #000;
+}
+@keyframes scroll{ from{transform: translateX(0)} to{transform: translateX(-50%)} }
+
+/* hero */
+.hero{padding:26px 6px 10px;}
+h1{
+  margin:0 0 10px;
+  font-size: 82px; line-height:.95;
+  letter-spacing:-.05em; font-weight:1000;
+  text-shadow: none;
+}
+@media (max-width:520px){ h1{font-size:56px} }
+.sub{margin:0 0 14px; color:rgba(0,0,0,.72); font-weight:800; max-width: 70ch;}
+
+.btnRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  padding:12px 16px; border-radius:14px;
+  font-weight:1000; text-decoration:none;
+  border:2px solid #000;
+  transition: transform .08s ease;
+}
+.btn:active{transform: translateY(1px) scale(.99)}
+.btn.feature{background:#000; color:var(--brand); box-shadow: 0 12px 24px rgba(0,0,0,.10);}
+.btn.apply{background:#000; color:#fff; box-shadow: 0 12px 24px rgba(0,0,0,.10);}
+.pricing{margin-top:12px; font-weight:900; color:rgba(0,0,0,.70);}
+
+.tools{
+  margin-top:14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+@media (max-width:720px){ .tools{grid-template-columns:1fr} }
+.search{
+  width:100%;
+  max-width:360px;
+  flex:0 0 auto;
+}
+
+.filterBar{
+  display:flex;
+  gap:8px;
+  flex-wrap:nowrap;
+  justify-content:flex-end;
+  min-width:0;
+  overflow-x:auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom:2px;
+  flex:1 1 auto;
+}
+
+.fchip{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 12px;
+  border-radius:999px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:950;
+  cursor:pointer;
+  user-select:none;
+  box-shadow: 0 10px 18px rgba(0,0,0,.10);
+}
+.fchip.is-on{background: var(--brand);}
+/* magazine section dividers */
+.section{margin-top:54px; padding:0 6px;}
+.divider{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:10px; margin:0 0 14px;
+  padding-bottom:10px;
+  border-bottom:0 !important;
+  position:relative;
+}
+.divider:after{content:""; position:absolute; left:0; bottom:-2px; width:150px; height:3px; background: var(--brand); box-shadow: 0 0 18px rgba(138,206,0,.25);}
+h2{
+  margin:0;
+  font-size:28px;
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:-.04em;
+}
+.dividerHint{color:rgba(0,0,0,.70); font-weight:900; font-size:13px; text-align:right;}
+
+/* grids + cards */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap:14px;
+}
+@media (max-width:980px){ .grid{grid-template-columns: repeat(2, minmax(0, 1fr));} }
+@media (max-width:520px){ .grid{grid-template-columns: 1fr;} }
+
+.card{
+  background: rgba(255,255,255,.92);
+  border-radius: var(--radius);
+  overflow:hidden;
+  border:2px solid #000;
+  text-decoration:none;
+  color:inherit;
+  position:relative;
+  box-shadow: 0 10px 22px rgba(0,0,0,.10);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+}
+.thumb{
+  /* Genre section seller cards: allow true square profile images.
+     The previous fixed height acted like a "locking mechanism" that
+     prevented the cards from getting taller. */
+  aspect-ratio: 1 / 1;
+  height:auto;
+  background: linear-gradient(135deg, rgba(138,206,0,.28), rgba(0,0,0,.04));
+}
+.thumb img{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1.10) contrast(1.05);}
+.meta{padding:12px;}
+.name{font-weight:1000; letter-spacing:-.02em; margin:0 0 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.handle{margin:0 0 10px; color:rgba(0,0,0,.72); font-weight:900; font-size:13px;}
+.tags{display:flex; gap:8px; flex-wrap:wrap;}
+
+.cluster .card.seller .tags{display:flex; flex-direction:column; align-items:flex-start; gap:6px; flex-wrap:nowrap;}
+.cluster .card.seller .tags .pillMainLine{display:flex; gap:8px; align-items:center; flex-wrap:nowrap;}
+.cluster .card.seller .tags .pillSubLine{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+.cluster .card.seller .tags .pillLines{display:flex; flex-direction:column; gap:6px;}
+
+
+.footer{margin-top:64px; padding:0 6px; color:rgba(0,0,0,.70); font-weight:850; font-size:13px; line-height:1.5;}
+.hidden{display:none !important;}
+
+/* popstar native form */
+.formWrap{
+  border:2px solid #000;
+  border-radius:18px;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+  overflow:hidden;
+}
+.formInner{padding:14px;}
+.formGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+}
+@media (max-width:720px){ .formGrid{grid-template-columns:1fr;} }
+
+label{display:block; font-weight:950; margin:0 0 6px;}
+.field{
+  width:100%;
+  padding:12px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.96);
+  font-weight:850;
+  outline:none;
+}
+.field:focus{box-shadow: 0 0 0 4px rgba(138,206,0,.28);}
+
+.help{margin-top:6px; color:rgba(0,0,0,.70); font-weight:850; font-size:13px; line-height:1.35;}
+.row{margin-bottom:12px;}
+.full{grid-column:1 / -1;}
+
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.choice{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  border-radius:999px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:950;
+  cursor:pointer;
+  user-select:none;
+}
+.choice input{display:none;}
+.choice.is-on{background: var(--brand);}
+
+.inline{
+  display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+}
+.checkbox{
+  display:inline-flex; align-items:center; gap:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  font-weight:950;
+}
+
+.notice{
+  margin-top:10px;
+  padding:12px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,255,255,.96);
+  font-weight:950;
+}
+.notice b{background: var(--brand); padding:2px 8px; border-radius:999px; border:2px solid #000;}
+.error{
+  margin-top:10px;
+  padding:12px 12px;
+  border-radius:14px;
+  border:2px solid #000;
+  background: rgba(255,0,0,.10);
+  font-weight:950;
+}
+.small{font-size:13px; color:rgba(0,0,0,.70); font-weight:900;}
+
+/* --- boosts layout (v5) --- */
+.pricingRow{
+  display:flex !important;
+  gap:24px !important;          /* half of the extreme spacing */
+  flex-wrap:wrap !important;
+  align-items:flex-start !important;
+}
+
+.sectionBoostRow{
+  margin: 20px 0 16px !important;  /* half vertical spacing */
+}
+
+.priceLink{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  font-weight:1000 !important;
+  padding: 10px 14px !important;
+  text-decoration:none !important;
+  color:#000 !important;             /* true black */
+  cursor:pointer !important;
+  transition: color .12s ease, transform .12s ease;
+}
+
+.priceLink:hover{
+  color: var(--brand) !important;    /* hover to green */
+}
+
+.priceLink:active{
+  transform: translateY(1px);
+}
+
+/* --- hero play / pause icon style --- */
+.mediaControls{
+  display:flex;
+  gap:4px; /* extra tight spacing */
+  margin-top:12px;
+  justify-content:flex-start;
+}
+
+.mediaIconBtn{
+  background:transparent;
+  border:none;
+  padding:0;
+  cursor:pointer;
+}
+
+.mediaIconBtn svg{
+  display:block;
+}
+
+.mediaIconBtn:active{
+  transform: translateY(1px);
+}
+
+/* build marker: popstar premium v6 */
+
+/* --- hover states (v6) --- */
+/* hero buttons under title */
+.btn.feature:hover,
+.btn.apply:hover{
+  background: var(--brand) !important;
+  color:#000 !important;
+}
+
+/* white buttons */
+.chip:hover,
+.fchip:hover,
+.iconBtn:hover{
+  background: var(--brand) !important;
+  color:#000 !important;
+}
+
+/* --- overrides: popstar build v91 --- */
+.brandMark{ }
+.brandMark span{ color:#000 !important; }
+
+/* center boosts */
+.pricingRow, .pricingBlock{
+  display:flex !important;
+  justify-content:center !important;
+  gap:24px !important;
+  flex-wrap:wrap !important;
+}
+.sectionBoostRow, .sectionPricing{
+  display:flex !important;
+  justify-content:center !important;
+  margin:20px 0 16px !important;
+}
+.priceLink{ color:#000 !important; font-weight:1000 !important; }
+.priceLink:hover{ color: var(--brand) !important; }
+
+/* influencer message */
+.influencerMsg{
+  margin:-6px 0 14px;
+  font-weight:900;
+  color:rgba(0,0,0,.68);
+}
+.influencerMsg.ok{ color:#000; }
+.influencerMsg.ok span{ background:var(--brand); border:2px solid #000; padding:2px 8px; border-radius:999px; font-weight:1000; }
+.heroLeft{min-width:0;}
+.heroRight{min-width:0;}
+@media(max-width:700px){
+  .heroHeader{grid-template-columns:1fr; gap:22px;}
+}
+
+/* --- hero vertical alignment fix (v20) --- */
+.heroHeader{
+  align-items:flex-start !important;
+}
+
+.heroRight{
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+
+/* --- topbar nav removed (v22) --- */
+.topbar{
+  justify-content:flex-start !important;
+}
+
+/* --- v30: restore layout + full-width boosts/tools --- */
+.heroBelow{
+  margin-top:22px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+}
+.heroBelow #boosts{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:34px;
+  width:100%;
+}
+.heroBelow .tools{
+  width:100%;
+  max-width:980px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+}
+.heroBelow .tools .search{
+  width:100%;
+  max-width:920px;
+}
+.heroBelow .tools .filterBar{
+  width:100%;
+  justify-content:center !important;
+}
+.heroRight{
+  margin-top:-70px !important; /* spotlight lowered 20px vs -90 */
+}
+.hero h1{
+  transition: color .2s ease;
+}
+.hero h1:hover{
+  color:#8ACE00 !important;
+  cursor:pointer;
+}
+.heroBelowBoosts{
+  grid-column:2;
+  display:flex;
+  justify-content:center;
+}
+.heroBelowBoosts #boosts{
+  width:100%;
+  max-width:580px; /* roughly spotlight width */
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:34px;
+}
+.heroBelowTools{
+  grid-column:1 / -1;
+  display:flex;
+  justify-content:center;
+}
+.heroBelowTools .tools{
+  width:100%;
+  max-width:980px;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+}
+.heroBelowTools .tools .search{
+  width:520px;
+  max-width:520px;
+}
+.heroBelowTools .tools .filterBar{
+  width:auto;
+  justify-content:center !important;
+}
+/* Let pills wrap nicely but stay inline with search */
+.heroBelowTools .tools .filterBar{
+  flex:1 1 auto;
+  flex-wrap:wrap;
+  gap:12px;
+}
+@media(max-width:980px){
+  .heroBelow{
+    grid-template-columns:1fr;
+    row-gap:18px;
+  }
+  .heroBelowBoosts{grid-column:1;}
+  .heroBelowTools .tools{
+    flex-direction:column;
+  }
+  .heroBelowTools .tools .search{
+    width:100%;
+    max-width:920px;
+  }
+  .heroBelowTools .tools .filterBar{
+    width:100%;
+  }
+}
+
+/* --- v32: feature row tighter + single-line --- */
+.heroBelowBoosts{
+  margin-top:-2px !important; /* move up 10px */
+}
+.heroBelowBoosts #boosts{
+  gap:17px !important;          /* half spacing */
+  flex-wrap:nowrap !important;  /* keep on one line */
+}
+.heroBelowBoosts #boosts a{
+  font-size:13px !important;    /* slightly smaller */
+  white-space:nowrap !important;
+}
+@media(max-width:980px){
+  .heroBelowBoosts #boosts{
+    flex-wrap:wrap !important;  /* allow wrap on mobile */
+  }
+}
+
+/* v89: drop search row down a touch */
+.heroBelowTools{ margin-top:10px !important; }
+
+/* --- v32: search + genres on one line --- */
+.heroBelowTools .tools{
+  flex-wrap:nowrap !important;
+}
+.heroBelowTools .filterBar{
+  flex:1 1 auto !important;
+}
+@media(max-width:980px){
+  .heroBelowTools .tools{
+    flex-direction:column !important;
+    flex-wrap:wrap !important;
+  }
+}
+
+/* --- v33 tweaks: boosts smaller + tighter, remove corner mark, pull sections up --- */
+
+/* remove the little green square star in the corner */
+.topbar{display:none !important;}
+.heroBelowBoosts #boosts{
+  gap:16px !important;
+  flex-wrap:nowrap !important;
+}
+.heroBelowBoosts #boosts .priceLink{
+  font-size:13px !important;
+  letter-spacing:-.01em !important;
+  white-space:nowrap !important;
+}
+
+/* keep mobile readable */
+@media(max-width:980px){
+  .heroBelowBoosts #boosts{ flex-wrap:wrap !important; }
+  .heroBelowBoosts #boosts .priceLink{ font-size:16px !important; }
+}
+
+/* move everything below the search row up 10px */
+.section.cluster#alt{ margin-top:-2px !important; }
+
+/* --- v34 adjustments --- */
+
+/* bring topbar back but hide only the green square star */
+.topbar{display:flex !important;}
+.brandMark{display:none !important;}
+.heroBelowBoosts #boosts .priceLink{
+  font-size:11px !important;   /* smaller font */
+  white-space:nowrap !important;
+}
+
+/* drop everything below search row down 10px */
+.section.cluster{
+  margin-top:10px !important;
+}
+
+/* --- v35 spacing corrections --- */
+
+/* extra space at very top of page */
+body{
+  padding-top:5px !important;
+}
+
+/* move everything below search row down 10px properly */
+.section.cluster{
+  margin-top:20px !important; /* add more separation below search */
+}
+
+/* --- popstar v36 global spacing + topbar --- */
+body{ padding-top:10px !important; }
+.topbar{ display:flex !important; }
+.brandMark{ display:none !important; }
+
+/* --- popstar v36 spacing: search row to first genre section --- */
+.heroBelow{ margin-bottom:35px !important; }
+.heroBelowBoosts #boosts{ gap:8px !important; flex-wrap:nowrap !important; }
+.heroBelowBoosts #boosts .priceLink{ font-size:11px !important; white-space:nowrap !important; }
+@media(max-width:980px){
+  .heroBelowBoosts #boosts{ flex-wrap:wrap !important; }
+  .heroBelowBoosts #boosts .priceLink{ font-size:14px !important; }
+}
+
+/* --- popstar v36 search + genres inline --- */
+.heroBelowTools .tools{
+  flex-direction:row !important; align-items:center !important; justify-content:center !important;
+  flex-wrap:nowrap !important; gap:16px !important;
+}
+.heroBelowTools .filterBar{ flex:1 1 auto !important; width:auto !important; justify-content:center !important; }
+@media(max-width:980px){
+  .heroBelowTools .tools{ flex-direction:column !important; flex-wrap:wrap !important; }
+  .heroBelowTools .filterBar{ width:100% !important; }
+}
+
+/* --- popstar v36 bio popover --- */
+.bioBtn{
+  border:1.5px solid rgba(0,0,0,.65);
+  border-radius:999px;
+  padding:6px 10px;
+  font-weight:900;
+  font-size:13px;
+  letter-spacing:.01em;
+  background:transparent;
+  color:#000;
+  cursor:pointer;
+  line-height:1;
+}
+.bioBtn:hover{
+  border-color:#8ACE00;
+  color:#8ACE00;
+}
+.bioPopover{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(320px, calc(100% - 24px));
+  background:#fff; border:2px solid #000; border-radius:18px;
+  box-shadow:0 18px 45px rgba(0,0,0,.18);
+  padding:14px; z-index:30; display:none;
+}
+.bioPopover .bioText{ font-weight:800; font-size:14px; line-height:1.35; color:#111; }
+.bioPopover .bioMeta{ margin-top:10px; display:flex; justify-content:flex-end; }
+.bioClose{ border:2px solid #000; border-radius:999px; padding:7px 10px; font-weight:1000; background:#fff; cursor:pointer; }
+.sellerCard{ position:relative; }
+.heroBelowBoosts #boosts{ gap:6px !important; }
+.heroBelowBoosts #boosts .priceLink{ font-size:11px !important; }
+
+/* search bar smaller */
+.stickerBoosted{ padding:4px 8px !important; font-size:10px !important; border-width:2px !important; }
+
+/* bio (no-js) */
+.bioDetails{ display:inline-block; position:relative; }
+.bioDetails > summary{
+  list-style:none;
+  display:inline-block;
+  cursor:pointer;
+  user-select:none;
+}
+.bioDetails > summary::-webkit-details-marker{ display:none; }
+.bioDetails[open] .bioBubble{ display:block; }
+.bioBubble{
+  display:none;
+  position:absolute;
+  left:50%;
+  top:calc(100% + 10px);
+  transform:translateX(-50%);
+  width:min(320px, calc(100vw - 40px));
+  background:#fff;
+  border:2px solid #000;
+  border-radius:18px;
+  box-shadow:0 18px 45px rgba(0,0,0,.18);
+  padding:14px;
+  z-index:50;
+}
+.bioBubble p{
+  margin:0;
+  font-weight:800;
+  font-size:14px;
+  line-height:1.35;
+  color:#111;
+}
+
+/* apply form: bio character counter */
+.textareaWrap{ position:relative; }
+.charCount{
+  position:absolute;
+  bottom:8px;
+  right:10px;
+  font-size:13px;
+  pointer-events:none;
+  opacity:.6;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+}
+
+/* --- v45 top bar redesign --- */
+header, .topBar {
+  background:#8ACE00 !important;
+}
+
+.scrollBar{
+  width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  background:#8ACE00;
+  border-top:0 !important;
+}
+
+.scrollInner{
+  display:inline-block;
+  padding:8px 0;
+  font-weight:600;
+  color:#000;
+  animation:scrollMove 18s linear infinite;
+}
+
+@keyframes scrollMove{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
+
+/* --- v46 topbar + ticker --- */
+.topbar{
+  background:#8ACE00 !important;
+}
+.topbar .brandMark span{ color:#000 !important; }
+
+.scrollBar{
+  width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  background:#8ACE00;
+  border-top:0 !important;
+}
+.scrollInner{
+  display:inline-block;
+  padding:10px 0 9px;
+  font-weight:700;
+  letter-spacing:.2px;
+  color:#000;
+  will-change:transform;
+  animation:scrollMove 18s linear infinite;
+}
+@keyframes scrollMove{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
+
+/* --- v46 bio button matches pills --- */
+button.pill.bioBtn{
+  border:0;
+  cursor:pointer;
+  font:inherit;
+  line-height:1;
+}
+button.pill.bioBtn:focus{ outline: none; }
+
+/* --- v52 topbar + ticker (fixed, full-bleed, no clipping, makes space for hero) --- */
+.topbar{
+  background:#8ACE00 !important;
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  width:100% !important;
+  margin:0 !important;
+  border-radius:0 !important;
+  z-index:60 !important;
+  padding-top: env(safe-area-inset-top) !important;
+}
+
+/* topbar layout: brand row + ticker row */
+.topbar{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:0 !important;
+  padding-bottom:0 !important;
+}
+.topbar .brand{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  padding:14px 16px 10px !important;
+}
+.topbar .brandText{
+  font-weight:1000;
+  letter-spacing:-.03em;
+  color:#000;
+}
+.topbar .brandMark span{ color:#000 !important; }
+
+/* ticker row */
+.ticker{
+  width:100% !important;
+  overflow:hidden !important;
+  border-top:0 !important;
+  background:#8ACE00 !important;
+}
+
+.tickerItem{
+  flex:0 0 auto !important;
+  padding:8px 18px 7px !important;
+  font-weight:800 !important;
+  color:#000 !important;
+  white-space:nowrap !important;
+}
+
+/* seamless: 4 copies, shift by 25% */
+100%{ transform:translateX(-25%); }
+}
+
+/* reserve space so featured box isn't shoved/colliding */
+/* make sure no mysterious white strip above */
+html, body{ margin:0 !important; padding:0 !important; }
+
+/* --- bio modal --- */
+.bioModal{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:80;
+  background:rgba(0,0,0,.55);
+}
+.bioModal.hidden{ display:none; }
+.bioModalInner{
+  width:min(520px, 92vw);
+  max-height:70vh;
+  background:#fff;
+  border:2px solid #000;
+  border-radius:18px;
+  padding:14px 14px 16px;
+  box-shadow: 0 18px 45px rgba(0,0,0,.18);
+  display:flex;
+  flex-direction:column;
+}
+.bioModalText{
+  overflow:auto;
+  padding-right:6px;
+  max-height:calc(70vh - 140px);
+}
+
+.bioModalTitle{ font-weight:700; margin:6px 0 10px; color:#fff; }
+.bioModalText{ opacity:.92; line-height:1.35; font-size:14px; color:#fff; white-space:pre-wrap; }
+.bioModalClose{ float:right; padding:6px 10px; border-radius:999px; }
+
+.pill[data-bio-trigger="1"]{ cursor:pointer; user-select:none; }
+
+/* --- v53 topbar spacing uses measured spacer --- */
+#topbarSpacer{  }
+
+/* --- v57 modal brand styling --- */
+.bioModalInner{
+  border: 1px solid rgba(138,206,0,.45) !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,.55) !important;
+}
+.bioModalTitle{
+  color:#8ACE00 !important;
+  text-transform: lowercase;
+}
+.bioModalSub{
+  margin-top:-6px;
+  margin-bottom:12px;
+  font-size:13px;
+  opacity:.8;
+}
+.bioModalClose{
+  background: rgba(138,206,0,.14) !important;
+  border: 1px solid rgba(138,206,0,.35) !important;
+}
+
+/* --- v58 definitive topbar + hero fix --- */
+html, body { margin:0 !important; padding:0 !important; }
+body{ overflow-x:hidden; }
+
+/* Remove any accidental top padding from legacy tweaks */
+.wrap{ padding-top:0 !important; margin-top:0 !important; }
+
+/* One bar only: ticker full-bleed, flush to top */
+.topbar{
+  position:sticky !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  width:100vw !important;
+  margin:0 !important;
+  padding:0 !important;
+  border-radius:0 !important;
+  background:#8ACE00 !important;
+  z-index:80 !important;
+}
+
+/* Break out of any centered container */
+.topbar{
+  margin-left:calc(50% - 50vw) !important;
+  margin-right:calc(50% - 50vw) !important;
+}
+
+/* Ticker */
+.ticker{
+  display:block !important;
+  width:100% !important;
+  overflow:hidden !important;
+  border-top:0 !important;
+  background:#8ACE00 !important;
+}
+
+.tickerItem{
+  flex:0 0 auto !important;
+  padding:8px 18px 7px !important;
+  font-weight:900 !important;
+  color:#000 !important;
+  white-space:nowrap !important;
+}
+
+/* Seamless loop: we duplicate content exactly twice; translate by 50% */
+100%{ transform:translateX(-50%); }
+}
+
+/* Make room under sticky bar so hero doesn't feel cropped */
+.hero{ padding-top: 10px !important; }
+
+/* card store + location */
+.storeName{
+  font-size:13px;
+  opacity:.82;
+  margin-top:2px;
+}
+.loc{
+  font-size:11px;
+  letter-spacing:.08em;
+  opacity:.6;
+  margin-top:2px;
+}
+
+/* --- v59 topbar height + spacing --- */
+.topbar{
+  padding-top:0 !important;
+}
+.tickerItem{
+  padding:8px 18px 7px !important;
+}
+
+.tickerItem{ margin:0 !important; }
+
+/* --- bio modal --- */
+.bioModal{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:80;
+  background:rgba(0,0,0,.55);
+}
+.bioModal.hidden{ display:none; }
+.bioModalInner{
+  width:min(520px, 100%);
+  background:#0f0f10;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:14px 14px 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.45);
+}
+.bioModalTitle{ font-weight:700; margin:6px 0 10px; color:#fff; }
+.bioModalText{ opacity:.92; line-height:1.35; font-size:14px; color:#fff; white-space:pre-wrap; }
+.bioModalClose{ float:right; padding:6px 10px; border-radius:999px; }
+
+.pill[data-bio-trigger="1"]{ cursor:pointer; user-select:none; }
+
+/* --- v53 topbar spacing uses measured spacer --- */
+#topbarSpacer{  }
+
+/* --- v57 modal brand styling --- */
+.bioModalInner{
+  border: 1px solid rgba(138,206,0,.45) !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,.55) !important;
+}
+.bioModalTitle{
+  color:#8ACE00 !important;
+  text-transform: lowercase;
+}
+.bioModalSub{
+  margin-top:-6px;
+  margin-bottom:12px;
+  font-size:13px;
+  opacity:.8;
+}
+.bioModalClose{
+  background: rgba(138,206,0,.14) !important;
+  border: 1px solid rgba(138,206,0,.35) !important;
+}
+
+/* --- v58 definitive topbar + hero fix --- */
+html, body { margin:0 !important; padding:0 !important; }
+body{ overflow-x:hidden; }
+
+/* Remove any accidental top padding from legacy tweaks */
+.wrap{ padding-top:0 !important; margin-top:0 !important; }
+
+/* One bar only: ticker full-bleed, flush to top */
+.topbar{
+  position:sticky !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  width:100vw !important;
+  margin:0 !important;
+  padding:0 !important;
+  border-radius:0 !important;
+  background:#8ACE00 !important;
+  z-index:80 !important;
+}
+
+/* Break out of any centered container */
+.topbar{
+  margin-left:calc(50% - 50vw) !important;
+  margin-right:calc(50% - 50vw) !important;
+}
+
+/* Ticker */
+.ticker{
+  display:block !important;
+  width:100% !important;
+  overflow:hidden !important;
+  border-top:0 !important;
+  background:#8ACE00 !important;
+}
+
+.tickerItem{
+  flex:0 0 auto !important;
+  padding:8px 18px 7px !important;
+  font-weight:900 !important;
+  color:#000 !important;
+  white-space:nowrap !important;
+}
+
+/* Seamless loop: we duplicate content exactly twice; translate by 50% */
+100%{ transform:translateX(-50%); }
+
+.thumb{ position:relative; }
+.thumbLoc{
+  position:absolute;
+  left:10px;
+  bottom:10px;
+  font-size:11px;
+  letter-spacing:.08em;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(0,0,0,.55);
+  color:#fff;
+}
+
+/* --- v60 city/state same line --- */
+.row2{ display:grid !important; grid-template-columns:1fr 1fr !important; gap:10px !important; }
+@media (max-width:520px){ .row2{ grid-template-columns:1fr !important; } }
+
+/* v60 chips */
+.chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{
+  border:2px solid #000;
+  background: rgba(255,255,255,.92);
+  border-radius:999px;
+  padding:8px 12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.chip.is-on{
+  background:#8ACE00;
+}
+
+/* --- v61 seamless ticker (no gaps, never runs out) --- */
+.ticker{ overflow:hidden !important; }
+
+.tickerGroup{
+  flex:0 0 auto !important;
+  white-space:nowrap !important;
+  font-weight:900 !important;
+  color:#000 !important;
+  padding:7px 16px 6px !important;
+}
+@keyframes tickerSeamless{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
+
+/* --- v62 FIX: seamless ticker (no boundary gap, never runs out) --- */
+.ticker{ padding:0 16px !important; }
+
+.tickerGroup{
+  padding:0 !important;
+  margin:0 !important;
+  letter-spacing: .2px;
+}
+
+/* --- v64 ticker speed (definitive) --- */
+.tickerTrack{
+  animation: tickerSeamless 60s linear infinite !important;
+  -webkit-animation: tickerSeamless 60s linear infinite !important;
+  display:flex !important;
+  width:max-content !important;
+  will-change:transform !important;
+}
+.heroRight{ margin-top:0 !important; }
+
+/* --- v64 city/state same line --- */
+.row2{ display:grid !important; grid-template-columns:1fr 1fr !important; gap:10px !important; }
+@media (max-width:520px){ .row2{ grid-template-columns:1fr !important; } }
+@media (max-width:720px){
+  }
+.slideMedia{
+  position:relative !important;
+  border-radius:14px !important;
+  overflow:hidden !important;
+  background: linear-gradient(135deg, rgba(138,206,0,.35), rgba(0,0,0,.06)) !important;
+}
+
+/* controls layout */
+/* --- v65 ticker speed (definitive) --- */
+.tickerTrack{
+  animation-duration: 90s !important;
+}
+
+/* --- v65 prevent hero from being shoved up --- */
+.heroRight{ margin-top:0 !important; }
+.hero{ padding-top: 10px !important; }
+
+/* --- v66 tighten form vertical spacing --- */
+#applyForm .row{
+  margin-bottom: 10px !important;
+}
+#applyForm .row.full{
+  margin-bottom: 10px !important;
+}
+#applyForm label{
+  margin-bottom: 4px !important;
+  display:block;
+}
+#applyForm .field{
+  margin-top: 0 !important;
+}
+
+/* --- v67 location field (international) --- */
+#applyForm #location{ text-transform: lowercase; }
+
+/* --- v68 genre title links --- */
+.genreLink{
+  color:#000;
+  text-decoration:none;
+  transition:color .2s ease;
+}
+.genreLink:hover{
+  color:#8ACE00;
+}
+
+}
+
+/* --- v72 subgenre pills + inline bio --- */
+.subPill{
+  background:#8ACE00 !important;
+  color:#000 !important;
+  border:2px solid #000 !important;
+}
+
+/* --- v10x seller card pills: rounded + site-consistent --- */
+a.card.seller .tags{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  align-items:center !important;
+}
+a.card.seller .tags .pill{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:5px 10px !important;
+  border-radius:999px !important;
+  font-weight:950 !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  letter-spacing:.01em !important;
+  border:2px solid #000 !important;
+  box-shadow:none !important;
+}
+a.card.seller .tags .mainPill{
+  background:rgba(255,255,255,.92) !important;
+  color:#000 !important;
+}
+a.card.seller .tags .subPill{
+  background:var(--brand) !important;
+  color:#000 !important;
+}
+.bioSnippet{
+  margin-top:8px;
+  font-size:13px;
+  line-height:1.35;
+  opacity:.85;
+}
+/* genre link hover affects star + title */
+.genreLink{ color:#000; text-decoration:none; transition:color .2s ease; }
+.genreLink:hover{ color:#8ACE00; }
+
+.tinyHelp{ font-size:13px; opacity:.75; margin-top:6px; }
+
+/* --- v73 section spacing fixes (street + all) --- */
+section h2{ margin: 0 0 10px !important; }
+.dividerHint{ margin: 0 0 14px !important; }
+
+/* ensure card content breathes */
+a.card.seller{ padding-bottom: 12px !important; }
+a.card.seller .tags{ padding: 0 12px 0 !important; }
+a.card.seller .bioSnippet{
+  margin: 10px 12px 0 !important;
+  padding-bottom: 6px !important;
+}
+
+/* --- v73 form spacing polish --- */
+#applyForm .row{ margin-bottom: 10px !important; }
+#applyForm label{ margin: 0 0 5px !important; }
+#applyForm .field{ margin-top: 0 !important; }
+#applyForm .chips{ margin-top: 6px !important; margin-bottom: 6px !important; }
+#applyForm .tinyHelp{ margin-top: 4px !important; margin-bottom: 6px !important; }
+
+/* keep subcategory label tight above chips */
+#subChips{ padding:0 !important; }
+
+/* --- v74 section padding so titles don't touch edges --- */
+section{
+  padding-top: 18px !important;
+}
+section h2{
+  margin: 0 0 10px !important;
+}
+.dividerHint{
+  margin: 0 0 14px !important;
+}
+
+/* --- v74 form spacing polish --- */
+#applyForm .row{ margin-bottom: 10px !important; }
+#applyForm label{ margin: 0 0 5px !important; }
+#applyForm .chips{ margin-top: 6px !important; }
+@media (max-width:520px){
+}
+
+/* --- v75 uniform card pills + bio across categories --- */
+a.card.seller .tags{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  padding: 0 12px !important;
+}
+a.card.seller .pill{ white-space:nowrap !important; }
+a.card.seller .bioSnippet{
+  margin: 10px 12px 0 !important;
+  font-size:11px !important;
+  line-height:1.35 !important;
+  opacity:.85 !important;
+}
+.subPill{
+  background:#8ACE00 !important;
+  color:#000 !important;
+  border:2px solid #000 !important;
+}
+
+/* --- v75 section spacing: keep title + hint comfortable --- */
+section{ padding-top: 18px !important; }
+section h2{ margin: 0 0 10px !important; }
+.dividerHint{ margin: 0 0 14px !important; }
+@media (max-width:520px){
+}
+@media (max-width:520px){
+}
+
+/* --- v78 form: uniform row spacing --- */
+#applyForm .row{ margin-bottom:10px !important; }
+#applyForm label{ margin:0 0 5px !important; }
+#applyForm .chips{ margin-top:6px !important; }
+#applyForm .chip{ text-align:left; } /* align left in form chips */
+
+/* remove any leftover helper copy spacing */
+#applyForm .tinyHelp{ display:none !important; }
+
+/* --- v78 section headers spacing + ensure divider line visible --- */
+section{ padding-top:18px !important; }
+section h2{ margin:0 0 10px !important; }
+.dividerHint{ margin:0 0 14px !important; display:block !important; }
+
+/* --- v78 card tags alignment --- */
+a.card.seller .tags{ justify-content:flex-start !important; }
+.mainPill{
+  background:#000;
+  color:#fff;
+  border:2px solid #000;
+}
+
+/* --- v82 space below top bar (content only) --- */
+section.hero{ margin-top: 20px !important; }
+
+/* --- v82 uniform card layout --- */
+a.card.seller .tags{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  justify-content:flex-start !important;
+  padding:0 12px !important;
+}
+a.card.seller .bioSnippet{
+  margin: 10px 12px 0 !important;
+  font-size:11px !important;
+  line-height:1.35 !important;
+  opacity:.85 !important;
+}
+
+/* v88: tighten spacing between category labels and chip rows in the form */
+.row.tight{ margin-bottom:4px; }
+.row.tight + .chips{ margin-top:0; }
+
+/* v88: standardize seller card spacing, pills, and bio rhythm */
+.meta{ padding:12px; }
+.name{ margin:0 0 4px; }
+.handle{ margin:0 0 8px; }
+.tags{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-start;
+  margin:0 0 10px;
+}
+.bioSnippet{
+  margin-top:0;
+  line-height:1.35;
+  display:-webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow:hidden;
+}
+
+/* v88: featured spotlight containment + controls placement */
+.wrap{max-width:1100px; margin:0 auto; padding:18px 16px 90px;}
+/* keep ticker full-bleed only */
+.topbar{width:100vw;}
+/* seller cards: align everything to same gutter */
+a.card.seller .meta{ padding:12px !important; }
+a.card.seller .tagRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:0 0 10px !important;
+}
+a.card.seller .tags{
+  display:flex !important;
+  gap:8px !important;
+  flex-wrap:wrap !important;
+  justify-content:flex-start !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+a.card.seller .cardView{
+  font-weight:900;
+  font-size:14px;
+  white-space:nowrap;
+}
+a.card.seller .bioSnippet{
+  margin:0 !important;
+  font-size:11px !important;
+  line-height:1.35 !important;
+  opacity:.85 !important;
+  display:-webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 4 !important;
+  overflow:hidden !important;
+}
+
+/* v91: apply form vertical rhythm + containment */
+.formWrap{max-width: 980px; margin:0 auto; width:100%;}
+.formInner{width:100%;}
+.formGrid{display:grid; gap:18px;}
+.formGrid .row{margin:0 !important;}
+.formGrid label{display:block; margin:0 0 8px !important;}
+.formGrid .field{margin:0 !important;}
+.formGrid .chips{margin:0 0 6px !important; padding:0 !important;}
+.formGrid .row.full.tight{margin-top:0 !important;}
+
+/* --- v92: spine reset (keep topbar full-bleed, constrain everything else) --- */
+.wrap{
+  max-width: 1180px !important;
+  margin: 0 auto !important;
+  padding: 0 24px !important;
+  box-sizing: border-box !important;
+}
+@media(max-width:520px){
+  .wrap{ padding: 0 16px !important; }
+}
+
+/* Topbar stays full-bleed */
+.topbar{
+  width: 100vw !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+}
+
+/* Everything else must NOT breakout */
+.hero, .section, .footer, .buildBadge{
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Prevent any accidental 100vw breakouts below topbar */
+.hero *, .section *, .footer *{
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- v92: search + filter chips on one row --- */
+.heroBelowTools .tools{
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+}
+.heroBelowTools .filterBar{
+  flex: 1 1 auto !important;
+  flex-wrap: nowrap !important;
+  gap: 10px !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.heroBelowTools .filterBar::-webkit-scrollbar{ height: 0; }
+
+/* Mobile: allow wrap */
+@media(max-width:980px){
+  .heroBelowTools .tools{ flex-direction: column !important; flex-wrap: wrap !important; }
+  .heroBelowTools .filterBar{ width: 100% !important; flex-wrap: wrap !important; overflow: visible; }
+}
+
+/* --- v92: bio modal sizing + safe hidden state --- */
+.bioModal{
+  width: 520px !important;
+  max-width: calc(100vw - 32px) !important;
+}
+.bioModalInner{
+  max-height: 70vh !important;
+  overflow: auto !important;
+}
+.bioModal.hidden{ display:none !important; }
+
+/* --- v92: apply form spacing + containment --- */
+#apply .formWrap, #apply .formInner{
+  width: 100% !important;
+  max-width: 980px !important;
+  margin: 0 auto !important;
+}
+#apply .formGrid{
+  row-gap: 14px !important;
+}
+#apply .row{ margin: 0 !important; }
+#apply .row + .row{ margin-top: 12px !important; }
+#apply .row.tight{ margin-top: 8px !important; }
+#apply .row.tight + .chips{ margin-top: 6px !important; margin-bottom: 10px !important; }
+
+/* --- v92: card alignment + clamp consistency --- */
+a.card.seller .meta{ padding: 12px !important; }
+a.card.seller .tags{
+  padding: 0 !important;     /* remove old padding that misaligned */
+  margin: 0 0 10px !important;
+}
+a.card.seller .bioSnippet{
+  margin: 0 !important;
+  line-height: 1.35 !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 4 !important;
+  overflow: hidden !important;
+}
+
+/* force categories row to match main content width */
+.heroBelowTools .tools{
+  width:100% !important;
+  max-width:1100px !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* align feature buttons to right edge of spotlight */
+.heroBelowBoosts{
+  justify-content:flex-end !important;
+}
+
+.heroBelowBoosts #boosts{
+  justify-content:flex-end !important;
+}
+
+/* --- popstar: success pulse (form submit) --- */
+.successPulse{
+  animation: successPulse 0.7s ease-out;
+}
+@keyframes successPulse{
+  0%{ box-shadow: 0 0 0 0 rgba(138,206,0,0); }
+  40%{ box-shadow: 0 0 0 8px rgba(138,206,0,.35); }
+  100%{ box-shadow: 0 0 0 0 rgba(138,206,0,0); }
+}
+
+/* --- popstar apply spacing refinement --- */
+#apply .row {
+  margin-bottom: 14px;
+}
+
+#apply .row.full {
+  margin-bottom: 16px;
+}
+
+#apply .help {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+#apply button[type="submit"] {
+  margin-top: 6px;
+}
+
+#apply .inline,
+#apply .checkbox {
+  margin-bottom: 8px;
+}
+
+/* add breathing room below depop disclaimer */
+#depopDisclaimer{
+  margin-bottom: 40px !important;
+}
+
+/* --- hero media label --- */
+.mediaLabel{
+  font-weight:900;
+  font-size:14px;
+  margin-left:8px;
+  align-self:center;
+}
+
+/* --- media hover interactions --- */
+.mediaLabel{
+  text-decoration:none;
+  color:#000;
+  transition: color .15s ease;
+}
+
+.mediaLabel:hover{
+  color: var(--brand);
+}
+
+.mediaIconBtn svg polygon,
+.mediaIconBtn svg rect{
+  transition: fill .15s ease;
+}
+
+.mediaIconBtn:hover svg polygon,
+.mediaIconBtn:hover svg rect{
+  fill:#000;
+}
+
+/* --- v99: spotlight refined (slightly less tall + slightly wider) --- */
+
+/* slightly wider spotlight column */
+.heroHeader{
+  grid-template-columns: 1.28fr 1.52fr !important;
+}
+
+@media (max-width:520px){
+}
+
+/* --- v100: spotlight slightly wider only (height unchanged) --- */
+
+.heroHeader{
+  grid-template-columns: 1.22fr 1.58fr !important;
+}
+
+/* --- v106: spotlight mini item slideshow --- */
+/* --- v107: mini item strip auto-scroll (subtle) --- */
+/* Pause on hover (desktop) */
+@media (hover:hover){
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+}
+100%{ transform: translateX(-50%); }
+}
+
+/* --- v109: center spotlight pricing under new box width --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+}
+
+.heroBelowBoosts #boosts{
+  width:100% !important;
+  max-width:100% !important;
+  justify-content:center !important;
+  text-align:center !important;
+}
+
+/* --- v112: spotlight sticker for Featured Spotlight sellers --- */
+.stickerSpotlight{
+  position:absolute;
+  top:14px; left:14px;
+  background: var(--brand); color:#000;
+  padding:6px 12px;
+  border-radius:999px;
+  border:2px solid #000;
+  font-size:10px;
+  font-weight:1000;
+  transform: rotate(-8deg);
+  box-shadow: 0 10px 18px rgba(0,0,0,.12);
+  z-index:3;
+}
+
+/* --- v113: spotlight sticker slightly bigger + subtle glow animation --- */
+.stickerSpotlight{
+  padding:6px 10px !important;
+  font-size:11px !important;
+  box-shadow: 0 10px 18px rgba(0,0,0,.12), 0 0 0 rgba(138,206,0,.0) !important;
+  animation: spotlightGlow 2.4s ease-in-out infinite;
+}
+
+@keyframes spotlightGlow{
+  0%, 100%{
+    box-shadow: 0 10px 18px rgba(0,0,0,.12), 0 0 0 rgba(138,206,0,0);
+    filter: saturate(1);
+  }
+  50%{
+    box-shadow: 0 10px 18px rgba(0,0,0,.12), 0 0 18px rgba(138,206,0,.45);
+    filter: saturate(1.15);
+  }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .stickerSpotlight{ animation: none !important; }
+}
+
+/* --- v113: center spotlight pricing under spotlight column width --- */
+.heroBelowBoosts{
+  width:100% !important;
+  justify-content:stretch !important;
+}
+
+.heroBelowBoosts #boosts{
+  width:100% !important;
+  max-width:none !important;     /* remove old cap that can mis-align */
+  justify-content:center !important;
+}
+
+/* --- v114: reposition + larger + stronger glow --- */
+.stickerSpotlight{
+  top:8px !important;          /* closer to top edge */
+  left:8px !important;         /* closer to left edge */
+  padding:8px 14px !important; /* slightly bigger */
+  font-size:11px !important;
+  transform: rotate(-6deg) !important;
+  animation: spotlightGlowStrong 1.8s ease-in-out infinite !important;
+}
+
+@keyframes spotlightGlowStrong{
+  0%, 100%{
+    box-shadow: 0 10px 18px rgba(0,0,0,.18),
+                0 0 0 rgba(138,206,0,0);
+  }
+  50%{
+    box-shadow: 0 10px 18px rgba(0,0,0,.18),
+                0 0 28px rgba(138,206,0,.75),
+                0 0 45px rgba(138,206,0,.45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .stickerSpotlight{ animation:none !important; }
+}
+
+/* --- v115: spotlight sticker bigger (clean, no animation) --- */
+.stickerSpotlight{
+  top:6px !important;
+  left:6px !important;
+  padding:10px 18px !important;
+  font-size:11px !important;
+  font-weight:1000 !important;
+  transform: rotate(-5deg) !important;
+  box-shadow:
+    0 12px 22px rgba(0,0,0,.22),
+    0 0 18px rgba(138,206,0,.65) !important; /* visible green glow */
+}
+
+/* --- v116: spotlight sticker top-left + extreme pulsing glow --- */
+.stickerSpotlight{
+  top:2px !important;
+  left:2px !important;
+  padding:10px 18px !important; /* keep size from v115 */
+  font-size:11px !important;
+  transform: rotate(-5deg) !important;
+  /* use filter drop-shadows for more consistent glow */
+  box-shadow: 0 12px 22px rgba(0,0,0,.22) !important;
+  filter: drop-shadow(0 0 0 rgba(138,206,0,0));
+  animation: spotlightPulse 1.5s ease-in-out infinite !important;
+}
+
+@keyframes spotlightPulse{
+  0%,100%{
+    filter:
+      drop-shadow(0 0 6px rgba(138,206,0,.55))
+      drop-shadow(0 0 14px rgba(138,206,0,.45))
+      drop-shadow(0 0 26px rgba(138,206,0,.25));
+  }
+  50%{
+    filter:
+      drop-shadow(0 0 10px rgba(138,206,0,.95))
+      drop-shadow(0 0 22px rgba(138,206,0,.85))
+      drop-shadow(0 0 44px rgba(138,206,0,.55))
+      drop-shadow(0 0 72px rgba(138,206,0,.35));
+  }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .stickerSpotlight{ animation:none !important; }
+}
+
+/* ensure sticker layers above image */
+.stickerSpotlight{
+  position:absolute !important;
+  top:0px !important;
+  left:0px !important;
+  z-index:50 !important;
+}
+
+/* --- v118: remove spotlight glow (clean badge) --- */
+.stickerSpotlight{
+  animation:none !important;
+  filter:none !important;
+  box-shadow: 0 12px 22px rgba(0,0,0,.22) !important; /* subtle depth only */
+}
+
+/* --- v119: move spotlight sticker slightly more left --- */
+.stickerSpotlight{
+  left:-6px !important;  /* shift slightly further left */
+}
+
+/* --- v122: hide right-edge sliver WITHOUT moving sticker --- */
+
+/* keep sticker where it was (more left) */
+.stickerSpotlight{
+  top:2px !important;
+  left:-6px !important;
+}
+
+/* Keep spotlight sticker over image but inside bounds (prevents next-slide edge peeks) */
+.stickerSpotlight{
+  top:4px !important;
+  left:4px !important;
+}
+
+/* --- v126: move spotlight sticker back (more left) --- */
+.stickerSpotlight{
+  top:2px !important;
+  left:-6px !important;   /* back to original more-left position */
+}
+
+/* Keep sticker inside bounds but visually shifted left */
+.stickerSpotlight{
+  left:0 !important;              /* keep inside container */
+  top:2px !important;
+  transform: translateX(-6px) rotate(-5deg) !important;  /* visual shift only */
+}
+
+/* Keep sticker visually left but contained */
+.stickerSpotlight{
+  left:0 !important;
+  transform: translateX(-6px) rotate(-5deg) !important;
+}
+
+/* (fallback for browsers that ignore clip-path): */
+@supports not (clip-path: inset(0 0 0 0)){
+}
+
+.slideCta{font-weight:1000;}
+
+/* --- seller modal (items preview) --- */
+.sellerModal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:18px; z-index:90; background:rgba(0,0,0,.55); }
+.sellerModal.hidden{ display:none; }
+.sellerModalInner{
+  width:min(760px, 94vw);
+  max-height:82vh;
+  background:#fff;
+  border:2px solid #000;
+  border-radius:18px;
+  padding:14px 14px 16px;
+  box-shadow: 0 18px 45px rgba(0,0,0,.18);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.sellerModalTop{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.sellerModalTitle{ font-weight:1000; letter-spacing:-.02em; font-size:18px; }
+.sellerModalHandle{ margin-top:4px; font-weight:900; color:rgba(0,0,0,.70); font-size:13px; }
+.sellerModalClose{ border:2px solid #000; border-radius:999px; padding:7px 10px; font-weight:1000; background:#fff; cursor:pointer; }
+.sellerModalBody{ overflow:auto; padding-right:6px; }
+.sellerModalBio{ font-weight:850; line-height:1.35; margin:0 0 12px; }
+.itemGrid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; }
+@media(max-width:720px){ .itemGrid{ grid-template-columns:1fr; } }
+.itemGrid img{ width:100%; height:220px; object-fit:cover; border-radius:14px; border:2px solid #000; background:rgba(0,0,0,.04); }
+.sellerModalActions{ display:flex; justify-content:flex-end; }
+.sellerModalActions a{ text-decoration:none; }
+.sellerModalActions .btnShop{ display:inline-flex; align-items:center; justify-content:center; padding:10px 12px; border-radius:999px; border:2px solid #000; background:var(--brand); font-weight:1000; }
+
+/* spotlight location overlay */
+/* spotlight style icon quote (rebuild step 1) */
+.spotStyleQuote{
+  line-height:1.05;
+  width:100%;
+  text-align:center;
+  font-weight:1000;
+  font-size:22px;                 /* base; JS will fit */
+  padding:8px 14px 0;
+  letter-spacing:-.01em;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.spotStyleQuote span{
+  display:inline-block;
+  transform-origin:center;
+}
+.spotLoc{
+  position:absolute;
+  left:10px;
+  bottom:10px;
+  padding:6px 9px;
+  border:2px solid #000;
+  border-radius:999px;
+  background:#fff;
+  font-weight:1000;
+  font-size:13px;
+  line-height:1;
+  max-width:calc(100% - 20px);
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.slideMedia{ position:relative; }
+
+/* spotlight item loop (auto-scroll, no buttons) */
+to{ transform: translate3d(calc(-1 * var(--loopPx, 50%)),0,0); }
+}
+@media(max-width:720px){
+}
+@media (max-width:520px){
+}
+
+/* --- v122: location pill hover parity + spotlight placement + spotlight hover --- */
+
+/* genre cards: location pill turns green on hover (match spotlight) */
+.card:hover .thumbLoc{
+  background: var(--brand) !important;
+  color:#000 !important;
+}
+@media (max-width:520px){
+}
+
+/* POPSTAR_SUCCESS_ANIMATION_V1 */
+.popstarSuccess{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:80px 20px;
+}
+.popstarSuccess .successInner{
+  text-align:center;
+  animation: popstarFade 0.6s ease-out forwards;
+}
+.popstarSuccess .successLine{
+  font-weight:1000;
+  font-size:28px;
+  letter-spacing:-0.02em;
+  margin-bottom:14px;
+  opacity:0;
+  animation: fadeUp 0.6s ease-out 0.2s forwards;
+}
+.popstarSuccess .successBrand{
+  font-weight:1000;
+  font-size:64px;
+  letter-spacing:-0.02em;
+  opacity:0;
+  animation: fadeUp 0.6s ease-out 0.35s forwards, pulseGlow 1.4s ease-in-out 0.6s;
+}
+@keyframes popstarFade{
+  from{ opacity:0; transform:scale(0.96); }
+  to{ opacity:1; transform:scale(1); }
+}
+@keyframes fadeUp{
+  from{ opacity:0; transform:translateY(10px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+@keyframes pulseGlow{
+  0%{ text-shadow:0 0 0px rgba(0,0,0,0); }
+  50%{ text-shadow:0 0 20px rgba(0,0,0,0.12); }
+  100%{ text-shadow:0 0 0px rgba(0,0,0,0); }
+}
+@media (max-width:520px){
+}
+
+
+
+
+/* Desktop: give the right column a fixed width so the spotlight can actually expand */
+@media (min-width: 981px){
+  .heroHeader{
+    grid-template-columns: minmax(0, 1fr) 730px !important;
+    gap:40px !important;
+    align-items:start !important;
+  }
+  .heroRight{
+    display:flex !important;
+    justify-content:flex-end !important;
+    align-items:flex-start !important;
+    min-width:0 !important;
+  }
+  
+}
+
+/* Mobile/tablet: keep it inside the viewport */
+@media (max-width: 980px){
+  
+}
+
+
+/* --- spotlight: lock overall box height (matches current look) --- */
+@media (min-width: 700px){
+}
+@media (max-width: 699px){
+}
+@media (max-width:520px){
+}
+
+/* Spotlight purchase buttons (replace links under spotlight box) */
+  display:inline-block;
+  background:#000 !important;
+  color: var(--brand) !important;
+  padding: 7px 14px !important;
+  border-radius: 6px !important;
+  text-decoration:none !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+}
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+
+
+
+
+/* --- hero two-column layout (spotlight placeholder sits in right column) --- */
+.heroHeader{
+  display:grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap:40px;
+  align-items:start;
+}
+.heroLeft{min-width:0;}
+.heroRight{min-width:0; display:flex; justify-content:flex-end; align-items:flex-start;}
+@media (max-width:980px){
+  .heroHeader{grid-template-columns:1fr; gap:22px;}
+  .heroRight{justify-content:flex-start;}
+}
+
+
+
+
+/* --- remove black outline under top bar (force clean edge) --- */
+.topbar,
+.ticker{
+  border:0 !important;
+  outline:0 !important;
+  box-shadow:none !important;
+}
+
+.topbar::after,
+.topbar::before,
+.ticker::after,
+.ticker::before{
+  display:none !important;
+  content:none !important;
+}
+
+
+
+
+/* --- ultra slim top bar --- */
+.topbar{
+  padding:0 !important;
+  min-height:0 !important;
+}
+
+.ticker{
+  margin:0 !important;
+  padding:0 !important;
+}
+
+.tickerItem{
+  padding:4px 12px 3px !important;
+  line-height:1 !important;
+  font-size:14px !important;
+}
+
+/* --- v126.1: tools row alignment (search left with title, chips right with spotlight) --- */
+.heroBelowTools{ width:100% !important; }
+
+.heroBelowTools .tools{
+  width:100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  display: grid !important;
+  grid-template-columns: 1.22fr 1.58fr !important; /* match heroHeader */
+  gap: 40px !important;
+  align-items: center !important;
+}
+
+.heroBelowTools .tools input.search{
+  grid-column: 1 !important;
+  justify-self: start !important;
+  width: 520px !important;
+  max-width: 520px !important;
+  flex: 0 0 auto !important;
+}
+
+.heroBelowTools .tools .filterBar{
+  grid-column: 2 !important;
+  justify-self: end !important;
+  justify-content: flex-start !important;
+  width: auto !important;
+  flex: 0 0 auto !important;
+  overflow-x: auto !important;
+  flex-wrap: nowrap !important;
+  padding-bottom: 2px !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media(max-width:980px){
+  .heroBelowTools .tools{
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    justify-items: stretch !important;
+  }
+  .heroBelowTools .tools input.search{
+    width: 100% !important;
+    max-width: 920px !important;
+    justify-self: stretch !important;
+  }
+  .heroBelowTools .tools .filterBar{
+    justify-self: stretch !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    overflow: visible !important;
+  }
+}
+
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+
+/* --- vCENTER: make heroBelow a 2-col grid so boosts can align to spotlight column --- */
+.heroBelow{
+  display:grid !important;
+  grid-template-columns: 1.22fr 1.58fr !important;
+  column-gap:40px !important;
+  row-gap:0 !important;
+  align-items:start !important;
+}
+
+/* Ensure boosts sit in the spotlight column and are vertically centered against the spotlight box height */
+.heroBelowBoosts{
+  grid-column:2 !important;
+  height:490px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  margin-top:0 !important;
+}
+
+/* Keep tools spanning full width under both columns */
+.heroBelowTools{
+  grid-column:1 / -1 !important;
+}
+
+/* Mobile: revert to stacked flow */
+@media (max-width: 980px){
+  .heroBelow{ display:flex !important; flex-direction:column !important; align-items:center !important; gap:18px !important; }
+  .heroBelowBoosts{ height:auto !important; }
+}
+
+
+/* --- spotlight: buttons under spotlight box --- */
+.spotlightBoosts{
+  margin-top:14px;
+  display:flex;
+  justify-content:center;
+}
+.spotlightBoosts #boosts{
+  justify-content:center !important;
+}
+
+
+/* --- vX: definitive spotlight button size + proximity override --- */
+.spotlightBoosts{ margin-top:8px !important; }
+.spotlightBoosts #boosts{ gap:10px !important; }
+.spotlightBoosts .spotlightBtn{
+  padding:7px 14px !important;
+  font-size:12px !important;
+  border-radius:12px !important;
+}
+
+</style>
+<link href="favicon.ico" rel="icon" sizes="any"/>
+<link href="favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="favicon-192.png" rel="icon" sizes="192x192" type="image/png"/>
+<link href="apple-touch-icon.png" rel="apple-touch-icon"/>
+<style>
+/* --- v93 overrides: tighter spine + modal overflow + form rhythm --- */
+
+/* Keep topbar full-bleed only */
+.topbar{
+  width:100vw !important;
+  margin-left:calc(50% - 50vw) !important;
+  margin-right:calc(50% - 50vw) !important;
+}
+
+/* Tight centered spine (matches "good" build feel) */
+.wrap{
+  max-width: 1080px !important;
+  margin: 0 auto !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  box-sizing: border-box !important;
+}
+@media(max-width:520px){
+  .wrap{ padding-left: 14px !important; padding-right: 14px !important; }
+}
+
+/* Prevent breakout widths below topbar */
+.hero, .section, .footer{ width:100% !important; }
+.hero, .section, .footer{
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* --- Bio modal: stop overflow + keep size sane --- */
+.bioModal{ padding:18px !important; }
+.bioModalInner{
+  width: min(520px, 92vw) !important;
+  max-height: 70vh !important;
+  overflow: hidden !important;
+}
+.bioModalText{
+  flex: 1 1 auto !important;
+  overflow: auto !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+/* --- Hero search: slightly narrower so chips stay one row --- */
+/* --- Apply form: consistent vertical rhythm --- */
+#apply .formWrap, #apply .formInner{
+  max-width: 980px !important;
+  margin: 0 auto !important;
+}
+#apply .formGrid{
+  gap: 14px !important;
+}
+#apply .row{ margin:0 !important; }
+#apply .row.full{ grid-column: 1 / -1 !important; }
+#apply .chips.full{ grid-column: 1 / -1 !important; }
+#apply .row.tight{ margin-bottom: 0 !important; }
+#apply .row.tight + .chips{ margin-top: -6px !important; } /* pull chips closer to label */
+#apply .chips{ margin-bottom: 6px !important; }           /* keep next field consistent */
+
+/* --- Seller cards: align pills/bio with name/handle --- */
+a.card.seller .tags{ padding:0 !important; margin:0 0 10px !important; }
+a.card.seller .bioSnippet{
+  margin:0 !important;
+  display:-webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 4 !important;
+  overflow:hidden !important;
+}
+  width:88px;
+  height:88px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#fff;
+  flex:0 0 auto;
+}
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+
+
+<style>
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+<style id="build-badge-v133">
+.buildBadge{
+  position:fixed;
+  top:10px;
+  right:14px;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.08em;
+  background:#000;
+  color:#8ACE00;
+  padding:6px 10px;
+  border-radius:999px;
+  z-index:9999;
+  border:2px solid #000;
+}
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+100% { transform: translate3d(calc(var(--loopPx, 0px) * -1), 0, 0); }
+}
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+@media (prefers-reduced-motion: reduce){
+}
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Hover parity (only where hover exists) */
+@media (hover:hover) and (pointer:fine){
+}
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+<style>
+.slideMediaCol{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.saleCentered{
+  text-transform:uppercase;
+  width:100%;
+  margin-top:12px;
+  text-align:center;
+  background:#ff3b30;
+  color:#fff;
+  padding:12px 0;
+  border-radius:16px;
+  border:2px solid #000;
+  font-size:13px;
+  font-weight:1000;
+  letter-spacing:.14em;
+}
+
+.slideMediaCol .slideMedia{
+  width:100%;
+}
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+<style>
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+<style>
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+<style>
+#boosts{
+  display:flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+<style>
+
+/* Ensure style icon + bio are visible;
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+<style>
+
+/* --- spotlight placeholder alignment (even left/right edges) --- */
+.heroHeader{
+  display:grid !important;
+  grid-template-columns: 1.35fr 1fr !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+}
+
+@media (max-width:980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+
+<style>
+/* --- POPSTAR SPOTLIGHT ★ REBUILD: alignment + search aesthetic + spotlight buttons (FINAL OVERRIDE) --- */
+
+/* Keep hero grid as the spine for left/right alignment */
+.heroHeader{
+  display:grid !important;
+  grid-template-columns: 1.22fr 1.58fr !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+}
+
+/* Spotlight placeholder: fixed size, unaffected by content */
+
+
+/* Tools row uses SAME 2-col spine as hero: search left, chips right */
+.heroBelowTools{
+  width:100% !important;
+}
+.heroBelowTools .tools{
+  display:grid !important;
+  grid-template-columns: 1.22fr 1.58fr !important;
+  gap:40px !important;
+  align-items:center !important;
+  justify-content:unset !important;
+  width:100% !important;
+  max-width:1100px !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+}
+
+/* Left column: fixed-width search, aligned with title */
+/* Search aesthetic restored */
+.heroBelowTools #search:focus{
+  box-shadow: 0 0 0 4px rgba(138,206,0,.28), 0 10px 22px rgba(0,0,0,.10) !important;
+}
+
+/* Right column: chips aligned to spotlight right edge */
+.heroBelowTools #filterBar{
+  grid-column:2 !important;
+  justify-self:stretch !important;
+  display:flex !important;
+  justify-content:flex-end !important;
+  gap:10px !important;
+  flex-wrap:nowrap !important;
+  overflow-x:auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding-left:0 !important;
+}
+.heroBelowTools #filterBar::-webkit-scrollbar{ height:0 !important; }
+
+/* Spotlight purchase buttons: keep as BLACK BUTTONS w/ GREEN TEXT + stars */
+#boosts{
+  display:flex !important;
+  justify-content:center !important;     /* centered under spotlight column */
+  align-items:center !important;
+  gap:12px !important;
+  flex-wrap:nowrap !important;           /* single line on desktop */
+  width:680px !important;                /* match spotlight box width */
+  margin:14px auto 0 !important;
+}
+#boosts .spotlightBtn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:12px 18px !important;
+  border-radius:14px !important;
+  border:2px solid #000 !important;
+  background:#000 !important;
+  color: var(--brand) !important;
+  text-decoration:none !important;
+  font-weight:1000 !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  box-shadow: 0 12px 24px rgba(0,0,0,.12) !important;
+}
+#boosts .spotlightBtn:hover{
+  background: var(--brand) !important;
+  color:#000 !important;
+}
+#boosts .spotlightBtn:active{
+  transform: translateY(1px) scale(.99) !important;
+}
+
+/* Mobile: allow wrapping + full width */
+@media (max-width:980px){
+  .heroBelowTools .tools{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:16px !important;
+    max-width:980px !important;
+  }
+  .heroBelowTools #filterBar{
+    justify-content:center !important;
+    flex-wrap:wrap !important;
+    overflow:visible !important;
+    width:100% !important;
+  }
+  
+  #boosts{
+    width:100% !important;
+    max-width:600px !important;
+    flex-wrap:wrap !important;
+  }
+}
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+
+
+<style>
+
+/* --- vFINAL: tools row alignment + search width definitive --- */
+
+/* Tools row: same 2-column spine as hero header */
+.heroBelowTools .tools{
+  display:grid !important;
+  grid-template-columns: 1.35fr 1fr !important;   /* mirror heroHeader baseline */
+  column-gap:40px !important;
+  align-items:center !important;
+  width:100% !important;
+  max-width:1100px !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* Search: fixed width, left column, left-aligned with title */
+.heroBelowTools #search{
+  grid-column:1 !important;
+  justify-self:start !important;
+  width:400px !important;
+  max-width:400px !important;
+  flex:0 0 auto !important;
+}
+
+/* Chips: right column, right-aligned with spotlight box */
+.heroBelowTools #filterBar{
+  grid-column:2 !important;
+  justify-self:end !important;
+  justify-content:flex-end !important;
+}
+
+/* Mobile: stack like before */
+@media(max-width:980px){
+  .heroBelowTools .tools{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    gap:16px !important;
+    max-width:980px !important;
+  }
+  .heroBelowTools #search{
+    width:100% !important;
+    max-width:920px !important;
+  }
+  .heroBelowTools #filterBar{
+    width:100% !important;
+    justify-self:stretch !important;
+    justify-content:center !important;
+    flex-wrap:wrap !important;
+  }
+}
+
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+
+<style>
+
+/* --- vFINAL: tools row alignment + search width definitive --- */
+.heroBelowTools .tools{
+  display:grid !important;
+  grid-template-columns: 1.35fr 1fr !important;
+  column-gap:40px !important;
+  align-items:center !important;
+  width:100% !important;
+  max-width:1100px !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+.heroBelowTools #search{
+  grid-column:1 !important;
+  justify-self:start !important;
+  width:400px !important;
+  max-width:400px !important;
+  flex:0 0 auto !important;
+}
+.heroBelowTools #filterBar{
+  grid-column:2 !important;
+  justify-self:end !important;
+  justify-content:flex-end !important;
+}
+
+/* spotlight buttons: black buttons, single line desktop */
+#boosts{
+  display:flex !important;
+  gap:16px !important;
+  justify-content:center !important;
+  align-items:center !important;
+  flex-wrap:nowrap !important;
+}
+.priceLink.spotlightBtn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:#000 !important;
+  color: var(--brand) !important;
+  border:2px solid #000 !important;
+  border-radius:14px !important;
+  padding:12px 18px !important;
+  font-weight:1000 !important;
+  text-decoration:none !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+.priceLink.spotlightBtn:hover{
+  background: var(--brand) !important;
+  color:#000 !important;
+}
+
+/* Mobile stack */
+@media(max-width:980px){
+  .heroBelowTools .tools{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    gap:16px !important;
+    max-width:980px !important;
+  }
+  .heroBelowTools #search{
+    width:100% !important;
+    max-width:920px !important;
+  }
+  .heroBelowTools #filterBar{
+    width:100% !important;
+    justify-content:center !important;
+    flex-wrap:wrap !important;
+  }
+  #boosts{ flex-wrap:wrap !important; }
+}
+
+
+/* --- spotlight size +50px width & height --- */
+/* --- spotlight sizing (locked, +50px wider & taller, NO overflow) --- */
+/* The spotlight can never push past the wrap; it will cap at 730px and shrink if needed. */
+.heroHeader{
+  grid-template-columns: minmax(0, 1fr) minmax(0, 600px) !important;
+  gap:40px !important;
+  align-items:start !important;
+}
+
+.heroRight{
+  display:flex !important;
+  justify-content:flex-end !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+}
+
+/* Width: expand up to 730px but never exceed the available column width */
+
+
+/* Mobile/tablet stays safe */
+@media (max-width: 980px){
+  .heroHeader{ grid-template-columns: 1fr !important; gap:22px !important; }
+  .heroRight{ justify-content:flex-start !important; }
+  
+}
+
+
+
+/* --- vertically center spotlight buttons relative to spotlight box --- */
+.heroBelowBoosts{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center */
+}
+
+.heroBelowBoosts #boosts{
+  width:600px !important;
+  max-width:100% !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;   /* vertical center inside row */
+  gap:16px !important;
+  margin:0 auto !important;
+}
+
+</style>
+
+<style>
+/* --- spotlight: stack sale + view shop buttons (aligned + equal width) --- */
+.heroRight .slideCta,
+.heroRight .btnShop{
+  display:block !important;
+  width:100% !important;
+  max-width:240px !important;
+  margin:10px auto 0 !important;
+  text-align:center !important;
+}
+
+.heroRight .slideCta + .btnShop{
+  margin-top:8px !important;
+}
+</style>
+
+
+<style>
+/* --- spotlight: view shop button (match cardView text, but full-width under sale) --- */
+.heroRight .spotViewShop{
+  display:block;
+  width:100%;
+  margin:0 !important;
+  padding:10px 0;
+  border:2px solid #000;
+  border-radius:12px;
+  background:#fff;
+  text-decoration:none;
+  text-align:center;
+  font-weight:900;
+  font-size:14px;
+  white-space:nowrap;
+}
+.heroRight .spotViewShop:hover{
+  background: var(--brand);
+  color:#000;
+}
+
+.heroRight #spotlight img{display:block;}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+/* --- vCAROUSEL: spotlight right-column 3-item mini carousel (bottom) --- */
+.spotMiniCarousel{
+  /* positioning handled inline in JS so it aligns with view shop */
+  padding:0 10px;
+  z-index:5;
+}
+
+
+.spotMiniViewport{
+  display:flex;
+  align-items:flex-end;
+  width:100%;
+  overflow:hidden;
+  border-radius:14px;
+}
+.spotMiniTrack{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:max-content;
+  will-change: transform;
+  animation: spotMiniScroll 12s linear infinite;
+}
+.spotMiniItem{
+  flex:0 0 auto;
+  width:120px;
+  height:120px;
+  border-radius:14px;
+  border:2px solid #000;
+  overflow:hidden;
+  background:#fff;
+  box-shadow: 0 10px 18px rgba(0,0,0,.10);
+}
+.spotMiniItem img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+@keyframes spotMiniScroll{
+  from{ transform: translate3d(0,0,0); }
+  to{ transform: translate3d(calc(-1 * var(--miniLoopPx, 0px)),0,0); }
+}
+@media (hover:hover){
+  .spotMiniCarousel:hover .spotMiniTrack{ animation-play-state: paused; }
+}
+@media (prefers-reduced-motion: reduce){
+  .spotMiniTrack{ animation: none !important; }
+}
+</style>
+
+
+<style>
+/* --- Spotlight Left Column Spacing Test (Option B: 12px consistent gap) --- */
+.spotlightLeft{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:12px !important;
+}
+
+.spotlightLeft img,
+.spotlightLeft .saleBtn,
+.spotlightLeft .viewShopBtn{
+  margin:0 !important;
+}
+</style>
+
+
+<style>
+/* --- Move spotlight sale button up 5px --- */
+.spotlightLeft .saleBtn{
+  margin-top:-5px !important;
+}
+</style>
+
+
+<style>
+/* --- Spotlight: main genre on its own line, subcategories below --- */
+.spotlightRight .tags{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+}
+
+.spotlightRight .tags .mainPill{
+  flex:0 0 100% !important;   /* force full line */
+}
+
+.spotlightRight .tags .subPill{
+  flex:0 0 auto !important;   /* normal inline behavior */
+}
+</style>
+
+
+<style>
+/* --- Spotlight: subcategory pills 50% smaller --- */
+.spotlightRight .subPill{
+  font-size: 50% !important;
+  padding: 4px 8px !important;
+}
+</style>
+
+
+<style>
+/* --- FORCE spotlight subcategory pills smaller --- */
+.spotlightRight .tags > *:not(.mainPill){
+  font-size: 10px !important;
+  padding: 3px 6px !important;
+  border-radius: 999px !important;
+}
+</style>
+
+
+<style>
+/* --- FORCE spotlight main genre pill back to full size --- */
+.spotlightRight .tags > *:first-child{
+  font-size: 12px !important;
+  padding: 10px 12px !important;
+}
+</style>
+
+
+<style>
+/* --- Move spotlight buttons up 5px --- */
+.spotlightBoosts{
+  margin-top:3px !important; /* previously 8px, now 5px closer */
+}
+</style>
+
+
+<style>
+/* --- Spotlight: FORCE main genre pill to original seller-card sizing (override inline JS) --- */
+.spotlightRight .tags > span:first-child{
+  font-size: 14px !important;
+  padding: 8px 12px !important;
+}
+</style>
+
+
+<style>
+/* --- Spotlight-specific pills (reuse .chip aesthetic; do not affect seller cards) --- */
+.spotPills{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:14px !important;
+  margin-top:10px !important;
+}
+.spotPills .spotSubLine{ gap:10px !important; }
+
+.spotPills .spotMainLine,
+.spotPills .spotSubLine{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+/* Base aesthetic comes from .chip */
+.spotGenrePill.chip{
+  background:#000 !important;
+  color:#fff !important;
+}
+.spotSubPill.chip{
+  background:var(--brand) !important;
+  color:#000 !important;
+}
+
+/* Sizing tweaks (keep chip vibe) */
+.spotSubPill.chip{
+  padding:6px 10px !important;
+  font-size:11px !important;
+  box-shadow: 0 10px 18px rgba(0,0,0,.10) !important; /* match chip */
+}
+</style>
+
+
+<style>
+/* --- vSPOT: spotlight subcategory pills slightly bigger --- */
+#spotlight .spotPills .spotSubPill.chip,
+#spotlight .spotSubPill.chip{
+  font-size:12px !important;
+  padding:7px 12px !important;
+  line-height:1 !important;
+}
+
+/* If spotlight is still using the older .subPill markup, bump those too (spotlight-only) */
+#spotlight .spotlightRight .subPill,
+#spotlight .spotlightRight .tags > *:not(.mainPill){
+  font-size:12px !important;
+  padding:5px 10px !important;
+  line-height:1 !important;
+}
+</style>
+
+
+<style>
+/* --- v7: add horizontal breathing room to genre sections --- */
+.section{
+  padding-left: 48px !important;
+  padding-right: 48px !important;
+}
+@media (max-width:520px){
+  .section{
+    padding-left:32px !important;
+    padding-right:32px !important;
+  }
+}
+</style>
+
+
+<style>
+/* Spotlight subcategory pills slightly larger */
+.heroRight .subPill{
+  font-size: 14px !important;
+  padding: 6px 12px !important;
+}
+</style>
+
+
+<style id="filterBarAllRobustCSS">
+/* Ensure the filter bar starts from the left and doesn't animate on load */
+#filterBar{
+  justify-content:flex-start !important;
+  scroll-behavior:auto !important;
+}
+</style>
+
+
+
+
+
+<style id="leftAlignedGenreRow">
+.toolsRowLeft{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  margin-top:22px;
+}
+
+/* Smaller search bar */
+.toolsRowLeft .search{
+  width:460px;
+  padding:14px 18px;
+  border:2px solid #000;
+  border-radius:999px;
+  font-size:16px;
+  font-weight:900;
+  outline:none;
+  background:rgba(255,255,255,.95);
+}
+
+/* Smaller genre buttons */
+.genreInline{
+  display:flex;
+  gap:12px;
+  flex-wrap:nowrap;
+}
+
+.gchip{
+  border:2px solid #000;
+  border-radius:999px;
+  background:rgba(255,255,255,.92);
+  padding:10px 18px;
+  font-weight:1000;
+  font-size:15px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.gchip:active{ transform:translateY(1px); }
+
+@media(max-width:1100px){
+  .toolsRowLeft{ flex-wrap:wrap; }
+  .genreInline{ flex-wrap:wrap; }
+}
+
+@media(max-width:700px){
+  .toolsRowLeft{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .toolsRowLeft .search{
+    width:100%;
+  }
+}
+</style>
+
+<style id="spotlightBoxLinkCSS">
+/* Spotlight box behaves like a single clickable card */
+#spotlight{
+  cursor:pointer;
+  transition: background .14s ease, transform .08s ease;
+}
+#spotlight:hover{
+  background: var(--brand) !important;
+}
+@media (hover:hover){
+  #spotlight:active{ transform: translateY(1px) scale(.997); }
+}
+</style>
+<style id="genreCardHoverGreen">
+/* vGREENHOVER: genre profile cards turn brand green on hover */
+a.card.seller:hover,
+.card.seller:hover{
+  background: var(--brand) !important;
+}
+a.card.seller:hover .meta,
+.card.seller:hover .meta{
+  background: transparent !important;
+}
+a.card.seller:hover .name,
+a.card.seller:hover .handle,
+a.card.seller:hover .bioSnippet,
+.card.seller:hover .name,
+.card.seller:hover .handle,
+.card.seller:hover .bioSnippet{
+  color:#000 !important;
+  opacity:1 !important;
+}
+a.card.seller:hover .pill,
+.card.seller:hover .pill{
+  border-color:#000 !important;
+}
+a.card.seller:hover .mainPill,
+.card.seller:hover .mainPill{
+  background:#000 !important;
+  color:#fff !important;
+}
+a.card.seller:hover .subPill,
+.card.seller:hover .subPill{
+  background: rgba(255,255,255,.92) !important;
+  color:#000 !important;
+}
+</style>
+
+<style id="spotlightHoverPillOverride">
+/* Spotlight box hover: subcategory pills turn white */
+#spotlight:hover .spotSubPill,
+#spotlight:hover .subPill{
+  background:#fff !important;
+  color:#000 !important;
+  border:2px solid #000 !important;
+}
+</style>
+
+
+<style id="spotlightHoverButtonOverride">
+/* Spotlight box hover: spotlight button turns white */
+#spotlight:hover .spotlightBtn,
+#spotlight:hover #boosts .spotlightBtn{
+  background:#fff !important;
+  color:#000 !important;
+  border:2px solid #000 !important;
+}
+</style>
+
+
+<style id="spotlightHoverButtonOverride_v2">
+/* When hovering the spotlight box, also restyle the spotlight purchase buttons below it */
+#spotlight:hover + .spotlightBoosts .spotlightBtn,
+#spotlight:hover ~ .spotlightBoosts .spotlightBtn{
+  background:#fff !important;
+  color:#000 !important;
+  border:2px solid #000 !important;
+}
+
+/* If the spotlight box is wrapped in a link, keep it working */
+a:hover > #spotlight + .spotlightBoosts .spotlightBtn,
+a:hover > #spotlight ~ .spotlightBoosts .spotlightBtn{
+  background:#fff !important;
+  color:#000 !important;
+  border:2px solid #000 !important;
+}
+</style>
+
+
+<style id="spotlightHoverStickerOverride">
+/* When hovering spotlight box, invert spotlight sticker */
+#spotlight:hover .stickerSpotlight{
+  background:#fff !important;
+  color:#000 !important;
+  border:2px solid #000 !important;
+}
+</style>
+
+
+
+
+
+<style id="genreFeaturedStickerHardwire">
+/* Hardwire a "featured ★" sticker on ALL genre profile cards */
+/* Match the spotlight sticker *style* but keep it fully inside the card so nothing clips/peeks out */
+
+a.card.seller{
+  overflow:hidden !important; /* keep rounded corners clean */
+}
+
+a.card.seller .thumb{
+  position:relative !important;
+}
+
+/* place sticker inside the card bounds (prevents corner artifacts) */
+a.card.seller .thumb::before{
+  content:"featured ★";
+  position:absolute;
+  top:6px !important;
+  left:6px !important;
+  transform: rotate(-5deg) !important;
+  background: var(--brand);
+  color:#000;
+  padding:10px 18px;
+  border-radius:999px;
+  border:2px solid #000;
+  font-size:11px;
+  font-weight:1000;
+  line-height:1;
+  box-shadow: 0 12px 22px rgba(0,0,0,.22);
+  z-index:50;
+  pointer-events:none;
+}
+</style>
+
+
+
+
+
+<style id="genreFilterHover">
+/* White genre buttons hover -> brand green */
+.gchip:hover{
+  background: var(--brand) !important;
+  color:#000 !important;
+}
+</style>
+
+</head>
+<body>
+<div class="topbar">
+<div aria-label="categories" class="ticker"><div class="tickerTrack"><div aria-hidden="true" class="tickerGroup">alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ </div><div aria-hidden="true" class="tickerGroup">alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ </div></div></div></div><div class="wrap">
+<section class="hero">
+<div class="heroHeader">
+<div class="heroLeft">
+<h1>popstar ★</h1>
+<p class="sub">promote your depop. get discovered.</p>
+<div class="btnRow">
+<a class="btn feature" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" id="boostSpotlightBtn_disabled" rel="noopener" target="_blank">★ feature my shop</a>
+<a class="btn apply" href="#apply" id="applyBtn">✦ submit your shop</a>
+</div>
+<div class="mediaControls">
+<button aria-label="play" class="mediaIconBtn" id="playBtn">
+<svg height="28" viewbox="0 0 100 100" width="28">
+<polygon fill="var(--brand)" points="25,15 85,50 25,85"></polygon>
+</svg>
+</button>
+<button aria-label="pause" class="mediaIconBtn" id="pauseBtn">
+<svg height="28" viewbox="0 0 100 100" width="28">
+<rect fill="var(--brand)" height="60" width="18" x="25" y="20"></rect>
+<rect fill="var(--brand)" height="60" width="18" x="57" y="20"></rect>
+</svg>
+</button>
+<a class="mediaLabel" href="https://open.spotify.com/track/2gMtW38lYFYh1XHuKrzbpx" id="trackLink" rel="noopener" target="_blank">crunk that -- lanea ft lokadonna</a>
+</div>
+<!-- spotlight -->
+<!-- spotlight moved into hero -->
+</div>
+<div class="heroRight">
+
+<div id="spotlight" style="display:block; width:730px; height:490px; border:2px solid #000; border-radius:18px; background:rgba(255,255,255,.90); box-shadow:0 16px 34px rgba(0,0,0,.14);"></div>
+<div class="spotlightBoosts">
+<div class="pricing pricingRow" id="boosts">
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour spotlight ★</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day spotlight ★</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day spotlight ★</a>
+</div>
+</div>
+
+
+
+
+
+</div>
+</div>
+<div class="heroBelow">
+
+<div class="toolsRowLeft">
+  <input type="text" id="search" class="search" placeholder="search shop names, usernames, keywords, cities" />
+  <div class="genreInline">
+    <button class="gchip" data-filter="all">all</button>
+    <button class="gchip" data-filter="y2k">y2k</button>
+    <button class="gchip" data-filter="street">street</button>
+    <button class="gchip" data-filter="vintage">vintage</button>
+    <button class="gchip" data-filter="archive">archive</button>
+    <button class="gchip" data-filter="clean">clean</button>
+  </div>
+</div>
+</div>
+</div></div>
+</div>
+</section></div>
+<!-- clusters -->
+<section class="section cluster" data-cluster="alt" id="alt">
+<div class="divider">
+<h2><a class="genreLink" href="#alt">★ alt</a></h2>
+<div class="dividerHint">grunge • emo • goth • opium</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour alt feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day alt feature — $15</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day alt feature — $39</a>
+</div>
+<div class="grid" id="altGrid"><div class="loading">Loading…</div></div></section>
+<section class="section cluster" data-cluster="y2k" id="y2k">
+<div class="divider">
+<h2><a class="genreLink" href="#y2k">★ y2k</a></h2>
+<div class="dividerHint">baggy • surf • blingy • cute</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour y2k feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day y2k feature — $15</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day y2k feature — $39</a>
+</div>
+<div class="grid" id="y2kGrid"><div class="empty">loading y2k sellers…</div></div>
+</section>
+<section class="section cluster" data-cluster="street" id="street">
+<div class="divider">
+<h2><a class="genreLink" href="#street">★ street</a></h2>
+<div class="dividerHint">skate • workwear • gorp • flashy</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01">★ 24 hour street feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01">★ 7 day street feature — $15</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01">★ 30 day street feature — $39</a>
+</div>
+<div class="grid" id="streetGrid"><div class="loading">Loading…</div></div></section>
+<section class="section cluster" data-cluster="vintage" id="vintage">
+<div class="divider">
+<h2><a class="genreLink" href="#vintage">★ vintage</a></h2>
+<div class="dividerHint">true • 80s • 90s • band tees</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour vintage feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day vintage feature — $15</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day vintage feature — $39</a>
+</div>
+<div class="grid" id="vintageGrid"><div class="empty">loading vintage sellers…</div></div>
+</section>
+<section class="section cluster" data-cluster="archive" id="archive">
+<div class="divider">
+<h2><a class="genreLink" href="#archive">★ archive</a></h2>
+<div class="dividerHint">designer • avant-garde • runway • rare</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour archive feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day archive feature — $15</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day archive feature — $39</a>
+</div>
+<div class="grid" id="archiveGrid"><div class="empty">loading archive sellers…</div></div>
+</section>
+<section class="section cluster" data-cluster="clean" id="clean">
+<div class="divider">
+<h2><a class="genreLink" href="#clean">★ clean</a></h2>
+<div class="dividerHint">prep • neutral • fitness • basics</div>
+</div>
+<div class="pricingRow sectionBoostRow">
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour clean feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day clean feature — $15</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day clean feature — $39</a>
+</div>
+<div class="grid" id="cleanGrid"><div class="empty">loading clean sellers…</div></div>
+</section>
+<!-- apply (apply -> formspree) -->
+<section class="section cluster" id="apply">
+<div class="divider">
+<h2><a class="genreLink" href="#apply">✦ apply</a></h2>
+<div class="dividerHint">submit to be featured</div>
+</div>
+<div class="formWrap">
+<div class="formInner">
+<form action="https://formsubmit.co/popstarthewebsite@gmail.com" id="applyForm" method="POST" novalidate="">
+<input name="_captcha" type="hidden" value="false"/>
+<input name="_honey" style="display:none" type="text"/>
+<input id="mainCategory" name="main_category" type="hidden"/><input id="subTag2Hidden" name="sub_tag_2" type="hidden"/><input id="subTag1Hidden" name="sub_tag_1" type="hidden"/>
+<div class="formGrid">
+<div class="row2 full">
+<div class="row">
+<label for="depopUrl">depop url *</label>
+<input class="field" id="depopUrl" name="depop_url" placeholder="https://depop.com/@username" required=""/>
+<div class="help"></div>
+</div>
+<div class="row">
+<label for="handle">depop @username *</label>
+<input class="field" id="handle" name="depop_handle" placeholder="@username" required=""/>
+<div class="help"></div>
+</div>
+</div>
+<div class="row full">
+<label for="shopName">shop name *</label>
+<input class="field" id="shopName" name="shop_name" placeholder="shop name" required=""/>
+</div><div class="row full"><label for="location">location *</label><input class="field" id="location" name="location" placeholder="city, country (e.g. london, uk)" required="required"/></div>
+<div class="row full tight"><label for="mainCategory">main category *</label></div>
+<div class="chips full" id="primaryChips"></div>
+<div class="row full tight"><label for="subChips">subcategories (choose two) *</label></div>
+<div class="chips full" id="subChips"></div>
+<div class="row full bioRow">
+<label for="pitch">bio (160 characters max) *</label><div class="textareaWrap"><textarea class="field" id="pitch" maxlength="160" name="pitch" placeholder="tell us a little bit about yourself and your shop" required="" rows="4"></textarea><div class="charCount"><span id="bioCount">0</span>/160</div></div>
+</div>
+<div class="help"></div></div>
+<div class="row full">
+<label for="imageLink">image link (optional)</label>
+<input class="field" id="imageLink" name="image_link" placeholder="link to the image you want used"/>
+<div class="help">instagram post link, imgur, google drive share link (anyone with link), etc.</div>
+</div>
+<div id="influencerSection">
+<div class="row full">
+<div class="inline">
+<label class="checkbox">
+<input id="hasCode" type="checkbox"/>
+                  i have an influencer code
+                </label>
+<div class="small">codes unlock free featured placement (optional)</div>
+</div>
+</div>
+<div class="row full" id="codeRow" style="display:none;">
+<label for="influencerCode">influencer code</label>
+<input class="field" id="influencerCode" name="influencer_code" placeholder=""/>
+<div class="help">if you don’t have one, leave it blank and submit normally.</div>
+</div></div>
+<div class="row full">
+<div class="row full">
+<label for="contactEmail">contact email *</label>
+<input class="field" id="contactEmail" name="email" placeholder="you@example.com" required="" type="email"/>
+<div class="help">we’ll only use this to contact you if there’s an issue with your submission.</div>
+</div>
+<button class="btn apply" id="submitBtn" type="submit">✦ submit</button>
+<div class="help">by submitting you agree your profile may be displayed on popstar.</div>
+</div>
+<div class="row full hidden" id="formSuccess">
+<div class="notice successPulse"><b>★</b> submitted. review within 24 hours.</div>
+</div>
+<div class="row full hidden" id="formError">
+<div class="error" id="formErrorText">something went wrong. try again.</div>
+</div>
+</form></div>
+</div>
+<p class="sub" style="margin:12px 0 0;">
+</p>
+</section>
+<div class="footer">
+<div id="depopDisclaimer"><b>not affiliated with depop.</b> popstar is an independent promotion platform for depop sellers.</div>
+</div>
+<div aria-hidden="true" class="bioModal hidden" id="bioModal"><div aria-modal="true" class="bioModalInner" role="dialog"><button aria-label="close bio" class="btn bioModalClose" type="button">✕</button><div class="bioModalTitle">bio</div><div class="bioModalSub" id="bioModalSub"></div><div class="bioModalText" id="bioModalText"></div></div></div><script>
+
+const BUILD = "index-v172-spotlight-demo-spread-fix-2026-03-01";
+</script><script>
+// v57: bio modal opens from bio pills (prevents card navigation)
+(function(){
+  function openBio(host){
+    const modal = document.getElementById("bioModal");
+    const title = modal && modal.querySelector(".bioModalTitle");
+    const sub = document.getElementById("bioModalSub");
+    const text = document.getElementById("bioModalText");
+    if (!modal || !text) return;
+
+    const handle = (host && host.getAttribute("data-handle")) || "@seller";
+    const loc = (host && host.getAttribute("data-location")) || "";
+    const bio = (host && host.getAttribute("data-bio")) || "no bio available.";
+
+    if (title) title.textContent = handle;
+    if (sub) sub.textContent = loc ? loc : "";
+    text.textContent = bio;
+
+    modal.classList.remove("hidden");
+    modal.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
+  }
+  function closeBio(){
+    const modal = document.getElementById("bioModal");
+    if (!modal) return;
+    modal.classList.add("hidden");
+    modal.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+  }
+
+  document.addEventListener("click", (e) => {
+    const pill = e.target.closest && e.target.closest('[data-bio-trigger="1"]');
+    if (!pill) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const host = pill.closest("[data-bio]");
+    openBio(host);
+  }, true);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const pill = e.target.closest && e.target.closest('[data-bio-trigger="1"]');
+    if (!pill) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const host = pill.closest("[data-bio]");
+    openBio(host);
+  }, true);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("bioModal");
+    const close = modal && modal.querySelector(".bioModalClose");
+    if (close) close.addEventListener("click", closeBio);
+    if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) closeBio(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeBio(); });
+  });
+})();
+</script><script>
+// Spotlight box rebuild (step 1): show ONLY the style icon quote for the FSU profile
+document.addEventListener("DOMContentLoaded", () => {
+  const spotlight = document.getElementById("spotlight");
+  if (!spotlight) return;
+
+  // Clear anything previously injected
+  
+spotlight.innerHTML = "";
+
+  // choose spotlight profile (supabase pool -> random per refresh). fallback stays fsu.
+  const __pool = Array.isArray(window.__POPSTAR_SPOTLIGHT_POOL) ? window.__POPSTAR_SPOTLIGHT_POOL : [];
+  const __fallback = {
+    shop_name:"fsu",
+    username:"fsu",
+    location:"portland, usa",
+    genre:"archive",
+    subcategories:["designer","avant-garde"],
+    bio:"i am a celebrity stylist specializing in archive designer, rare vintage, and unique streetwear — curated pieces, fast ship, worldwide clients, new drops weekly.",
+    avatar_url:"https://otvznctmwutbwulbhfvx.supabase.co/storage/v1/object/public/avatars/square-image.jpg",
+    style_icon:"brad pitt",
+    era:"1970s",
+    favorite_city:"tokyo"
+  };
+  const __p = (__pool.length ? __pool[Math.floor(Math.random()*__pool.length)] : __fallback) || __fallback;
+
+  const __first = (obj, keys) => {
+    for (const k of keys){
+      const v = obj && obj[k] != null ? String(obj[k]).trim() : "";
+      if (v) return v;
+    }
+    return "";
+  };
+  const __toArray = (v) => {
+    if (!v) return [];
+    if (Array.isArray(v)) return v.map(x=>String(x).trim()).filter(Boolean);
+    return String(v).split(",").map(s=>s.trim()).filter(Boolean);
+  };
+
+  const __shop = __first(__p, ["shop_name","shop","store","store_name","name"]) || "fsu";
+  const __userRaw = __first(__p, ["username","handle","depop_handle","depop_username","ig_username","instagram"]) || "fsu";
+  const __username = (__userRaw.startsWith("@") ? __userRaw : "@"+__userRaw).toLowerCase();
+  const __handleSlug = __username.replace("@","").trim().toLowerCase();
+  const __depopUrl = __handleSlug ? `https://www.depop.com/${__handleSlug}/` : "";
+  const __location = (__first(__p, ["location"]) || "").toLowerCase() || "portland, usa";
+  const __genre = (__first(__p, ["genre","main_genre","main_category","category"]) || "archive").toLowerCase();
+  const __subs = __toArray(__first(__p, ["subcategories","subs","tags","subcats"]));
+  const __sub1 = (__subs[0] || "designer").toLowerCase();
+  const __sub2 = (__subs[1] || "avant-garde").toLowerCase();
+  const __bio = (__first(__p, ["bio","about","description","blurb"]) || "").toLowerCase() || "i am a celebrity stylist specializing in archive designer, rare vintage, and unique streetwear — curated pieces, fast ship, worldwide clients, new drops weekly.";
+  const __avatar = __first(__p, ["avatar_url","avatar","profile_pic","profile_image","image_url","img"]) || "https://otvznctmwutbwulbhfvx.supabase.co/storage/v1/object/public/avatars/square-image.jpg";
+
+  // spotlight identity (lowercase, cinematic)
+  const __icon = (__first(__p, ["style_icon","styleicon","style"]) || "").toLowerCase();
+  const __era = (__first(__p, ["era"]) || "").toLowerCase();
+  const __city = (__first(__p, ["favorite_city","city_favorite","fav_city"]) || "").toLowerCase();
+  const __styleLine = (__icon && __era && __city) ? `${__icon} in ${__era} ${__city}` : (__icon && __era ? `${__icon} — ${__era}` : (__icon || "kate moss 2003"));
+
+// Create inner spotlight layout
+const inner = document.createElement("div");
+inner.style.display = "grid";
+inner.style.position = "relative";
+inner.style.gridTemplateColumns = "300px 1fr";
+inner.style.gridTemplateRows = "auto 1fr auto auto";
+inner.style.width = "100%";
+inner.style.height = "100%"; inner.style.overflow = "hidden";
+inner.style.padding = "8px 18px 18px 18px";
+inner.style.boxSizing = "border-box";
+inner.style.gap = "8px";
+inner.style.alignItems = "start";
+
+spotlight.appendChild(inner);
+
+// Make the entire spotlight box a link to the seller\'s Depop (wired after username renders)
+
+/*
+  Spotlight quote auto-fit:
+  - Shrinks/grows font-size to fit width
+  - If the string is very short, we cap font-size and instead add letter-spacing (within limits)
+  - Prevents "90s" from becoming comically huge while still visually spanning the header
+*/
+window.__fitSpotQuote = (textEl, containerEl) => {
+  if (!textEl || !containerEl) return;
+
+  // Reset
+  textEl.style.letterSpacing = "-0.01em";
+  textEl.style.transform = "";
+  textEl.style.fontSize = "";
+
+  // Available width = container inner width (account for padding)
+  const cs = getComputedStyle(containerEl);
+  const padL = parseFloat(cs.paddingLeft) || 0;
+  const padR = parseFloat(cs.paddingRight) || 0;
+  const cw = Math.max(0, containerEl.clientWidth - padL - padR);
+  if (!cw) return;
+
+  const MAX_PX = 40;
+  const MIN_PX = 7;
+
+  const measure = () => (textEl.scrollWidth || textEl.getBoundingClientRect().width || 0);
+
+  // Binary search for largest font size that fits (at base letter-spacing)
+  let lo = MIN_PX, hi = MAX_PX, best = MIN_PX;
+  while (lo <= hi) {
+    const mid = Math.floor((lo + hi) / 2);
+    textEl.style.fontSize = mid + "px";
+    const tw = measure();
+    if (tw <= cw) {
+      best = mid;
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  textEl.style.fontSize = best + "px";
+
+  // Ensure no overflow after rounding
+  let tw2 = measure();
+  while (tw2 > cw && best > MIN_PX) {
+    best -= 1;
+    textEl.style.fontSize = best + "px";
+    tw2 = measure();
+  }
+  if (!tw2) return;
+
+  // Fill remaining space via letter-spacing (capped)
+  const remaining = cw - tw2;
+  const txt = (textEl.textContent || "").replace(/\s+/g, " ").trim();
+  const chars = Math.max(1, txt.length);
+  const gaps = Math.max(1, chars - 1);
+
+  if (remaining > 6) {
+    const ls = Math.min(12, Math.max(0, remaining / gaps));
+    textEl.style.letterSpacing = ls.toFixed(2) + "px";
+    tw2 = measure();
+
+    // If letter-spacing caused overflow, nudge font-size down until it fits again
+    while (tw2 > cw && best > MIN_PX) {
+      best -= 1;
+      textEl.style.fontSize = best + "px";
+      tw2 = measure();
+    }
+  }
+
+  // Final micro-stretch if still short (capped, subtle) AND still fits
+  if (tw2 && tw2 < cw - 6) {
+    const sx = Math.min(1.10, Math.max(1, cw / tw2));
+    textEl.style.transform = `scaleX(${sx.toFixed(3)})`;
+  }
+};
+
+/* Fit any single-line label (shop name / username) to its container by shrinking font-size */
+window.__fitOneLine = (el, opts={}) => {
+  if (!el) return;
+  const maxPx = typeof opts.maxPx === "number" ? opts.maxPx : null;
+  const minPx = typeof opts.minPx === "number" ? opts.minPx : 10;
+  const step  = typeof opts.step  === "number" ? opts.step  : 0.25;
+
+  // Ensure one-line behavior
+  el.style.whiteSpace = "nowrap";
+  el.style.overflow = "hidden";
+  el.style.textOverflow = "clip";
+
+  const parent = el.parentElement;
+  if (!parent) return;
+
+  // Measure available width (account for parent padding)
+  const pcs = getComputedStyle(parent);
+  const padL = parseFloat(pcs.paddingLeft) || 0;
+  const padR = parseFloat(pcs.paddingRight) || 0;
+  const avail = Math.max(0, parent.clientWidth - padL - padR);
+  if (avail <= 0) return;
+
+  // Start from current (or maxPx) and shrink until it fits
+  const cs = getComputedStyle(el);
+  let start = maxPx || parseFloat(cs.fontSize) || 16;
+  start = Math.max(minPx, start);
+
+  // Reset to start size first (important on resize)
+  el.style.fontSize = start + "px";
+
+  // If already fits, we're done
+  if (el.scrollWidth <= avail) return;
+
+  // Binary-ish search with small steps (stable + deterministic)
+  let size = start;
+  while (size > minPx && el.scrollWidth > avail) {
+    size = Math.max(minPx, size - step);
+    el.style.fontSize = size.toFixed(2) + "px";
+  }
+};
+
+  const style = __styleLine;
+
+  const quote = document.createElement("div");
+  quote.className = "spotStyleQuote";
+  quote.innerHTML = `<span id="spotStyleQuoteText">"${style}"</span>`;
+
+  quote.style.gridColumn = "1 / -1";
+  inner.appendChild(quote);
+
+  const span = quote.querySelector("#spotStyleQuoteText");
+  const fit = () => window.__fitSpotQuote && window.__fitSpotQuote(span, quote);
+
+  
+
+// Profile picture (FSU)
+
+  const profileWrap = document.createElement("div");
+  profileWrap.className = "spotProfileMedia";
+  profileWrap.style.position = "relative";
+  profileWrap.style.width = "100%";
+  profileWrap.style.gridColumn = "1";
+  profileWrap.style.gridRow = "2";
+  profileWrap.style.alignSelf = "start";
+
+  const profileImg = document.createElement("img");
+  profileImg.src = __avatar;
+
+  /* FORCE SQUARE */
+  profileImg.style.width = "100%";
+  profileImg.style.aspectRatio = "1 / 1";
+  profileImg.style.height = "auto";
+  profileImg.style.objectFit = "cover";
+  profileImg.style.borderRadius = "18px";
+  profileImg.style.border = "2px solid #000";
+  profileImg.style.display = "block";
+
+  // Spotlight sticker (top-left of the profile picture)
+  const spotSticker = document.createElement("div");
+  spotSticker.className = "stickerSpotlight";
+  spotSticker.textContent = "SPOTLIGHT ★";
+
+  // Location sticker (bottom-left, using the same style as genre card location pill)
+  const location = __location;
+  const locSticker = document.createElement("div");
+  locSticker.className = "thumbLoc";
+  locSticker.textContent = location;
+
+  profileWrap.appendChild(profileImg);
+  profileWrap.appendChild(spotSticker);
+  profileWrap.appendChild(locSticker);
+
+  inner.appendChild(profileWrap);
+
+// Right column: shop info (stress test)
+const rightCol = document.createElement("div");
+rightCol.className = "spotRightInfo";
+rightCol.style.gridColumn = "2";
+rightCol.style.gridRow = "2 / 5";
+rightCol.style.alignSelf = "start";
+rightCol.style.minWidth = "0";
+rightCol.style.display = "flex";
+rightCol.style.flexDirection = "column";
+rightCol.style.gap = "8px";
+rightCol.style.padding = "0 10px 0 8px";
+rightCol.style.boxSizing = "border-box";
+
+// Long shop name + username
+const shopName = document.createElement("div");
+shopName.id = "spotShopName";
+shopName.textContent = __shop;
+shopName.style.fontWeight = "1000";
+shopName.style.letterSpacing = "-0.02em";
+shopName.style.fontSize = "20px";
+shopName.style.lineHeight = "1.05";
+shopName.style.whiteSpace = "nowrap";
+shopName.style.overflow = "hidden";
+shopName.style.textOverflow = "clip";
+
+const username = document.createElement("div");
+username.id = "spotUsername";
+username.textContent = __username;
+
+// wire spotlight click-through
+try{
+  if (__depopUrl){
+    spotlight.setAttribute("role","link");
+    spotlight.setAttribute("aria-label", `open ${__handleSlug} on depop`);
+    spotlight.addEventListener("click", (e) => {
+      if (e.target && e.target.closest && e.target.closest("a")) return;
+      window.open(__depopUrl, "_blank", "noopener");
+    });
+  }
+}catch(e){}
+username.style.fontWeight = "900";
+username.style.opacity = "0.72";
+username.style.fontSize = "13px";
+username.style.whiteSpace = "nowrap";
+username.style.overflow = "hidden";
+username.style.textOverflow = "clip";
+
+// Genre pills (hardwired): vintage + true + band tees
+const pillRow = document.createElement("div");
+pillRow.className = "spotPills";
+/* Layout handled by .spotPills CSS */
+pillRow.style.alignItems = "flex-start";
+
+
+
+const pillMainLine = document.createElement("div");
+pillMainLine.style.display = "flex";
+pillMainLine.style.gap = "8px";
+pillMainLine.style.flexWrap = "nowrap";
+pillMainLine.style.alignItems = "center";
+
+const pillSubLine = document.createElement("div");
+pillSubLine.style.display = "flex";
+pillSubLine.style.gap = "8px";
+pillSubLine.style.flexWrap = "wrap";
+pillSubLine.style.alignItems = "center";
+
+/* Spotlight genre pills (hardwired): main + two subcategories
+   Main pill: black bg / white text. Sub pills: brand green bg / black text. */
+const styleSpotPill = (el, kind) => {
+  // Base pill look (matches seller-card pill feel)
+  el.classList.add("pill");
+  if(kind === "main"){
+    el.classList.add("mainPill");
+  }else{
+    el.classList.add("subPill");
+  }
+
+  el.style.display = "inline-flex";
+  el.style.alignItems = "center";
+  el.style.borderRadius = "999px";
+  el.style.border = "2px solid #000";
+  el.style.fontWeight = "950";
+  el.style.whiteSpace = "nowrap";
+  el.style.lineHeight = "1";
+
+  if(kind === "main"){
+    // Main genre pill: original seller-card size
+    el.style.padding = "10px 12px";
+    el.style.fontSize = "12px";
+    el.style.boxShadow = "0 10px 18px rgba(0,0,0,.10)";
+  }else{
+    // Subcategory pills: ~half size
+    el.style.padding = "5px 6px";
+    el.style.fontSize = "10px";
+    el.style.boxShadow = "0 6px 12px rgba(0,0,0,.10)";
+  }
+};
+
+const pMain = document.createElement("span");
+pMain.className = "chip spotGenrePill";
+pMain.textContent = __genre;
+
+const pSub1 = document.createElement("span");
+pSub1.className = "chip spotSubPill";
+pSub1.textContent = __sub1;
+
+const pSub2 = document.createElement("span");
+pSub2.className = "chip spotSubPill";
+pSub2.textContent = __sub2;
+
+pillMainLine.className = "spotMainLine";
+pillSubLine.className = "spotSubLine";
+
+pillMainLine.appendChild(pMain);
+[pSub1, pSub2].forEach(p => pillSubLine.appendChild(p));
+
+pillRow.appendChild(pillMainLine);
+pillRow.appendChild(pillSubLine);
+// 160-character bio
+const bio = document.createElement("div");
+bio.className = "bioSnippet";
+bio.textContent = __bio;
+bio.style.fontSize = "12px";
+bio.style.lineHeight = "1.35";
+bio.style.opacity = "0.86";
+bio.style.marginTop = "10px";
+bio.style.display = "-webkit-box";
+bio.style.webkitBoxOrient = "vertical";
+bio.style.webkitLineClamp = "6";
+bio.style.overflow = "hidden";
+
+rightCol.appendChild(shopName);
+rightCol.appendChild(username);
+
+// Fit shop name + username to one line by shrinking font-size as needed
+const fitNames = () => {
+  if (window.__fitOneLine) {
+    window.__fitOneLine(shopName, { maxPx: 20, minPx: 12, step: 0.25 });
+    window.__fitOneLine(username, { maxPx: 13, minPx: 10, step: 0.25 });
+  }
+};
+requestAnimationFrame(()=>{ requestAnimationFrame(fitNames); });
+window.addEventListener("resize", () => { requestAnimationFrame(fitNames); }, { passive: true });
+rightCol.appendChild(pillRow);
+rightCol.appendChild(bio);
+
+inner.appendChild(rightCol);
+
+
+
+// (removed spotRightCol wrapper — carousel is aligned via grid)
+// --- 3-item mini carousel (bottom of right column) ---
+  const mini = document.createElement("div");
+  mini.className = "spotMiniCarousel";
+
+  const vp = document.createElement("div");
+  vp.className = "spotMiniViewport";
+
+  const track = document.createElement("div");
+  track.className = "spotMiniTrack";
+
+  const miniSeeds = Array.from({length:3}, () => Math.floor(Math.random()*100000));
+  const miniImgs = miniSeeds.map(s => `https://picsum.photos/seed/popstar_${s}/240/240`);
+  // duplicate once for seamless loop (6 total)
+  const loop = miniImgs.concat(miniImgs);
+
+  loop.forEach(src => {
+    const it = document.createElement("div");
+    it.className = "spotMiniItem";
+    const im = document.createElement("img");
+    im.src = src;
+    im.alt = "item";
+    it.appendChild(im);
+    track.appendChild(it);
+  });
+
+  
+  // --- lock loop distance in pixels (prevents visible jump at seam) ---
+  function measureMiniLoop(){
+    const items = track.querySelectorAll(".spotMiniItem");
+    if (items.length < 4) return;
+    // distance from first item of set A to first item of set B (includes the gap between sets)
+    const loopPx = items[3].offsetLeft - items[0].offsetLeft;
+    if (loopPx > 0){
+      track.style.setProperty("--miniLoopPx", loopPx + "px");
+      // set duration by pixel speed for consistent motion across widths
+      const pxPerSec = 26; // subtle speed
+      const dur = Math.max(6, loopPx / pxPerSec);
+      track.style.animationDuration = dur.toFixed(2) + "s";
+    }
+  }
+
+  // Wait for layout + image decoding so widths are stable before measuring
+  Promise.all(Array.from(track.querySelectorAll("img")).map(img => (img.decode ? img.decode().catch(()=>{}) : Promise.resolve())))
+    .then(()=>{ requestAnimationFrame(()=>{ requestAnimationFrame(measureMiniLoop); }); });
+
+  window.addEventListener("resize", () => { requestAnimationFrame(measureMiniLoop); }, { passive: true });
+
+vp.appendChild(track);
+  mini.appendChild(vp);mini.style.position = "absolute";
+  mini.style.right = "18px";
+  mini.style.bottom = "18px";
+  mini.style.left = "calc(18px + 300px + 8px)";
+  mini.style.margin = "0";
+  inner.appendChild(mini);
+
+
+
+
+
+
+
+// Sale button (FSU data)
+const saleBtn = document.createElement("div");
+saleBtn.textContent = "50% OFF FOR 24 HOURS";
+saleBtn.style.width = "100%";
+saleBtn.style.marginTop = "0px"; /* remove extra spacing */
+saleBtn.style.marginBottom = "0px";
+saleBtn.style.padding = "12px 0";
+saleBtn.style.textAlign = "center";
+saleBtn.style.background = "#E10600";
+saleBtn.style.color = "#FFFFFF";
+saleBtn.style.fontWeight = "1000";
+saleBtn.style.textTransform = "uppercase";
+saleBtn.style.letterSpacing = "1px";
+saleBtn.style.border = "none";
+saleBtn.style.borderRadius = "12px";
+saleBtn.style.position = "relative";
+saleBtn.style.zIndex = "10";
+
+saleBtn.style.gridColumn = "1";
+saleBtn.style.gridRow = "3"; /* directly under image */
+
+inner.appendChild(saleBtn);
+
+// View shop (match genre card "view shop →" but placed under sale)
+const viewShop = document.createElement("a");
+viewShop.className = "spotViewShop";
+viewShop.textContent = "view shop →";
+viewShop.href = "https://www.depop.com/"; // placeholder; wire to seller URL later
+viewShop.target = "_blank";
+viewShop.rel = "noopener";
+viewShop.style.margin = "0";
+viewShop.style.position = "relative";
+viewShop.style.zIndex = "10";
+
+viewShop.style.gridColumn = "1";
+viewShop.style.gridRow = "4";
+viewShop.style.alignSelf = "end";
+inner.appendChild(viewShop);
+requestAnimationFrame(fit);
+  window.addEventListener("resize", fit, { passive: true });
+});</script><script>
+// v82 form: main category + subcategories (choose up to 2)
+document.addEventListener("DOMContentLoaded", () => {
+  const MAIN = ['alt', 'y2k', 'street', 'vintage', 'archive', 'clean'];
+  const SUBS = {'alt': ['goth', 'punk', 'emo', 'metal'], 'y2k': ['baggy', 'surf', 'blingy', 'cute'], 'vintage': ['true', '80s', '90s', 'band tees'], 'archive': ['designer', 'runway', 'rare', 'experimental'], 'clean': ['prep', 'neutral', 'fitness', 'basics'], 'street': ['skate', 'workwear', 'gorp', 'flashy']};
+
+  const mainWrap = document.getElementById("primaryChips");
+  const mainHidden = document.getElementById("mainCategory");
+  const subWrap = document.getElementById("subChips");
+  const sub1 = document.getElementById("subTag1Hidden");
+  const sub2 = document.getElementById("subTag2Hidden");
+  if (!mainWrap || !mainHidden || !subWrap || !sub1 || !sub2) return;
+
+  function renderSub(g){
+    subWrap.innerHTML = "";
+    (SUBS[g] || []).forEach(w => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.dataset.word = w;
+      b.textContent = w;
+      b.addEventListener("click", () => {
+        b.classList.toggle("is-on");
+        const on = [...subWrap.querySelectorAll(".chip.is-on")];
+        if (on.length > 2) {
+          b.classList.remove("is-on");
+          return;
+        }
+        const words = on.map(x => x.dataset.word);
+        sub1.value = words[0] || "";
+        sub2.value = words[1] || "";
+      });
+      subWrap.appendChild(b);
+    });
+    sub1.value = "";
+    sub2.value = "";
+  }
+
+  function setMain(g){
+    mainHidden.value = g;
+    mainWrap.querySelectorAll(".chip").forEach(x => x.classList.remove("is-on"));
+    const btn = mainWrap.querySelector(`.chip[data-genre="${g}"]`);
+    if (btn) btn.classList.add("is-on");
+    renderSub(g);
+  }
+
+  mainWrap.innerHTML = "";
+  MAIN.forEach(g => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.dataset.genre = g;
+    b.textContent = g;
+    b.addEventListener("click", () => setMain(g));
+    mainWrap.appendChild(b);
+  });
+
+  setMain("y2k");
+});
+</script>
+<script>
+/* v90: safety - keep bio modal closed on load */
+document.addEventListener("DOMContentLoaded", () => {
+  const m = document.getElementById("bioModal");
+  if (m){
+    m.classList.add("hidden");
+    m.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+  }
+});
+</script>
+<script>
+/* --- v92: ensure bio modal is closed on load --- */
+document.addEventListener("DOMContentLoaded", () => {
+  const m = document.getElementById("bioModal");
+  if (m){
+    m.classList.add("hidden");
+    m.setAttribute("aria-hidden","true");
+    document.body.style.overflow = "";
+  }
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>/* SUCCESS CONFIRMATION (REPLACES FORM COMPLETELY) */
+(function() {
+  const form = document.getElementById('applyForm');
+  if(!form) return;
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const data = new FormData(form);
+
+    try {
+      const response = await fetch(form.action, {
+        method: form.method,
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if(response.ok) {
+        const successHTML = `<div class="popstarSuccess">
+  <div class="successInner">
+    <div class="successLine">thank you for submitting to</div>
+    <div class="successBrand">popstar ★</div>
+  </div>
+</div>`;
+        form.outerHTML = successHTML;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => (window.location.href = "https://popstarrr.com/"), 1800);
+      }
+    } catch (err) {
+      // leave form in place if submit fails
+    }
+  });
+})();</script><script>/* POPSTAR_INFLUENCER_TOGGLE_V2 */
+(function(){
+  const hasCode = document.getElementById('hasCode');
+  const codeRow = document.getElementById('codeRow');
+  const codeInput = document.getElementById('influencerCode');
+  if(!hasCode || !codeRow) return;
+
+  function sync(){
+    const on = !!hasCode.checked;
+    codeRow.style.display = on ? '' : 'none';
+    if(codeInput){
+      if(on) codeInput.setAttribute('required','');
+      else {
+        codeInput.removeAttribute('required');
+        codeInput.value = '';
+      }
+    }
+  }
+
+  hasCode.addEventListener('change', sync);
+  sync();
+})();</script>
+<audio id="heroAudio" preload="none" src="crunk_that_ft_lokadonna.mp3"></audio>
+<script>
+// --- hero audio controls (manual play, no loop) ---
+(function(){
+  const audio = document.getElementById("heroAudio");
+  const playBtn = document.getElementById("playBtn");
+  const pauseBtn = document.getElementById("pauseBtn");
+  if(!audio || !playBtn || !pauseBtn) return;
+
+  audio.loop = false;
+  audio.autoplay = false;
+
+  playBtn.addEventListener("click", function(){
+    audio.play();
+  });
+
+  pauseBtn.addEventListener("click", function(){
+    audio.pause();
+  });
+
+  // When song ends, reset to beginning
+  audio.addEventListener("ended", function(){
+    audio.currentTime = 0;
+  });
+})();
+</script>
+<script>
+(function () {
+  // If we landed here with #apply, scroll after layout settles
+  if (window.location.hash === "#apply") {
+    const tryScroll = () => {
+      const el = document.getElementById("apply");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    // run soon and also after full load (covers slow assets/fonts)
+    setTimeout(tryScroll, 80);
+    window.addEventListener("load", () => setTimeout(tryScroll, 80));
+  }
+})();
+</script>
+
+<script>
+  window.SUPABASE_URL = "https://otvznctmwutbwulbhfvx.supabase.co";
+  window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90dnpuY3Rtd3V0Ynd1bGJoZnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNzc3MzcsImV4cCI6MjA4NzY1MzczN30.txShYO4rqLSMHeLuN_2rzRmvXZK3mnPsaabFtTa8Ph8";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+/* Hide influencer code fields when in buyer mode (?buyer=1) */
+document.addEventListener("DOMContentLoaded", function(){
+  try{
+    var params = new URLSearchParams(window.location.search || "");
+    var isBuyer = params.get("buyer") === "1";
+    if(isBuyer){
+      var el = document.getElementById("influencerSection");
+      if(el) el.style.display = "none";
+    }
+  }catch(e){}
+});
+</script>
+<script>
+/* v104: simple chips + search for dynamic cards */
+document.addEventListener("DOMContentLoaded", () => {
+  const search = document.getElementById("search");
+  let active = "y2k";
+
+  function normalize(s){ return (s||"").toLowerCase(); }
+
+  function apply(){
+    const q = normalize(search ? search.value : "").trim();
+    const sections = Array.from(document.querySelectorAll("section.cluster[data-cluster]"));
+    // show/hide sections by active genre (never hide everything on all)
+    sections.forEach(sec => {
+      const g = sec.getAttribute("data-cluster");
+      sec.style.display = (active === "all" || g === active) ? "" : "none";
+    });
+
+    // filter cards by query within visible sections
+    const cards = Array.from(document.querySelectorAll("a.card"));
+    cards.forEach(card => {
+      // only filter cards inside visible sections
+      const sec = card.closest("section.cluster");
+      if (sec && sec.style.display === "none") { card.style.display = "none"; return; }
+
+      const hay =
+        normalize(card.getAttribute("data-handle")) + " " +
+        normalize(card.getAttribute("data-store")) + " " +
+        normalize(card.getAttribute("data-name")) + " " +
+        normalize(card.getAttribute("data-sub1")) + " " +
+        normalize(card.getAttribute("data-sub2"));
+      const match = !q || hay.includes(q);
+      card.style.display = match ? "" : "none";
+    });
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      active = chip.getAttribute("data-filter") || "all";
+      chips.forEach(c => c.classList.toggle("is-on", c === chip));
+      apply();
+      if (active !== "all"){
+        const target = document.getElementById(active);
+        if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
+        history.replaceState(null, "", "#" + active);
+      } else {
+        history.replaceState(null, "", "#");
+      }
+    });
+  });
+
+  if (search){
+    search.addEventListener("input", apply);
+  }
+
+  // expose for loaders
+  window.refreshSellerFilters = apply;
+
+  apply();
+});
+</script>
+<script>
+/* vDATA: supabase-powered profiles with demo fallback */
+(function(){
+  // --- shared helpers (mirrors existing rendering expectations) ---
+  function normText(v){ return String(v ?? "").trim(); }
+  function escapeHtml(str){
+    return String(str ?? "").replace(/[&<>"\']/g, (m)=>({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[m]));
+  }
+  function first(obj, keys){
+    for (const k of keys){
+      if (obj && obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== "") return obj[k];
+    }
+    return "";
+  }
+  function toArray(v){
+    if (!v) return [];
+    if (Array.isArray(v)) return v.filter(Boolean).map(normText);
+    return String(v).split(",").map(s=>s.trim()).filter(Boolean);
+  }
+  function shuffle(arr){
+    const a = (arr || []).slice();
+    for (let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+  function pickRandom(arr, n){
+    return shuffle(arr).slice(0, Math.max(0, n|0));
+  }
+
+  // --- card renderer (copied from existing file, unchanged) ---
+  function renderSellerCard(p){
+    const shop = first(p, ["shop_name","shop","store","store_name","name"]);
+    const handleRaw = first(p, ["handle","username","depop_handle","depop_username","ig","instagram"]);
+    const handle = handleRaw ? (handleRaw.startsWith("@") ? handleRaw : "@"+handleRaw) : "";
+    const city = first(p, ["city"]);
+    const country = first(p, ["country"]);
+    const state = first(p, ["state"]);
+    const location = first(p, ["location","loc","place"]) || [city,state,country].filter(Boolean).join(", ");
+    const genre = first(p, ["genre","main_genre","main_category","category"]);
+    const subs = toArray(first(p, ["subcategories","subs","tags","subcats"]));
+    const bio = first(p, ["bio","about","description","blurb"]);
+    const avatar = first(p, ["avatar_url","avatar","profile_pic","profile_image","image_url","img"]) ||
+      "https://otvznctmwutbwulbhfvx.supabase.co/storage/v1/object/public/avatars/square-image.jpg";
+
+    const depopHandle = handle.replace("@","").trim().toLowerCase();
+    const href = depopHandle ? `https://www.depop.com/${depopHandle}/` : (first(p, ["link","depop","url"]) || "#");
+
+    const pills = [];
+    if (genre) pills.push(`<span class="pill mainPill">${escapeHtml(String(genre))}</span>`);
+    for (const s of subs.slice(0,2)){
+      pills.push(`<span class="pill subPill">${escapeHtml(String(s))}</span>`);
+    }
+
+    return `
+      <a class="card seller" href="${escapeHtml(href)}" target="_blank" rel="noopener">
+        <div class="imgWrap">
+          <img class="avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(shop || "seller")}"/>
+        </div>
+        <div class="meta">
+          <div class="nameRow">
+            <div class="name">${escapeHtml(shop || "")}</div>
+            <div class="handle">${escapeHtml(handle || "")}</div>
+          </div>
+          <div class="pillsRow">${pills.join("")}</div>
+          <div class="bioSnippet">${escapeHtml(String(bio || location || "").slice(0,140))}</div>
+          <div class="viewShop">view shop →</div>
+        </div>
+      </a>
+    `;
+  }
+
+  // --- demo data (unchanged) ---
+const DEMO = {
+    alt: [
+      { shop_name:"nightstatic", handle:"@nightstatic", location:"portland, usa", genre:"alt", subcategories:["grunge","emo"], bio:"Independent alt curator blending grunge, cyber, and underground silhouettes. Small batch drops, dark textures, and pieces that feel like 3AM city air...........", avatar_url:pick(AV,0), item_images:items(0) },
+      { shop_name:"bruiseclub", handle:"@bruiseclub", location:"seattle, usa", genre:"alt", subcategories:["emo","goth"], bio:"Layered chaos with intention. Vintage leather, distressed denim, sharp hardware, and silhouettes that feel rebellious but wearable every day....................", avatar_url:pick(AV,1), item_images:items(1) },
+      { shop_name:"opalgrunge", handle:"@opalgrunge", location:"london, uk", genre:"alt", subcategories:["goth","opium"], bio:"Moody minimal alt. Black-on-black, structured tailoring, subtle shine. Built for night walks, loud music, and quiet confidence..................................", avatar_url:pick(AV,2), item_images:items(2) },
+      { shop_name:"cinderangel", handle:"@cinderangel", location:"berlin, de", genre:"alt", subcategories:["opium","grunge"], bio:"Soft goth meets modern street. Mesh, oversized knits, heavy boots, and pieces designed for movement and layered expression......................................", avatar_url:pick(AV,3), item_images:items(3) },
+      { shop_name:"voidshrine", handle:"@voidshrine", location:"chicago, usa", genre:"alt", subcategories:["grunge","emo"], bio:"Post-punk revival energy. Cropped jackets, metallic accents, vintage band tees, and curated staples that never feel basic.......................................", avatar_url:pick(AV,4), item_images:items(4) },
+      { shop_name:"stitchwitch", handle:"@stitchwitch", location:"austin, usa", genre:"alt", subcategories:["emo","goth"], bio:"Dark palette, strong lines, no compromises. Limited quantities, hand-selected textures, and pieces made to outlast trends.......................................", avatar_url:pick(AV,5), item_images:items(5) },
+      { shop_name:"opiumhour", handle:"@opiumhour", location:"paris, fr", genre:"alt", subcategories:["goth","opium"], bio:"Industrial edge with wearable proportions. Structured tops, layered straps, matte finishes, and silhouettes that photograph beautifully.........................", avatar_url:pick(AV,6), item_images:items(6) },
+      { shop_name:"basementhalo", handle:"@basementhalo", location:"nyc, usa", genre:"alt", subcategories:["opium","grunge"], bio:"Alt essentials refined. Statement outerwear, subtle hardware, and pieces that balance drama with everyday comfort...............................................", avatar_url:pick(AV,7), item_images:items(7) }
+    ],
+    y2k: [
+      { shop_name:"neonkitten", handle:"@neonkitten", location:"miami, usa", genre:"y2k", subcategories:["baggy","surf"], bio:"Early 2000s energy reimagined. Baby tees, low-rise silhouettes, glossy textures, and playful pieces built for flash photography.................................", avatar_url:pick(AV,8), item_images:items(8) },
+      { shop_name:"plasticsun", handle:"@plasticsun", location:"la, usa", genre:"y2k", subcategories:["surf","blingy"], bio:"Hyperpop color palette, nostalgic cuts, and playful layering. Think mall-core with a modern silhouette update...................................................", avatar_url:pick(AV,9), item_images:items(9) },
+      { shop_name:"glitterfax", handle:"@glitterfax", location:"toronto, ca", genre:"y2k", subcategories:["blingy","cute"], bio:"Bedazzled, cropped, and unapologetic. Shiny fabrics, fitted shapes, and statement pieces straight from a 2003 mood board........................................", avatar_url:pick(AV,10), item_images:items(10) },
+      { shop_name:"dialupdream", handle:"@dialupdream", location:"dallas, usa", genre:"y2k", subcategories:["cute","baggy"], bio:"Y2K club kid revival. Mini skirts, metallic shine, logo moments, and silhouettes that celebrate confidence......................................................", avatar_url:pick(AV,11), item_images:items(11) },
+      { shop_name:"satellitegirl", handle:"@satellitegirl", location:"san diego, usa", genre:"y2k", subcategories:["baggy","surf"], bio:"Playful nostalgia meets clean styling. Velour, ribbed tanks, tiny bags, and coordinated sets that feel iconic...................................................", avatar_url:pick(AV,0), item_images:items(12) },
+      { shop_name:"blingbuffer", handle:"@blingbuffer", location:"phoenix, usa", genre:"y2k", subcategories:["surf","blingy"], bio:"Glossy finishes and fitted cuts. Early internet fashion inspiration with modern tailoring and better proportions................................................", avatar_url:pick(AV,1), item_images:items(13) },
+      { shop_name:"baggybyte", handle:"@baggybyte", location:"montreal, ca", genre:"y2k", subcategories:["blingy","cute"], bio:"Low-rise denim, rhinestone details, and pop color accents. A curated throwback built for today’s spotlight......................................................", avatar_url:pick(AV,2), item_images:items(14) },
+      { shop_name:"hologramhush", handle:"@hologramhush", location:"tokyo, jp", genre:"y2k", subcategories:["cute","baggy"], bio:"Futuristic nostalgia. Sheen fabrics, cropped layers, and silhouettes inspired by music videos and mall culture..................................................", avatar_url:pick(AV,3), item_images:items(15) }
+    ],
+    street: [
+      { shop_name:"skatefile", handle:"@skatefile", location:"oakland, usa", genre:"street", subcategories:["skate","workwear"], bio:"Relaxed silhouettes, bold graphics, and everyday layers built for movement. Timeless street staples with modern structure.......................................", avatar_url:pick(AV,4), item_images:items(16) },
+      { shop_name:"gorpgrid", handle:"@gorpgrid", location:"denver, usa", genre:"street", subcategories:["workwear","gorp"], bio:"Oversized fits, heavyweight cotton, and clean logo work. Designed for comfort without losing edge...............................................................", avatar_url:pick(AV,5), item_images:items(17) },
+      { shop_name:"flashmarket", handle:"@flashmarket", location:"atlanta, usa", genre:"street", subcategories:["gorp","flashy"], bio:"Muted palette streetwear. Boxy tees, wide-leg denim, and refined layering that feels effortless.................................................................", avatar_url:pick(AV,6), item_images:items(18) },
+      { shop_name:"steelstitch", handle:"@steelstitch", location:"detroit, usa", genre:"street", subcategories:["flashy","skate"], bio:"Athletic influence with city structure. Functional pieces, breathable fabrics, and durable everyday staples.....................................................", avatar_url:pick(AV,7), item_images:items(19) },
+      { shop_name:"metrotag", handle:"@metrotag", location:"nyc, usa", genre:"street", subcategories:["skate","workwear"], bio:"Graphic-forward street rotation. Statement hoodies, balanced proportions, and curated neutral bases.............................................................", avatar_url:pick(AV,8), item_images:items(20) },
+      { shop_name:"curbside", handle:"@curbside", location:"london, uk", genre:"street", subcategories:["workwear","gorp"], bio:"Layer-ready silhouettes with subtle branding. Clean cuts, structured outerwear, and everyday wearability........................................................", avatar_url:pick(AV,9), item_images:items(21) },
+      { shop_name:"workwearwave", handle:"@workwearwave", location:"boston, usa", genre:"street", subcategories:["gorp","flashy"], bio:"Utility-inspired streetwear. Cargo pockets, technical fabrics, and oversized layering pieces....................................................................", avatar_url:pick(AV,10), item_images:items(22) },
+      { shop_name:"gutterlux", handle:"@gutterlux", location:"paris, fr", genre:"street", subcategories:["flashy","skate"], bio:"Modern street essentials. Relaxed tailoring, premium basics, and balanced proportions built for daily wear......................................................", avatar_url:pick(AV,11), item_images:items(23) }
+    ],
+    vintage: [
+      { shop_name:"truefinds", handle:"@truefinds", location:"nashville, usa", genre:"vintage", subcategories:["true","80s"], bio:"Hand-selected true vintage pieces spanning decades. Timeless cuts, textured fabrics, and silhouettes that tell stories..........................................", avatar_url:pick(AV,0), item_images:items(24) },
+      { shop_name:"bandvault", handle:"@bandvault", location:"manchester, uk", genre:"vintage", subcategories:["80s","90s"], bio:"Authentic archive garments with natural wear. Faded tees, structured denim, and classic tailoring...............................................................", avatar_url:pick(AV,1), item_images:items(25) },
+      { shop_name:"denimtime", handle:"@denimtime", location:"osaka, jp", genre:"vintage", subcategories:["90s","band tees"], bio:"90s and early 2000s originals. Carefully restored staples and one-of-one finds..................................................................................", avatar_url:pick(AV,2), item_images:items(26) },
+      { shop_name:"retrorelay", handle:"@retrorelay", location:"melbourne, au", genre:"vintage", subcategories:["band tees","true"], bio:"Heritage denim, vintage knits, and rare outerwear. Pieces chosen for longevity and character....................................................................", avatar_url:pick(AV,3), item_images:items(27) },
+      { shop_name:"thriftglow", handle:"@thriftglow", location:"minneapolis, usa", genre:"vintage", subcategories:["true","80s"], bio:"Curated classics with patina and history. Durable fabrics and timeless proportions..............................................................................", avatar_url:pick(AV,4), item_images:items(28) },
+      { shop_name:"oldschoolonly", handle:"@oldschoolonly", location:"dublin, ie", genre:"vintage", subcategories:["80s","90s"], bio:"Authentic vintage rotation. Natural fade, quality construction, and enduring silhouettes........................................................................", avatar_url:pick(AV,5), item_images:items(29) },
+      { shop_name:"80sforecast", handle:"@80sforecast", location:"vancouver, ca", genre:"vintage", subcategories:["90s","band tees"], bio:"Sourced across eras. Structured jackets, heavyweight cotton, and iconic shapes..................................................................................", avatar_url:pick(AV,6), item_images:items(30) },
+      { shop_name:"fieldnotesvntg", handle:"@fieldnotesvntg", location:"pittsburgh, usa", genre:"vintage", subcategories:["band tees","true"], bio:"Archive-level vintage finds. Clean restoration, subtle wear, and rare seasonal pieces...........................................................................", avatar_url:pick(AV,7), item_images:items(31) }
+    ],
+    archive: [
+      { shop_name:"runwaydrawer", handle:"@runwaydrawer", location:"milan, it", genre:"archive", subcategories:["designer","avant-garde"], bio:"Designer archive focus. Rare runway references, limited production garments, and collectible silhouettes curated with provenance and condition notes............", avatar_url:pick(AV,8), item_images:items(32) },
+      { shop_name:"rareunit", handle:"@rareunit", location:"seoul, kr", genre:"archive", subcategories:["avant-garde","runway"], bio:"Avant-garde tailoring and experimental textiles. Archival pieces that push silhouette, proportion, and construction beyond everyday basics......................", avatar_url:pick(AV,9), item_images:items(33) },
+      { shop_name:"designdrift", handle:"@designdrift", location:"paris, fr", genre:"archive", subcategories:["runway","rare"], bio:"Runway-era statements with real history. Collectible garments, careful sourcing, and rotating drops for serious collectors......................................", avatar_url:pick(AV,10), item_images:items(34) },
+      { shop_name:"labcoatarchive", handle:"@labcoatarchive", location:"amsterdam, nl", genre:"archive", subcategories:["rare","designer"], bio:"Rare designer finds, hard-to-source seasons, and quiet flex pieces. Built for those who read labels and study cut and drape.....................................", avatar_url:pick(AV,11), item_images:items(35) },
+      { shop_name:"vaultobjects", handle:"@vaultobjects", location:"nyc, usa", genre:"archive", subcategories:["designer","avant-garde"], bio:"Archival wardrobe staples with edge. Structured coats, engineered knits, and pieces that feel like wearable design research.....................................", avatar_url:pick(AV,0), item_images:items(36) },
+      { shop_name:"runwayloop", handle:"@runwayloop", location:"london, uk", genre:"archive", subcategories:["avant-garde","runway"], bio:"Curated runway references with clean condition. Statement shapes, niche designers, and silhouettes that photograph like editorials..............................", avatar_url:pick(AV,1), item_images:items(37) },
+      { shop_name:"ateliererror", handle:"@ateliererror", location:"berlin, de", genre:"archive", subcategories:["runway","rare"], bio:"Collector-grade archive with a modern styling lens. Limited availability, detailed listings, and fast shipping when possible....................................", avatar_url:pick(AV,2), item_images:items(38) },
+      { shop_name:"rarerender", handle:"@rarerender", location:"tokyo, jp", genre:"archive", subcategories:["rare","designer"], bio:"Avant-garde, runway, and rare. A rotating selection of designer archive pieces chosen for construction, fabric, and silhouette..................................", avatar_url:pick(AV,3), item_images:items(39) }
+    ],
+    clean: [
+      { shop_name:"neutralclub", handle:"@neutralclub", location:"copenhagen, dk", genre:"clean", subcategories:["prep","neutral"], bio:"Clean essentials with sharp fit. Neutral palettes, crisp layers, and simple silhouettes designed for daily wear and easy styling................................", avatar_url:pick(AV,4), item_images:items(40) },
+      { shop_name:"prepfile", handle:"@prepfile", location:"boston, usa", genre:"clean", subcategories:["neutral","fitness"], bio:"Prep-leaning basics: polos, clean denim, and structured knits. Minimal branding, maximum versatility, and good proportions......................................", avatar_url:pick(AV,5), item_images:items(41) },
+      { shop_name:"fitnessform", handle:"@fitnessform", location:"la, usa", genre:"clean", subcategories:["fitness","basics"], bio:"Neutral, modern, and functional. Elevated basics, simple sets, and pieces that work across seasons without trying too hard......................................", avatar_url:pick(AV,6), item_images:items(42) },
+      { shop_name:"simpleindex", handle:"@simpleindex", location:"zurich, ch", genre:"clean", subcategories:["basics","prep"], bio:"Fitness-meets-street staples. Breathable layers, clean colorways, and comfortable fits that still look polished outside the gym.................................", avatar_url:pick(AV,7), item_images:items(43) },
+      { shop_name:"basicsbureau", handle:"@basicsbureau", location:"toronto, ca", genre:"clean", subcategories:["prep","neutral"], bio:"Minimal wardrobe building blocks. Tailored tees, relaxed trousers, and clean outerwear for an effortless rotation...............................................", avatar_url:pick(AV,8), item_images:items(44) },
+      { shop_name:"ivorylane", handle:"@ivorylane", location:"stockholm, se", genre:"clean", subcategories:["neutral","fitness"], bio:"Basics done right. Smooth fabrics, neutral tones, and repeatable silhouettes that always look put together......................................................", avatar_url:pick(AV,9), item_images:items(45) },
+      { shop_name:"groundedgoods", handle:"@groundedgoods", location:"portland, usa", genre:"clean", subcategories:["fitness","basics"], bio:"Clean lines, subtle texture, and easy layering. A curated set of essentials designed to mix, match, and travel well.............................................", avatar_url:pick(AV,10), item_images:items(46) },
+      { shop_name:"plainandperfect", handle:"@plainandperfect", location:"edinburgh, uk", genre:"clean", subcategories:["basics","prep"], bio:"Prep, neutral, fitness, and basics—kept simple. Clean silhouettes, consistent sizing, and pieces that style themselves..........................................", avatar_url:pick(AV,11), item_images:items(47) }
+    ]
+  };
+
+  function fillGrid(id, arr){
+    const grid = document.getElementById(id);
+    if (!grid) return;
+    grid.innerHTML = (arr || []).slice(0,8).map(renderSellerCard).join("") || '<div class="empty">no sellers yet — be the first ★</div>';
+    if (typeof window.refreshSellerFilters === "function") window.refreshSellerFilters();
+  }
+
+  function getCred(name){
+    try{
+      const root = document.documentElement;
+      const ds = root && root.dataset ? root.dataset : {};
+      return (window[name] || window["__"+name+"__"] || ds[name.toLowerCase()] || ds[name.replace(/_/g,"").toLowerCase()] || "");
+    }catch(e){ return ""; }
+  }
+
+  async function initSupabase(){
+    try{
+      if (!window.supabase || typeof window.supabase.createClient !== "function") return null;
+      const url = getCred("SUPABASE_URL");
+      const key = getCred("SUPABASE_ANON_KEY");
+      if (!url || !key) return null;
+      return window.supabase.createClient(url, key);
+    }catch(e){
+      return null;
+    }
+  }
+
+  async function fetchSellerProfiles(sb){
+    // try approved-only first; fall back if schema differs
+    let resp = await sb.from("seller_profiles").select("*").eq("status","approved");
+    if (resp.error){
+      resp = await sb.from("seller_profiles").select("*");
+    }
+    return resp;
+  }
+
+  async function fetchActiveSpotlights(sb){
+    // prefer view
+    let resp = await sb.from("active_spotlights").select("*");
+    if (resp.error){
+      resp = await sb.from("placements")
+        .select("*")
+        .eq("placement_type","spotlight")
+        .eq("status","active");
+    }
+    return resp;
+  }
+
+  async function fetchActiveFeatures(sb){
+    let resp = await sb.from("active_features").select("*");
+    if (resp.error){
+      resp = await sb.from("placements")
+        .select("*")
+        .eq("placement_type","feature")
+        .eq("status","active");
+    }
+    return resp;
+  }
+
+  function keyId(v){
+    return String(v || "").trim();
+  }
+
+  function mapById(rows){
+    const m = new Map();
+    (rows||[]).forEach(r=>{
+      const id = keyId(r.id);
+      if (id) m.set(id, r);
+    });
+    return m;
+  }
+
+  function guessGenre(p){
+    return String(first(p, ["genre","main_genre","main_category","category"]) || "").trim().toLowerCase();
+  }
+
+  function uniqueById(arr){
+    const seen = new Set();
+    const out = [];
+    for (const x of (arr||[])){
+      const id = keyId(x.id);
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      out.push(x);
+    }
+    return out;
+  }
+
+  async function loadFromSupabase(){
+    const sb = await initSupabase();
+    if (!sb) return false;
+
+    const [profilesRes, spotsRes, featsRes] = await Promise.all([
+      fetchSellerProfiles(sb),
+      fetchActiveSpotlights(sb),
+      fetchActiveFeatures(sb)
+    ]);
+
+    const profiles = (profilesRes && profilesRes.data) ? profilesRes.data : null;
+    if (!profiles || !profiles.length) return false;
+
+    const byProfileId = mapById(profiles);
+
+    // spotlight pool (active placements -> profiles)
+    const spotlightPlacements = (spotsRes && spotsRes.data) ? spotsRes.data : [];
+    const spotlightPool = uniqueById(spotlightPlacements.map(pl=>{
+      const pid = keyId(pl.seller_id);
+      const p = byProfileId.get(pid);
+      if (!p) return null;
+      // attach placement metadata if useful later
+      p.__placement = pl;
+      return p;
+    }).filter(Boolean));
+
+    // expose pool to spotlight renderer
+    window.__POPSTAR_SPOTLIGHT_POOL = shuffle(spotlightPool);
+
+    // features per genre (most recent first)
+    const featurePlacements = (featsRes && featsRes.data) ? featsRes.data : [];
+    featurePlacements.sort((a,b)=> new Date(b.placement_start || 0) - new Date(a.placement_start || 0));
+
+    const featuredByGenre = {};
+    for (const pl of featurePlacements){
+      const g = String(pl.genre || "").trim().toLowerCase();
+      if (!g) continue;
+      if (!featuredByGenre[g]) featuredByGenre[g] = [];
+      if (featuredByGenre[g].length >= 8) continue;
+      const p = byProfileId.get(keyId(pl.seller_id));
+      if (p) featuredByGenre[g].push(p);
+    }
+
+    // fill each genre grid: featured first, then random organic
+    const GENRES = ["alt","y2k","street","vintage","archive","clean"];
+    for (const g of GENRES){
+      const featured = (featuredByGenre[g] || []).slice(0,8);
+      const featuredIds = new Set(featured.map(p=>keyId(p.id)));
+      const organicPool = profiles.filter(p=>guessGenre(p)===g && !featuredIds.has(keyId(p.id)));
+      const organicFill = pickRandom(organicPool, Math.max(0, 8-featured.length));
+      const combined = featured.concat(organicFill);
+      fillGrid(g+"Grid", combined);
+    }
+
+    return true;
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const ok = await loadFromSupabase();
+    if (ok) return;
+
+    // fallback to demo grids
+    fillGrid("altGrid", DEMO.alt);
+    fillGrid("y2kGrid", DEMO.y2k);
+    fillGrid("streetGrid", DEMO.street);
+    fillGrid("vintageGrid", DEMO.vintage);
+    fillGrid("archiveGrid", DEMO.archive);
+    fillGrid("cleanGrid", DEMO.clean);
+
+    // fallback spotlight pool to demo (optional)
+    window.__POPSTAR_SPOTLIGHT_POOL = window.__POPSTAR_SPOTLIGHT_POOL || [];
+  });
+})();
+</script>
+<div aria-hidden="true" class="sellerModal hidden" id="sellerModal">
+<div aria-modal="true" class="sellerModalInner" role="dialog">
+<div class="sellerModalTop">
+<div>
+<div class="sellerModalTitle" id="sellerModalTitle"></div>
+<div class="sellerModalHandle" id="sellerModalHandle"></div>
+</div>
+<button class="sellerModalClose" id="sellerModalClose" type="button">close</button>
+</div>
+<div class="sellerModalBody">
+<p class="sellerModalBio" id="sellerModalBio"></p>
+<div class="itemGrid" id="sellerModalItems"></div>
+</div>
+<div class="sellerModalActions">
+<a class="btnShop" href="#" id="sellerModalShop" rel="noopener" target="_blank">view shop →</a>
+</div>
+</div>
+</div>
+<script id="v148-spotlight-debug">
+/* v148 — optional debug: set window.DEBUG_SPOTLIGHT ★ = true in console to log parsed items */
+</script>
+
+
+
+
+
+
+
+
+
+
+<style id="spotlightPillSizeEqualOverride">
+/* Spotlight: make genre + subcategory pills the SAME size (chip-based pills) */
+#spotlight .spotPills .chip.spotGenrePill,
+#spotlight .spotPills .chip.spotSubPill{
+  font-size: 13px !important;
+  padding: 8px 14px !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+}
+</style>
+
+
+
+<style id="genreMainPillBlackOverride">
+/* FINAL OVERRIDE: Genre section seller-card main genre pills -> black w/ white text */
+.section.cluster a.card.seller .pill.mainPill,
+.section.cluster a.card.seller .tags .mainPill,
+.section.cluster a.card.seller .pillMainLine .mainPill{
+  background:#000 !important;
+  color:#fff !important;
+  border:2px solid #000 !important;
+}
+</style>
+
+
+<style id="filterBarAllVisibleFix">
+/* Fix: keep "all" visible (chips start from left) while the whole chip row can still sit on the right */
+.heroBelowTools .tools .filterBar{
+  justify-content:flex-start !important;
+}
+</style>
+
+
+
+<script id="filterBarScrollReset">
+(function(){
+  function reset(){
+    var fb = document.getElementById("filterBar") || document.querySelector(".filterBar");
+    if(!fb) return;
+    // Force leftmost position, multiple times to beat scroll restoration / layout shifts
+    fb.scrollLeft = 0;
+    requestAnimationFrame(function(){ fb.scrollLeft = 0; });
+    setTimeout(function(){ fb.scrollLeft = 0; }, 50);
+    setTimeout(function(){ fb.scrollLeft = 0; }, 250);
+    setTimeout(function(){ fb.scrollLeft = 0; }, 900);
+  }
+  document.addEventListener("DOMContentLoaded", reset);
+  window.addEventListener("load", reset);
+  window.addEventListener("pageshow", reset);
+})();
+</script>
+
+
+
+<script id="genreFilterScript">
+document.addEventListener("DOMContentLoaded", function(){
+
+  const buttons = document.querySelectorAll(".gchip");
+  const sections = document.querySelectorAll("section.cluster");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", function(){
+
+      const target = btn.textContent.trim().toLowerCase();
+
+      sections.forEach(section => {
+        const id = section.id ? section.id.toLowerCase() : "";
+
+        if(id === target || target === "all"){
+          section.style.display = "";
+        } else {
+          section.style.display = "none";
+        }
+      });
+
+      // active state styling
+      buttons.forEach(b => b.classList.remove("is-on"));
+      btn.classList.add("is-on");
+    });
+  });
+
+});
+</script>
+
+
+<script id="sellerSearchScript">
+/* Search sellers by shop name, username, bio keywords, and city/location */
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput =
+    document.querySelector("#search") ||
+    document.querySelector("input.search") ||
+    document.querySelector('input[type="search"]');
+
+  const sellerCards = Array.from(document.querySelectorAll("a.card.seller"));
+
+  function norm(s){
+    return (s || "")
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function cardHaystack(card){
+    // Prefer specific elements if present, but fall back to card text.
+    const shop =
+      card.querySelector(".name")?.textContent ||
+      card.querySelector(".storeName")?.textContent ||
+      "";
+    const username =
+      card.querySelector(".handle")?.textContent ||
+      "";
+    const bio =
+      card.querySelector(".bioSnippet")?.textContent ||
+      card.querySelector("[data-bio]")?.getAttribute("data-bio") ||
+      "";
+    const city =
+      card.querySelector(".thumbLoc")?.textContent ||
+      card.querySelector(".loc")?.textContent ||
+      card.querySelector(".spotLoc")?.textContent ||
+      "";
+
+    // Card text as a catch-all (covers keywords/pills that might matter)
+    const fallback = card.textContent || "";
+
+    return norm([shop, username, bio, city, fallback].join(" • "));
+  }
+
+  const haystacks = new Map();
+  sellerCards.forEach(c => haystacks.set(c, cardHaystack(c)));
+
+  function applySearch(){
+    const q = norm(searchInput?.value || "");
+    if(!q){
+      sellerCards.forEach(c => { c.style.display = ""; });
+      return;
+    }
+
+    // Support multi-term search: all terms must match somewhere.
+    const terms = q.split(" ").filter(Boolean);
+
+    sellerCards.forEach(card => {
+      const h = haystacks.get(card) || "";
+      const ok = terms.every(t => h.includes(t));
+      card.style.display = ok ? "" : "none";
+    });
+  }
+
+  if(searchInput){
+    searchInput.addEventListener("input", applySearch);
+    searchInput.addEventListener("search", applySearch);
+  }
+});
+</script>
+
+
+<script>
+/* === POPSTAR: Supabase → Spotlight bridge (failsafe) ===
+   This script updates the existing rebuilt spotlight DOM with live data.
+   It does NOT change layout; it only replaces text/images/pills when data is available.
+*/
+(function(){
+  const DEBUG = (window.__POPSTAR_SUPABASE_DEBUG = window.__POPSTAR_SUPABASE_DEBUG || {});
+  function nowISO(){ try{return new Date().toISOString();}catch(e){return ""} }
+
+  function decodeJwtPayload(token){
+    try{
+      const part = token.split('.')[1];
+      const b64 = part.replace(/-/g,'+').replace(/_/g,'/');
+      const jsonStr = decodeURIComponent(atob(b64).split('').map(c => '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+      return JSON.parse(jsonStr);
+    }catch(e){ return null; }
+  }
+
+  function ensureSupabaseUrl(){
+    if(window.SUPABASE_URL) return window.SUPABASE_URL;
+    const token = window.SUPABASE_ANON_KEY || window.SUPABASE_ANON || window.SUPABASE_KEY;
+    const payload = token ? decodeJwtPayload(token) : null;
+    const ref = payload && payload.ref ? payload.ref : null;
+    if(ref){
+      window.SUPABASE_URL = "https://" + ref + ".supabase.co";
+      return window.SUPABASE_URL;
+    }
+    return null;
+  }
+
+  function qs(sel){ return document.querySelector(sel); }
+  function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
+
+  function setText(el, txt){
+    if(!el) return;
+    el.textContent = (txt ?? "").toString();
+  }
+  function setImg(el, src){
+    if(!el || !src) return;
+    el.setAttribute('src', src);
+  }
+
+  function buildIdentity(profile){
+    const style = (profile.style_icon || "").trim();
+    const era = (profile.era || "").trim();
+    const city = (profile.favorite_city || "").trim();
+    const parts = [];
+    if(style) parts.push(style);
+    if(era || city){
+      let tail = "in";
+      if(era) tail += " " + era;
+      if(city) tail += " " + city;
+      parts.push(tail);
+    }
+    const line = parts.join(" ").trim();
+    return line ? `"${line}"` : null;
+  }
+
+  function splitSubs(val){
+    if(Array.isArray(val)) return val.filter(Boolean).map(String);
+    if(typeof val !== "string") return [];
+    // accept comma-separated or JSON-like string
+    return val.split(',').map(s => s.trim()).filter(Boolean);
+  }
+
+  function updateSpotlightDOM(profile){
+    // Existing rebuilt spotlight IDs/classes (from your current layout)
+    const spot = qs('#spotlight');
+    if(!spot) throw new Error("missing #spotlight container");
+
+    setText(qs('#spotShopName'), profile.shop_name || profile.shop || profile.name || "");
+    setText(qs('#spotUsername'), profile.username ? '@' + String(profile.username).replace(/^@/,'') : (profile.handle || profile.instagram || ""));
+    const identity = buildIdentity(profile);
+    if(identity) setText(qs('#spotStyleQuoteText'), identity);
+
+    // location pill
+    const loc = profile.location || profile.city || profile.favorite_city || "";
+    setText(qs('.thumbLoc'), loc);
+
+    // hero image
+    const heroImg = qs('.spotProfileMedia img') || qs('#spotlight img');
+    setImg(heroImg, profile.avatar_url || profile.avatar || profile.profile_image_url || profile.image_url || profile.photo_url);
+
+    // pills (genre + subs)
+    const pillsWrap = qs('.spotPills');
+    if(pillsWrap){
+      const main = (profile.genre || profile.main_genre || profile.category || "").toString().trim();
+      const subs = splitSubs(profile.subcategories || profile.subcategory || profile.subs);
+      // try to read a JSONB array style field if present
+      const safeMain = main || "archive";
+      // rebuild inner pills without touching layout container
+      const mainLine = pillsWrap.querySelector('.spotMainLine') || pillsWrap.firstElementChild;
+      const subLine = pillsWrap.querySelector('.spotSubLine') || pillsWrap.lastElementChild;
+      if(mainLine){
+        mainLine.innerHTML = '<span class="chip spotGenrePill">' + safeMain + '</span>';
+      }
+      if(subLine){
+        const items = (subs.length ? subs : ["designer","avant-garde"]);
+        subLine.innerHTML = items.slice(0,6).map(s => '<span class="chip spotSubPill">' + String(s) + '</span>').join('');
+      }
+    }
+
+    // bio
+    const bioEl = qs('.spotRightInfo .bioSnippet');
+    if(bioEl) setText(bioEl, profile.bio || profile.description || bioEl.textContent);
+
+    // mini items (optional)
+    const itemUrls = [profile.item_1, profile.item_2, profile.item_3].filter(Boolean);
+    if(itemUrls.length){
+      const imgs = qsa('.spotMiniItem img');
+      imgs.slice(0,3).forEach((img,i)=> setImg(img, itemUrls[i] || itemUrls[itemUrls.length-1]));
+    }
+  }
+
+  async function loadFromSupabase(){
+    DEBUG.lastRunAt = nowISO();
+    DEBUG.lastError = null;
+    DEBUG.steps = [];
+    try{
+      if(!window.supabase || typeof window.supabase.createClient !== 'function'){
+        throw new Error("supabase library not available on window.supabase");
+      }
+      const url = ensureSupabaseUrl();
+      const key = window.SUPABASE_ANON_KEY || window.SUPABASE_ANON || window.SUPABASE_KEY;
+      if(!url || !key) throw new Error("missing SUPABASE_URL or SUPABASE_ANON_KEY");
+      DEBUG.steps.push("client:init");
+      const sb = window.supabase.createClient(url, key);
+
+      // Fetch active spotlight placement (no join needed)
+      DEBUG.steps.push("placements:fetch");
+      const placementsRes = await sb
+        .from('placements')
+        .select('id,seller_id,placement_type,status')
+        .eq('placement_type','spotlight')
+        .eq('status','active')
+        .limit(5);
+
+      if(placementsRes.error) throw placementsRes.error;
+      const placements = placementsRes.data || [];
+      DEBUG.placementsCount = placements.length;
+      if(!placements.length) throw new Error("no active spotlight placements returned (RLS or data)");
+
+      const sellerId = placements[0].seller_id;
+      if(!sellerId) throw new Error("active placement missing seller_id");
+
+      // Fetch seller profile
+      DEBUG.steps.push("seller_profiles:fetch");
+      const profileRes = await sb
+        .from('seller_profiles')
+        .select('*')
+        .eq('id', sellerId)
+        .limit(1)
+        .maybeSingle();
+
+      if(profileRes.error) throw profileRes.error;
+      const profile = profileRes.data;
+      if(!profile) throw new Error("seller_profiles row not readable for seller_id (RLS or mismatch)");
+
+      DEBUG.profileId = profile.id;
+      DEBUG.profileShop = profile.shop_name || null;
+
+      // Update spotlight DOM
+      DEBUG.steps.push("spotlight:update_dom");
+      updateSpotlightDOM(profile);
+
+      // Expose minimal pool for any other scripts
+      window.__POPSTAR_SPOTLIGHT_POOL = [profile];
+      DEBUG.poolLength = 1;
+
+      return true;
+    }catch(err){
+      DEBUG.lastError = (err && (err.message || err.toString())) || "unknown error";
+      DEBUG.errorObject = err || null;
+      // Ensure pool is at least defined so other code can safely check length
+      if(typeof window.__POPSTAR_SPOTLIGHT_POOL === 'undefined') window.__POPSTAR_SPOTLIGHT_POOL = [];
+      return false;
+    }
+  }
+
+  // Expose for debugging
+  window.loadFromSupabase = loadFromSupabase;
+
+  // Run after full load to avoid racing layout scripts
+  window.addEventListener('load', () => { loadFromSupabase(); });
+})();
+</script>
+
+</body>
+</html>
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 refined -->
+<!-- build marker: popstar build v91 spotlight height fix -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
+<!-- build marker: popstar build v91 -->
