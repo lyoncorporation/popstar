@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -2500,6 +2501,60 @@ button[type="submit"]:hover{
   color:#000;
 }
 
+
+/* --- promo compare chart (feature vs spotlight) --- */
+.promoCompareWrap{ margin-top:14px; width:100%; display:flex; justify-content:flex-start; }
+.promoCompareBox{
+  width:100%;
+  max-width:620px;
+  border:2px solid #000;
+  border-radius:18px;
+  background: rgba(255,255,255,.90);
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+  padding:14px 16px;
+}
+.promoCompareTop{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.promoCompareTitle{ font-weight:1000; letter-spacing:-0.02em; font-size:16px; }
+.promoCompareSub{ font-size:12px; font-weight:850; opacity:.78; }
+.promoCompareTable{ width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; border:2px solid #000; background:#fff; }
+.promoCompareTable th, .promoCompareTable td{
+  padding:10px 10px;
+  border-bottom:1px solid rgba(0,0,0,.14);
+  vertical-align:middle;
+  font-size:12px;
+}
+.promoCompareTable thead th{
+  background: rgba(138,206,0,.14);
+  border-bottom:2px solid #000;
+  font-weight:1000;
+}
+.promoCompareTable th:first-child{ width:46%; }
+.promoCompareTable td:nth-child(2), .promoCompareTable td:nth-child(3),
+.promoCompareTable th:nth-child(2), .promoCompareTable th:nth-child(3){ text-align:center; }
+.promoCompareTable tr:last-child td{ border-bottom:0; }
+.promoYes{ font-weight:1000; }
+.promoNo{ opacity:.35; font-weight:900; }
+.promoPill{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:4px 10px;
+  border-radius:999px;
+  border:2px solid #000;
+  background:#000;
+  color:var(--brand);
+  font-weight:1000;
+  font-size:11px;
+  line-height:1;
+}
+.promoPillAlt{
+  background:#fff;
+  color:#000;
+}
+.promoCompareNote{ margin-top:10px; font-size:11px; opacity:.78; font-weight:850; }
+@media (max-width:980px){
+  .promoCompareWrap{ justify-content:center; }
+  .promoCompareBox{ max-width:100%; }
+}
+
 </style>
 <style id="genreCardAestheticV39">
 /* v39 — Genre section seller-card pills: rounded, correct weight, and sub-pills styling */
@@ -2839,8 +2894,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 #boosts{
   display:flex;
@@ -3960,7 +4013,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style>
 /* --- POPSTAR SPOTLIGHT ★ REBUILD: alignment + search aesthetic + spotlight buttons (FINAL OVERRIDE) --- */
 
@@ -4190,8 +4242,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 
 /* --- vFINAL: tools row alignment + search width definitive --- */
@@ -4365,7 +4415,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style>
 
 /* --- vFINAL: tools row alignment + search width definitive --- */
@@ -4560,7 +4609,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style>
 /* --- spotlight: stack sale + view shop buttons (aligned + equal width) --- */
 .heroRight .slideCta,
@@ -4649,8 +4697,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- spotlight: view shop button (match cardView text, but full-width under sale) --- */
 .heroRight .spotViewShop{
@@ -4747,30 +4793,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <style>
 /* --- vCAROUSEL: spotlight right-column 3-item mini carousel (bottom) --- */
 .spotMiniCarousel{
@@ -4895,8 +4917,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- Spotlight Left Column Spacing Test (Option B: 12px consistent gap) --- */
 .spotlightLeft{
@@ -4984,8 +5004,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- Move spotlight sale button up 5px --- */
 .spotlightLeft .saleBtn{
@@ -5065,8 +5083,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- Spotlight: main genre on its own line, subcategories below --- */
 .spotlightRight .tags{
@@ -5156,8 +5172,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- Spotlight: subcategory pills 50% smaller --- */
 .spotlightRight .subPill{
@@ -5238,8 +5252,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- FORCE spotlight subcategory pills smaller --- */
 .spotlightRight .tags > *:not(.mainPill){
@@ -5321,8 +5333,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- FORCE spotlight main genre pill back to full size --- */
 .spotlightRight .tags > *:first-child{
@@ -5403,8 +5413,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- Move spotlight buttons up 5px --- */
 .spotlightBoosts{
@@ -5484,8 +5492,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- Spotlight: FORCE main genre pill to original seller-card sizing (override inline JS) --- */
 .spotlightRight .tags > span:first-child{
@@ -5566,8 +5572,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- Spotlight-specific pills (reuse .chip aesthetic; do not affect seller cards) --- */
 .spotPills{
@@ -5676,8 +5680,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- vSPOT: spotlight subcategory pills slightly bigger --- */
 #spotlight .spotPills .spotSubPill.chip,
@@ -5768,8 +5770,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* --- v7: add horizontal breathing room to genre sections --- */
 .section{
@@ -5856,8 +5856,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style>
 /* Spotlight subcategory pills slightly larger */
 .heroRight .subPill{
@@ -5938,8 +5936,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style id="filterBarAllRobustCSS">
 /* Ensure the filter bar starts from the left and doesn't animate on load */
 #filterBar{
@@ -6020,11 +6016,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
-
-
-
 <style id="leftAlignedGenreRow">
 .toolsRowLeft{
   display:flex;
@@ -6153,7 +6144,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="spotlightBoxLinkCSS">
 /* Spotlight box behaves like a single clickable card */
 #spotlight{
@@ -6161,7 +6151,7 @@ button[type="submit"]:hover{
   transition: background .14s ease, transform .08s ease;
 }
 #spotlight:hover{
-  background: var(--spotAccent, var(--brand)) !important;
+  background: var(--spotAccent, #000) !important;
 }
 @media (hover:hover){
   #spotlight:active{ transform: translateY(1px) scale(.997); }
@@ -6240,7 +6230,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="spotlightThemeCSS">
 /* Per-spotlight theming (placement-level): defaults to brand green */
 #spotlight{
@@ -6295,13 +6284,23 @@ button[type="submit"]:hover{
 
 
 
-/* v23 — Default (pre-hydration) title color is white */
+/* v23 — Spotlight title color: avoid brand-green flash
+   - Default (before spotlight accent arrives): black (readable)
+   - Once accent is ready: use spotlight accent
+*/
 #spotlight #spotShopName,
 #spotlight #spotUsername{
-  color:#ffffff !important;
+  color: #000 !important;
+  transition: color .15s ease !important;
 }
-
-
+#spotlight[data-accent-ready="1"] #spotShopName,
+#spotlight[data-accent-ready="1"] #spotUsername{
+  color: var(--spotAccent) !important;
+}
+#spotlight:hover #spotShopName,
+#spotlight:hover #spotUsername{
+  color:#fff !important;
+}
 
 /* v24 — Spotlight View Shop button (uses spotlight accent by default; turns white on spotlight hover) */
 #spotlight .spotViewShop{
@@ -6503,7 +6502,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="spotlightHoverPillOverride">
 /* Spotlight box hover: subcategory pills turn white */
 #spotlight:hover .spotSubPill,
@@ -6586,15 +6584,13 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style id="spotlightHoverButtonOverride">
 
 /* vNEW: Spotlight box hover -> location pill uses spotlight_color (same as spotlight hover), text stays white */
 #spotlight:hover .thumbLoc,
 a:hover #spotlight .thumbLoc,
 a:hover > #spotlight .thumbLoc{
-  background: var(--spotAccent, var(--brand)) !important;
+  background: var(--spotAccent, #000) !important;
   color:#fff !important;
 }
 
@@ -6690,8 +6686,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style id="spotlightHoverButtonOverride_v2">
 /* When hovering the spotlight box, also restyle the spotlight purchase buttons below it */
 #spotlight:hover + .spotlightBoosts .spotlightBtn,
@@ -6782,8 +6776,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style id="spotlightHoverStickerOverride">
 /* When hovering spotlight box, invert spotlight sticker */
 #spotlight:hover .stickerSpotlight{
@@ -6865,11 +6857,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
-
-
-
 <style id="genreFeaturedStickerHardwire">
 /* Hardwire a "featured ★" sticker on ALL genre profile cards */
 /* Match the spotlight sticker *style* but keep it fully inside the card so nothing clips/peeks out */
@@ -6878,12 +6865,12 @@ a.card.seller{
   overflow:hidden !important; /* keep rounded corners clean */
 }
 
-a.card.seller .thumb{
+a.card.seller.hasFeaturedSticker .imgWrap{
   position:relative !important;
 }
 
-/* place sticker inside the card bounds (prevents corner artifacts) */
-a.card.seller .thumb::before{
+/* featured sticker for spotlight-in-genre cards */
+a.card.seller.hasFeaturedSticker .imgWrap::before{
   content:"featured ★";
   position:absolute;
   top:6px !important;
@@ -6975,11 +6962,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
-
-
-
 <style id="genreFilterHover">
 /* White genre buttons hover -> brand green */
 .gchip:hover{
@@ -7060,7 +7042,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="genreCardPillSpacingV40">
 /* v40 — Genre card pill spacing + button styling + ensure location sticker shows */
 .section.cluster a.card.seller .pillsRow{
@@ -7182,7 +7163,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="genreCardLocationAndButtonV41">
 /* v41 — Make genre-card location sticker match Spotlight box location sticker */
 .section.cluster a.card.seller .imgWrap .thumbLoc{
@@ -7285,7 +7265,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="genreCardSubPillHoverV42">
 /* v42 — Subcategory pills match View Shop button behavior */
 
@@ -7377,7 +7356,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="genreCardLocationMatchSpotlightV43">
 /* v43 — Make genre-card location sticker match the Spotlight box (dark translucent pill) */
 .section.cluster a.card.seller .imgWrap .thumbLoc{
@@ -7471,7 +7449,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="genreCardLocationWeightFixV44">
 /* v44 — Remove extra boldness from genre-card location sticker to match Spotlight */
 .section.cluster a.card.seller .imgWrap .thumbLoc{
@@ -7551,7 +7528,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="genreCardLocationExactMatchV45">
 /* v45 — Make genre-card location sticker match Spotlight styles EXACTLY */
 .section.cluster a.card.seller .imgWrap .thumbLoc{
@@ -7649,7 +7625,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="spotlightBioSizeV46">
 /* v46 — Slightly increase Spotlight bio font size */
 #spotlight .bioSnippet{
@@ -7730,7 +7705,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="spotlightNameColorV47">
 /* v47 — Spotlight shop name + username use spotlight color,
    turn white when hovering over the entire spotlight box */
@@ -7738,7 +7712,7 @@ button[type="submit"]:hover{
 /* Default = spotlight color */
 #spotlight .name,
 #spotlight .handle{
-  color: var(--spotlight-color, var(--brand)) !important;
+  color: var(--spotlight-color, #000) !important;
   transition: color .15s ease !important;
 }
 
@@ -7821,94 +7795,44 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <style id="spotlightNameColorV48">
-/* v48 — Spotlight shop name + username use spotlight accent color (after hydration),
-   then turn white when hovering over the spotlight box */
-
+/* v48 — Spotlight shop name + username:
+   - Default: black (pre-accent, avoids brand-green flash)
+   - When accent ready: spotlight accent
+   - On hover: white
+*/
 #spotShopName,
 #spotUsername{
-  color: var(--spotAccent, var(--brand)) !important;
+  color:#000 !important;
   transition: color .15s ease !important;
 }
-
+#spotlight[data-accent-ready="1"] #spotShopName,
+#spotlight[data-accent-ready="1"] #spotUsername{
+  color: var(--spotAccent) !important;
+}
 #spotlight:hover #spotShopName,
 #spotlight:hover #spotUsername{
   color:#fff !important;
 }
-
-/* --- genre view all buttons --- */
-.viewAllWrap{
-  display:flex;
-  justify-content:center;
-  margin-top:18px;
-}
-.viewAllBtn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:10px 16px;
-  border-radius:999px;
-  border:2px solid #000;
-  background:#fff;
-  font-weight:1000;
-  text-decoration:none;
-}
-.applyBtn{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;border-radius:999px;border:2px solid #000;background:#fff;color:#000;font-weight:1000;cursor:pointer;}
-.applyBtn:hover{background:var(--brand);color:#000;}
-
-.viewAllBtn:hover{
-  background:var(--brand);
-  color:#000;
-}
-
-
-/* --- upload layout fix --- */
-.uploadRow{display:flex;align-items:center;gap:16px;}
-.fileInput{flex:1;min-width:260px;}
-.uploadHint{margin-top:8px;font-size:13px;opacity:.7;}
-.fileInput::file-selector-button{
-  font-family:inherit;
-  font-weight:1000;
-  border:2px solid #000;
-  background:#fff;
-  color:#000;
-  border-radius:999px;
-  padding:10px 16px;
-  cursor:pointer;
-}
-.fileInput:hover::file-selector-button{background:#000;color:#fff;}
-
-
-/* --- vNEW: submit + choose photo button styling --- */
-button[type="submit"]{
-  background:#fff !important;
+</style>
+<style id="spotlightNameColorV49">
+/* v49 — prevent green/brand flash on first paint:
+   - default shop name + username are black until spotlight accent is actually set
+   - once accent is ready, they use --spotAccent
+   - on hover, they turn white (unchanged) */
+#spotShopName,
+#spotUsername{
   color:#000 !important;
-  border:2px solid #000 !important;
-  border-radius:999px !important;
-  font-weight:1000 !important;
-  padding:12px 16px !important;
-  cursor:pointer;
+  transition: color .15s ease !important;
 }
-button[type="submit"]:hover{
-  background:#8ACE00 !important;
-  color:#000 !important;
+#spotlight[data-accent-ready="1"] #spotShopName,
+#spotlight[data-accent-ready="1"] #spotUsername{
+  color: var(--spotAccent) !important;
 }
-
-.fileInput::file-selector-button{
-  background:#fff;
-  color:#000;
-  border:2px solid #000;
-  border-radius:999px;
-  padding:8px 14px;
-  font-weight:900;
-  cursor:pointer;
+#spotlight:hover #spotShopName,
+#spotlight:hover #spotUsername{
+  color:#fff !important;
 }
-.fileInput::file-selector-button:hover{
-  background:#8ACE00;
-  color:#000;
-}
-
 </style>
 
 <style id="spotlightCarouselV53">
@@ -8018,15 +7942,11 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
 <style id="loginStarHoverV1">
 /* login star hover: white fill + black label + black stroke */
 .loginStar:hover::before{ color:#fff !important; -webkit-text-stroke:2px #000 !important; }
 .loginStar:hover span{ color:#000 !important; }
 </style>
-
-
 <style id="submit-free-btn-style">
 a.btn.apply{
   background:#000 !important;
@@ -8039,26 +7959,23 @@ a.btn.apply:hover{
   border:2px solid #000 !important;
 }
 </style>
-
 <style id="promo-feature-spotlight">
-.promoWrap{
-  max-width:980px;
+.promoWrap{  max-width:1120px;
   margin:0 auto 16px;
   border:2px solid #000;
   border-radius:18px;
-  background: var(--brand);
+  background:#000; color:#fff;
   box-shadow: 0 16px 34px rgba(0,0,0,.14);
   overflow:hidden;
 }
 .promoInner{ padding:14px; }
-.promoTitle{
+.promoTitle{ color:#fff; 
   font-weight:1000;
   letter-spacing:-.04em;
   margin:0 0 10px;
   font-size:18px;
 }
-.promoGrid{
-  display:grid;
+.promoGrid{ display:grid; grid-template-columns:1fr 1fr; 
   grid-template-columns: 1fr 1fr;
   gap:12px;
 }
@@ -8081,7 +7998,7 @@ a.btn.apply:hover{
   padding:4px 8px;
   border-radius:6px;
 }
-.promoDesc{
+.promoDesc{ color:#fff; 
   margin:0 0 10px;
   font-weight:850;
   color:#fff;
@@ -8113,23 +8030,58 @@ a.btn.apply:hover{
   border:2px solid #000 !important;
 }
 </style>
+<style id="promo-buttons-one-line-v1">
+/* --- promo ad: keep the 3 pricing buttons on ONE LINE (desktop) --- */
+.promoBtns{
+  display:flex !important;
+  gap:6px !important;
+  flex-wrap:nowrap !important;
+  align-items:center !important;
+}
+
+/* make buttons smaller so 3 fit in a single row */
+.promoBtn{
+  padding:7px 10px !important;
+  font-size:11px !important;
+  line-height:1 !important;
+  border-radius:999px !important;
+  white-space:nowrap !important;
+}
+
+/* if someone has a narrower screen, allow horizontal scroll instead of wrapping */
+@media (max-width: 520px){
+  .promoBtns{
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:2px !important;
+  }
+  .promoBtns::-webkit-scrollbar{ height:0; }
+}
+</style>
+
+<style id="chipOnGreenV2">
+/* Keep selected pills green even after hover/focus rules */
+.chips .chip.is-on,
+.chip.is-on{
+  background: var(--brand, #8ACE00) !important;
+  color:#000 !important;
+  border-color:#000 !important;
+}
+</style>
 </head>
 <body>
 <div class="topbar">
-<a class="loginStar" href="seller-login.html" aria-label="log in">
-  <span>log in</span>
+<a aria-label="log in" class="loginStar" href="seller-login.html">
+<span>log in</span>
 </a>
 <div aria-label="categories" class="ticker"><div class="tickerTrack"><div aria-hidden="true" class="tickerGroup">alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ </div><div aria-hidden="true" class="tickerGroup">alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ alt ★ y2k ★ vintage ★ archive ★ clean ★ street ★ </div></div></div></div><div class="wrap">
 <section class="hero">
 <div class="heroHeader">
-
-<div class="authMini" aria-label="account">
-  
-  <div class="authStatus" id="authStatus" aria-live="polite"></div>
+<div aria-label="account" class="authMini">
+<div aria-live="polite" class="authStatus" id="authStatus"></div>
 </div>
-
 <div class="heroLeft">
-<h1>popstar ★</h1>
+<h1>popstar <a href="https://popstarrr.com/spotlight.html" style=";text-decoration:none">★</a></h1>
 <p class="sub">promote your depop. get discovered.</p>
 <div class="btnRow">
 <a class="btn apply" href="#apply">submit your shop for free</a>
@@ -8148,45 +8100,97 @@ a.btn.apply:hover{
 </button>
 <a class="mediaLabel" href="https://open.spotify.com/track/2gMtW38lYFYh1XHuKrzbpx" id="trackLink" rel="noopener" target="_blank">crunk that -- lanea ft lokadonna</a>
 </div>
+<div class="promoCompareWrap">
+  <div class="promoCompareBox" id="promoCompare">
+    <div class="promoCompareTop">
+      <div class="promoCompareTitle">feature vs spotlight</div>
+      <div class="promoCompareSub">spotlight is recommended</div>
+    </div>
+
+    <table class="promoCompareTable" role="table" aria-label="feature vs spotlight chart">
+      <thead>
+        <tr>
+          <th scope="col"> </th>
+          <th scope="col">feature</th>
+          <th scope="col">spotlight</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="promoPill promoPillAlt">exposure level</span></td>
+          <td>high</td>
+          <td><span class="promoPill">highest</span></td>
+        </tr>
+        <tr>
+          <td><span class="promoPill promoPillAlt">visibility</span></td>
+          <td>1 of 48 featured profiles</td>
+          <td>1 of 5 spotlight sellers</td>
+        </tr>
+        <tr>
+          <td>pricing</td>
+          <td>$5–$39</td>
+          <td>$20–$99</td>
+        </tr>
+        <tr>
+          <td>top 8 in your genre</td>
+          <td class="promoYes">✓</td>
+          <td class="promoYes">✓</td>
+        </tr>
+        <tr>
+          <td>homepage spotlight</td>
+          <td class="promoNo">—</td>
+          <td class="promoYes">✓</td>
+        </tr>
+        <tr>
+          <td>sale banner</td>
+          <td class="promoNo">—</td>
+          <td class="promoYes">✓</td>
+        </tr>
+        <tr>
+          <td>3 image carousel</td>
+          <td class="promoNo">—</td>
+          <td class="promoYes">✓</td>
+        </tr>
+        <tr>
+          <td>custom color</td>
+          <td class="promoNo">—</td>
+          <td class="promoYes">✓</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="promoCompareNote">feature puts you among the top sellers in your genre. spotlight adds the rotating homepage placement plus extra visual treatment.</div>
+  </div>
+</div>
 <!-- spotlight -->
 <!-- spotlight moved into hero -->
 </div>
 <div class="heroRight">
-
 <div id="spotlight" style="display:block; width:730px; height:490px; border:2px solid #000; border-radius:18px; background:rgba(255,255,255,.90); box-shadow:0 16px 34px rgba(0,0,0,.14);">
-
 <div class="spotNav spotNavLeft" id="spotNavLeft">‹</div>
 <div class="spotNav spotNavRight" id="spotNavRight">›</div>
 <div style="display: grid; position: relative; grid-template-columns: 300px 1fr; grid-template-rows: auto 1fr auto auto; width: 100%; height: 100%; overflow: hidden; padding: 8px 18px 18px; box-sizing: border-box; gap: 8px; align-items: start;"><div class="spotStyleQuote" style="grid-column: 1 / -1;"><span id="spotStyleQuoteText"></span></div><div class="spotProfileMedia" style="position: relative; width: 100%; grid-area: 2 / 1; align-self: start;"><img src="https://otvznctmwutbwulbhfvx.supabase.co/storage/v1/object/public/avatars/square-image.jpg" style="width: 100%; aspect-ratio: 1 / 1; height: auto; object-fit: cover; border-radius: 18px; border: 2px solid rgb(0, 0, 0); display: block;"/><div class="stickerSpotlight">SPOTLIGHT ★</div><div class="thumbLoc">portland, usa</div></div><div class="spotRightInfo" style="grid-area: 2 / 2 / 5; align-self: start; min-width: 0px; display: flex; flex-direction: column; gap: 8px; padding: 0px 10px 0px 8px; box-sizing: border-box;"><div id="spotShopName" style="font-weight: 1000; letter-spacing: -0.02em; font-size: 20px; line-height: 1.05; white-space: nowrap; overflow: hidden; text-overflow: clip;">fsu</div><div id="spotUsername" style="font-weight: 900; opacity: 0.72; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: clip;">@fsu</div><div class="spotPills" style="align-items: flex-start;"><div class="spotMainLine" style="display: flex; gap: 8px; flex-wrap: nowrap; align-items: center;"><span class="chip spotGenrePill">archive</span></div><div class="spotSubLine" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;"><span class="chip spotSubPill">designer</span><span class="chip spotSubPill">avant-garde</span></div></div><div class="bioSnippet" style="font-size: 12px; line-height: 1.35; opacity: 0.86; margin-top: 10px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; overflow: hidden;">i am a celebrity stylist specializing in archive designer, rare vintage, and unique streetwear — curated pieces, fast ship, worldwide clients, new drops weekly.</div></div><div class="spotMiniCarousel" style="position: absolute; right: 18px; bottom: 18px; left: calc(326px); margin: 0px;"><div class="spotMiniViewport"><div class="spotMiniTrack" style="--miniLoopPx: 396px; animation-duration: 15.23s;"><div class="spotMiniItem"><img alt="item" src="https://picsum.photos/seed/popstar_20355/240/240"/></div><div class="spotMiniItem"><img alt="item" src="https://picsum.photos/seed/popstar_68360/240/240"/></div><div class="spotMiniItem"><img alt="item" src="https://picsum.photos/seed/popstar_81241/240/240"/></div><div class="spotMiniItem"><img alt="item" src="https://picsum.photos/seed/popstar_20355/240/240"/></div><div class="spotMiniItem"><img alt="item" src="https://picsum.photos/seed/popstar_68360/240/240"/></div><div class="spotMiniItem"><img alt="item" src="https://picsum.photos/seed/popstar_81241/240/240"/></div></div></div></div><div id="spotSaleBanner" style="width: 100%; margin-top: 0px; margin-bottom: 0px; padding: 12px 0px; min-height: 38px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; text-align: center; background: rgb(225, 6, 0); color: rgb(255, 255, 255); font-weight: 1000; text-transform: uppercase; letter-spacing: 1px; border: none; border-radius: 12px; position: relative; z-index: 10; grid-area: 3 / 1;"> </div><a class="spotViewShop" href="https://www.depop.com/" rel="noopener" style="margin: 0px; position: relative; z-index: 10; grid-area: 4 / 1; align-self: end;" target="_blank">view shop →</a></div></div>
 <div class="spotlightBoosts">
 <div class="pricing pricingRow" id="boosts">
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour spotlight ★</a>
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day spotlight ★</a>
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day spotlight ★</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/8x2bJ298yepV1od1be43S0f" rel="noopener" target="_blank">★ 24 hour spotlight — $20</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/4gM9AUgB02Hd1odbPS43S0g" rel="noopener" target="_blank">★ 7 day spotlight — $40</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/4gM3cw70q6XtaYNg6843S0h" rel="noopener" target="_blank">★ 30 day spotlight — $99</a>
 </div>
 </div>
-
-
-
-
-
 </div>
 </div>
 <div class="heroBelow">
-
 <div class="toolsRowLeft">
-  <input type="text" id="search" class="search" placeholder="search shop names, usernames, keywords, cities" />
-  <div class="genreInline">
-    <button class="gchip" data-filter="all">all</button>
-    <button class="gchip" data-filter="y2k">y2k</button>
-    <button class="gchip" data-filter="street">street</button>
-    <button class="gchip" data-filter="vintage">vintage</button>
-    <button class="gchip" data-filter="archive">archive</button>
-    <button class="gchip" data-filter="clean">clean</button>
-  </div>
+<input class="search" id="search" placeholder="search shop names, usernames, keywords, cities" type="text"/>
+<div class="genreInline">
+<button class="gchip" data-filter="all">all</button>
+<button class="gchip" data-filter="y2k">y2k</button>
+<button class="gchip" data-filter="street">street</button>
+<button class="gchip" data-filter="vintage">vintage</button>
+<button class="gchip" data-filter="archive">archive</button>
+<button class="gchip" data-filter="clean">clean</button>
 </div>
 </div>
-</div></div>
 </div>
 </section></div>
 <!-- clusters -->
@@ -8196,14 +8200,14 @@ a.btn.apply:hover{
 <div class="dividerHint">grunge • emo • goth • opium</div>
 </div>
 <div class="pricingRow sectionBoostRow">
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour alt feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour alt feature — $5</a>
 <a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day alt feature — $15</a>
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day alt feature — $39</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day alt feature — $39</a>
 </div>
 <div class="grid" id="altGrid"><div class="loading">Loading…</div></div>
-  <div class="viewAllWrap">
-    <a class="viewAllBtn" href="alt.html">view all →</a>
-  </div>
+<div class="viewAllWrap">
+<a class="viewAllBtn" href="alt.html">view all →</a>
+</div>
 </section>
 <section class="section cluster" data-cluster="y2k" id="y2k">
 <div class="divider">
@@ -8211,15 +8215,14 @@ a.btn.apply:hover{
 <div class="dividerHint">baggy • surf • blingy • cute</div>
 </div>
 <div class="pricingRow sectionBoostRow">
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour y2k feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour y2k feature — $5</a>
 <a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day y2k feature — $15</a>
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day y2k feature — $39</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day y2k feature — $39</a>
 </div>
 <div class="grid" id="y2kGrid"><div class="empty">loading y2k sellers…</div></div>
-
-  <div class="viewAllWrap">
-    <a class="viewAllBtn" href="y2k.html">view all →</a>
-  </div>
+<div class="viewAllWrap">
+<a class="viewAllBtn" href="y2k.html">view all →</a>
+</div>
 </section>
 <section class="section cluster" data-cluster="street" id="street">
 <div class="divider">
@@ -8227,14 +8230,14 @@ a.btn.apply:hover{
 <div class="dividerHint">skate • workwear • gorp • flashy</div>
 </div>
 <div class="pricingRow sectionBoostRow">
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01">★ 24 hour street feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00">★ 24 hour street feature — $5</a>
 <a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01">★ 7 day street feature — $15</a>
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01">★ 30 day street feature — $39</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02">★ 30 day street feature — $39</a>
 </div>
 <div class="grid" id="streetGrid"><div class="loading">Loading…</div></div>
-  <div class="viewAllWrap">
-    <a class="viewAllBtn" href="street.html">view all →</a>
-  </div>
+<div class="viewAllWrap">
+<a class="viewAllBtn" href="street.html">view all →</a>
+</div>
 </section>
 <section class="section cluster" data-cluster="vintage" id="vintage">
 <div class="divider">
@@ -8242,15 +8245,14 @@ a.btn.apply:hover{
 <div class="dividerHint">true • 80s • 90s • band tees</div>
 </div>
 <div class="pricingRow sectionBoostRow">
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour vintage feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour vintage feature — $5</a>
 <a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day vintage feature — $15</a>
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day vintage feature — $39</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day vintage feature — $39</a>
 </div>
 <div class="grid" id="vintageGrid"><div class="empty">loading vintage sellers…</div></div>
-
-  <div class="viewAllWrap">
-    <a class="viewAllBtn" href="vintage.html">view all →</a>
-  </div>
+<div class="viewAllWrap">
+<a class="viewAllBtn" href="vintage.html">view all →</a>
+</div>
 </section>
 <section class="section cluster" data-cluster="archive" id="archive">
 <div class="divider">
@@ -8258,15 +8260,14 @@ a.btn.apply:hover{
 <div class="dividerHint">designer • avant-garde • runway • rare</div>
 </div>
 <div class="pricingRow sectionBoostRow">
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour archive feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour archive feature — $5</a>
 <a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day archive feature — $15</a>
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day archive feature — $39</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day archive feature — $39</a>
 </div>
 <div class="grid" id="archiveGrid"><div class="empty">loading archive sellers…</div></div>
-
-  <div class="viewAllWrap">
-    <a class="viewAllBtn" href="archive.html">view all →</a>
-  </div>
+<div class="viewAllWrap">
+<a class="viewAllBtn" href="archive.html">view all →</a>
+</div>
 </section>
 <section class="section cluster" data-cluster="clean" id="clean">
 <div class="divider">
@@ -8274,15 +8275,14 @@ a.btn.apply:hover{
 <div class="dividerHint">prep • neutral • fitness • basics</div>
 </div>
 <div class="pricingRow sectionBoostRow">
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 24 hour clean feature — $5</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour clean feature — $5</a>
 <a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day clean feature — $15</a>
-<a class="priceLink spotlightBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 30 day clean feature — $39</a>
+<a class="priceLink spotlightBtn" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day clean feature — $39</a>
 </div>
 <div class="grid" id="cleanGrid"><div class="empty">loading clean sellers…</div></div>
-
-  <div class="viewAllWrap">
-    <a class="viewAllBtn" href="clean.html">view all →</a>
-  </div>
+<div class="viewAllWrap">
+<a class="viewAllBtn" href="clean.html">view all →</a>
+</div>
 </section>
 <!-- apply (apply -> formspree) -->
 <section class="section cluster" id="apply">
@@ -8291,136 +8291,126 @@ a.btn.apply:hover{
 <div class="dividerHint">submit to be featured</div>
 </div>
 <div class="promoWrap" id="promote">
-  <div class="promoInner">
-    <div class="promoTitle">promote your shop ★</div>
-    <div class="promoGrid">
-      <div class="promoCard">
-        <div class="promoName">feature placement</div>
-        <p class="promoDesc">front page exposure for your shop.</p>
-        <div class="promoBtns">
-          <a class="promoBtn" href="feature.html">feature your shop →</a>
-        </div>
-      </div>
-      <div class="promoCard">
-        <div class="promoName">spotlight placement</div>
-        <p class="promoDesc">custom color profile + homepage spotlight.</p>
-        <div class="promoBtns">
-          <a class="promoBtn" href="spotlight.html">spotlight your shop →</a>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="promoInner">
+<div class="promoTitle">promote your shop ★</div>
+<div class="promoGrid">
+<div class="promoCard">
+<div class="promoName">feature placement</div>
+<p class="promoDesc">among the 8 top sellers in your genre</p>
+<div class="promoBtns">
+<a class="promoBtn" href="https://buy.stripe.com/14A28s0C21D9gj75ru43S00" rel="noopener" target="_blank">★ 24 hour feature — $5</a>
+<a class="promoBtn" href="https://buy.stripe.com/14A9AU5Wm6Xt3wl4nq43S01" rel="noopener" target="_blank">★ 7 day feature — $15</a>
+<a class="promoBtn" href="https://buy.stripe.com/00w6oI3Oe2Hd8QF6vy43S02" rel="noopener" target="_blank">★ 30 day feature — $39</a>
 </div>
-
+</div>
+<div class="promoCard">
+<div class="promoName">spotlight placement</div>
+<p class="promoDesc">in the rotating spotlight at the top of popstar</p>
+<div class="promoBtns">
+<a class="promoBtn" href="https://buy.stripe.com/8x2bJ298yepV1od1be43S0f" rel="noopener" target="_blank">★ 24 hour spotlight — $20</a>
+<a class="promoBtn" href="https://buy.stripe.com/4gM9AUgB02Hd1odbPS43S0g" rel="noopener" target="_blank">★ 7 day spotlight — $40</a>
+<a class="promoBtn" href="https://buy.stripe.com/4gM3cw70q6XtaYNg6843S0h" rel="noopener" target="_blank">★ 30 day spotlight — $99</a>
+</div>
+</div>
+</div>
+</div>
+</div>
 <div class="formWrap">
 <div class="formInner">
-<form action="#" id="applyForm" method="POST" novalidate>
-  <input name="_captcha" type="hidden" value="false"/>
-  <input name="_honey" style="display:none" type="text"/>
-
-  <input id="mainCategory" name="main_category" type="hidden" value=""/>
-
-  <div class="formGrid">
-    <div class="row full">
-      <label for="shopName">shop name *</label>
-      <input class="field" id="shopName" name="shop_name" placeholder="shop name" required/>
-    </div>
-
-    <div class="row">
-      <label for="handle">depop handle *</label>
-      <input class="field" id="handle" name="depop_handle" placeholder="@yourhandle" required/>
-      <div class="help">we’ll auto-build your shop link from this</div>
-    </div>
-
-    <div class="row">
-      <label for="email">email *</label>
-      <input class="field" id="email" name="contact_email" placeholder="email" type="email" required/>
-      <div class="help">we’ll only use this for approval + feature receipts</div>
-    </div>
-
-    <div class="row">
-      <label for="city">city *</label>
-      <input class="field" id="city" name="city" placeholder="city" required/>
-    </div>
-
-    <div class="row">
-      <label for="country">country *</label>
-      <input class="field" id="country" name="country" placeholder="country (e.g. uk, usa, canada)" required/>
-    </div>
-
-    <div class="row full tight">
-      <label>main category *</label>
-    </div>
-    <div class="chips full" id="primaryChips" aria-label="main category"></div>
-
-    <div class="row full tight">
-      <label>subcategories *</label>
-      <div class="help">choose up to two</div>
-    </div>
-    <div class="chips full" id="subChips" aria-label="subcategories"></div>
-
-    <div class="row full bioRow">
-      <label for="bio">bio (160 characters max) *</label>
-      <div class="textareaWrap">
-        <textarea class="field" id="bio" maxlength="160" name="bio" placeholder="tell us a little bit about yourself and your shop" required rows="4"></textarea>
-        <div class="charCount"><span id="bioCount">0</span>/160</div>
-      </div>
-    </div>
-
-    <div class="mediaGrid fullSpan" id="mediaGridApply">
-  <div class="mediaCard">
-    <div class="mediaTop">
-      <div>
-        <div class="mediaTitle">profile picture</div>
-        <div class="mediaHint">required: square image (1:1)</div>
-      </div>
-    </div>
-    <div class="mediaRow">
-      <div class="mediaPreview"><img id="prev_profile" alt="" style="display:none;" /></div>
-      <div class="mediaControls">
-        <input class="fileInput" id="file_profile" type="file" accept="image/*" required />
-        <div class="mediaStatus" id="status_profile"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="mediaCard">
-    <div class="mediaTop">
-      <div>
-        <div class="mediaTitle">item images</div>
-        <div class="mediaHint">required: square image (1:1)</div>
-      </div>
-    </div>
-
-    <div class="mediaRow" style="margin-bottom:10px;">
-      <div class="mediaPreview"><img id="prev_item1" alt="" style="display:none;" /></div>
-      <div class="mediaControls">
-        <input class="fileInput" id="file_item1" type="file" accept="image/*" />
-        <div class="mediaStatus" id="status_item1"></div>
-      </div>
-    </div>
-
-    <div class="mediaRow" style="margin-bottom:10px;">
-      <div class="mediaPreview"><img id="prev_item2" alt="" style="display:none;" /></div>
-      <div class="mediaControls">
-        <input class="fileInput" id="file_item2" type="file" accept="image/*" />
-        <div class="mediaStatus" id="status_item2"></div>
-      </div>
-    </div>
-
-    <div class="mediaRow">
-      <div class="mediaPreview"><img id="prev_item3" alt="" style="display:none;" /></div>
-      <div class="mediaControls">
-        <input class="fileInput" id="file_item3" type="file" accept="image/*" />
-        <div class="mediaStatus" id="status_item3"></div>
-      </div>
-    </div>
-  </div>
+<form action="#" id="applyForm" method="POST" novalidate="">
+<input name="_captcha" type="hidden" value="false"/>
+<input name="_honey" style="display:none" type="text"/>
+<input id="mainCategory" name="main_category" type="hidden" value=""/>
+<input id="subTag1Hidden" name="sub_tag_1" type="hidden" value=""/>
+<input id="subTag2Hidden" name="sub_tag_2" type="hidden" value=""/>
+<div class="formGrid">
+<div class="row full">
+<label for="shopName">shop name *</label>
+<input class="field" id="shopName" name="shop_name" placeholder="shop name" required=""/>
 </div>
-
+<div class="row">
+<label for="handle">depop handle *</label>
+<input class="field" id="handle" name="depop_handle" placeholder="@yourhandle" required=""/>
+<div class="help">we’ll auto-build your shop link from this</div>
+</div>
+<div class="row">
+<label for="email">email *</label>
+<input class="field" id="email" name="contact_email" placeholder="email" required="" type="email"/>
+<div class="help">we’ll only use this for approval + feature receipts</div>
+</div>
+<div class="row">
+<label for="city">city *</label>
+<input class="field" id="city" name="city" placeholder="city" required=""/>
+</div>
+<div class="row">
+<label for="country">country *</label>
+<input class="field" id="country" name="country" placeholder="country (e.g. uk, usa, canada)" required=""/>
+</div>
+<div class="row full tight">
+<label>main category *</label>
+</div>
+<div aria-label="main category" class="chips full" id="primaryChips"></div>
+<div class="row full tight">
+<label>subcategories *</label>
+<div class="help">choose up to two</div>
+</div>
+<div aria-label="subcategories" class="chips full" id="subChips"></div>
+<div class="row full bioRow">
+<label for="bio">bio (160 characters max) *</label>
+<div class="textareaWrap">
+<textarea class="field" id="bio" maxlength="160" name="bio" placeholder="tell us a little bit about yourself and your shop" required="" rows="4"></textarea>
+<div class="charCount"><span id="bioCount">0</span>/160</div>
+</div>
+</div>
+<div class="mediaGrid fullSpan" id="mediaGridApply">
+<div class="mediaCard">
+<div class="mediaTop">
+<div>
+<div class="mediaTitle">profile picture</div>
+<div class="mediaHint">required: square image (1:1)</div>
+</div>
+</div>
+<div class="mediaRow">
+<div class="mediaPreview"><img alt="" id="prev_profile" style="display:none;"/></div>
+<div class="mediaControls">
+<input accept="image/*" class="fileInput" id="file_profile" required="" type="file"/>
+<div class="mediaStatus" id="status_profile"></div>
+</div>
+</div>
+</div>
+<div class="mediaCard">
+<div class="mediaTop">
+<div>
+<div class="mediaTitle">item images</div>
+<div class="mediaHint">required: square image (1:1)</div>
+</div>
+</div>
+<div class="mediaRow" style="margin-bottom:10px;">
+<div class="mediaPreview"><img alt="" id="prev_item1" style="display:none;"/></div>
+<div class="mediaControls">
+<input accept="image/*" class="fileInput" id="file_item1" type="file"/>
+<div class="mediaStatus" id="status_item1"></div>
+</div>
+</div>
+<div class="mediaRow" style="margin-bottom:10px;">
+<div class="mediaPreview"><img alt="" id="prev_item2" style="display:none;"/></div>
+<div class="mediaControls">
+<input accept="image/*" class="fileInput" id="file_item2" type="file"/>
+<div class="mediaStatus" id="status_item2"></div>
+</div>
+</div>
+<div class="mediaRow">
+<div class="mediaPreview"><img alt="" id="prev_item3" style="display:none;"/></div>
+<div class="mediaControls">
+<input accept="image/*" class="fileInput" id="file_item3" type="file"/>
+<div class="mediaStatus" id="status_item3"></div>
+</div>
+</div>
+</div>
+</div>
 <div class="row full" style="margin-top:6px;">
-  <button class="btn applyBtn" type="submit">submit</button>
-  <div class="notice" id="applyStatus" aria-live="polite" style="display:none;"></div>
+<button class="btn applyBtn" type="submit">submit</button>
+<div aria-live="polite" class="notice" id="applyStatus" style="display:none;"></div>
 </div>
 </div>
 </form></div>
@@ -8435,7 +8425,6 @@ a.btn.apply:hover{
 /* Popstar: Spotlight quote auto-fit (single definitive) */
 
 </script>
-
 <script>
 /* Popstar: Spotlight quote auto-fit (single definitive) */
 window.__fitSpotQuote = function(textEl, containerEl){
@@ -8646,6 +8635,15 @@ if (!spotlight.children || spotlight.children.length===0){ spotlight.innerHTML =
       "black":"#0b0b0c"
     };
     const __hex = (__raw && __raw[0]==="#") ? __raw : (__map[__raw.toLowerCase()] || "");
+    // vFIX: avoid brand-green flash if a placeholder brand hex is present before real spotlight_color loads
+    const __brand = (getComputedStyle(document.documentElement).getPropertyValue("--brand") || "#8ACE00").trim().toLowerCase();
+    const __hexNorm = (__hex || "").trim().toLowerCase();
+    if(__hexNorm && (__hexNorm === __brand || __hexNorm === "#8ace00")){
+      spotlight.style.removeProperty("--spotAccent");
+      spotlight.style.removeProperty("--spotAccentText");
+      spotlight.removeAttribute("data-accent-ready");
+      return;
+    }
     if (__hex){
       const __h = __hex.replace("#","").trim();
       const __rgb = (__h.length===3)
@@ -8655,10 +8653,12 @@ if (!spotlight.children || spotlight.children.length===0){ spotlight.innerHTML =
       const __txt = (__lum < 0.55) ? "#fff" : "#000";
       spotlight.style.setProperty("--spotAccent", __hex);
       spotlight.style.setProperty("--spotAccentText", __txt);
+      spotlight.setAttribute("data-accent-ready","1");
     }else{
       // reset to default
       spotlight.style.removeProperty("--spotAccent");
       spotlight.style.removeProperty("--spotAccentText");
+      spotlight.removeAttribute("data-accent-ready");
     }
   }catch(e){}
 
@@ -9163,7 +9163,13 @@ document.addEventListener("DOMContentLoaded", () => {
     mainWrap.appendChild(b);
   });
 
-  setMain("y2k");
+
+// Start unselected (no default genre)
+mainHidden.value = "";
+mainWrap.querySelectorAll(".chip").forEach(x => x.classList.remove("is-on"));
+if (subWrap) subWrap.innerHTML = "";
+if (sub1) sub1.value = "";
+if (sub2) sub2.value = "";
 });
 </script>
 <script>
@@ -9188,20 +9194,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <script>/* APPLY FORM -> SUPABASE (ONE FORM FOR FREE/FEATURED). profile photo required. */
 (function() {
   const form = document.getElementById('applyForm');
@@ -9454,7 +9446,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 })();
 </script>
-
 <script>
   window.SUPABASE_URL = "https://otvznctmwutbwulbhfvx.supabase.co";
   window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90dnpuY3Rtd3V0Ynd1bGJoZnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNzc3MzcsImV4cCI6MjA4NzY1MzczN30.txShYO4rqLSMHeLuN_2rzRmvXZK3mnPsaabFtTa8Ph8";
@@ -9511,7 +9502,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 })();
 </script>
-
 <script>
 /* Hide influencer code fields when in buyer mode (?buyer=1) */
 document.addEventListener("DOMContentLoaded", function(){
@@ -9620,6 +9610,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- card renderer (copied from existing file, unchanged) ---
   function renderSellerCard(p){
+    // Mark spotlight seller cards so they get the "featured ★" sticker inside their genre grid
+    let isSpotlight = false;
+    try{
+      const sp = (window.__POPSTAR_SPOTLIGHT_POOL && window.__POPSTAR_SPOTLIGHT_POOL[0]) || null;
+      if (sp){
+        const pid = first(p, ["id","seller_id","sellerId"]);
+        const sid = first(sp, ["id","seller_id","sellerId"]);
+        const ph = String(first(p, ["depop_handle","depop_username","handle","username","ig","instagram"])||"").replace(/^@/,"").toLowerCase();
+        const sh = String(first(sp, ["depop_handle","depop_username","handle","username","ig","instagram"])||"").replace(/^@/,"").toLowerCase();
+        if (pid && sid && String(pid) === String(sid)) isSpotlight = true;
+        else if (ph && sh && ph === sh) isSpotlight = true;
+      }
+    }catch(e){}
+
     const shop = first(p, ["shop_name","shop","store","store_name","name"]);
     const handleRaw = first(p, ["handle","username","depop_handle","depop_username","ig","instagram"]);
     const handle = handleRaw ? (handleRaw.startsWith("@") ? handleRaw : "@"+handleRaw) : "";
@@ -9642,8 +9646,10 @@ document.addEventListener("DOMContentLoaded", () => {
       pills.push(`<span class="pill subPill">${escapeHtml(String(s))}</span>`);
     }
 
+    const cardClass = "card seller" + (isSpotlight ? " hasFeaturedSticker" : "");
+
     return `
-      <a class="card seller" href="${escapeHtml(href)}" target="_blank" rel="noopener">
+      <a class="${cardClass}" href="${escapeHtml(href)}" target="_blank" rel="noopener">
         <div class="imgWrap">
           <img class="avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(shop || "seller")}"/>
           ${location ? `<div class="thumbLoc">${escapeHtml(String(location).toLowerCase())}</div>` : ``}
@@ -9798,6 +9804,7 @@ const DEMO = {
         const tmp = document.createElement("div");
         tmp.innerHTML = renderSellerCard(profile).trim();
         const card = tmp.firstElementChild;
+        if (card) card.classList.add("hasFeaturedSticker");
         if (!card){ DBG.ok = false; DBG.reason = "renderSellerCard returned empty"; return false; }
 
         const newHref = card.getAttribute("href") || "";
@@ -9846,40 +9853,124 @@ const DEMO = {
 
 
   
-// AUTO-INJECT BOOTSTRAP (v34): make debug visible even if inject never runs,
-// and attempt injection from multiple lifecycle points.
+// AUTO-INJECT BOOTSTRAP (v37): keep debug fresh, wait for pool hydration,
+// inject Spotlight seller into its genre grid, and ensure the "featured ★" sticker appears.
 window.__SPOTLIGHT_INJECT_DEBUG = window.__SPOTLIGHT_INJECT_DEBUG || {};
-window.__SPOTLIGHT_INJECT_DEBUG.bootedAt = new Date().toISOString();
-window.__SPOTLIGHT_INJECT_DEBUG.build = "v34";
-window.__SPOTLIGHT_INJECT_DEBUG.ok = window.__SPOTLIGHT_INJECT_DEBUG.ok ?? null;
+(function(){
+  const DBG = window.__SPOTLIGHT_INJECT_DEBUG;
+  DBG.hardBootedAt = DBG.hardBootedAt || new Date().toISOString();
+  DBG.build = "v37";
+  DBG.errors = Array.isArray(DBG.errors) ? DBG.errors : [];
+  DBG.ok = (typeof DBG.ok === "undefined") ? null : DBG.ok;
 
-function __tryInjectFromPool(){
+  const norm = (v) => String(v || "").trim().replace(/^@/,"").toLowerCase();
+  const firstSafe = (o, keys) => {
+    try{
+      for (const k of keys){
+        if (!o) return "";
+        const v = o[k];
+        if (v !== undefined && v !== null && String(v).trim() !== "") return v;
+      }
+    }catch(e){}
+    return "";
+  };
+
+  function getSpotlightProfile(){
+    try{
+      const pool = window.__POPSTAR_SPOTLIGHT_POOL;
+      if (Array.isArray(pool) && pool[0]) return pool[0];
+    }catch(e){}
+    return null;
+  }
+
+  function applyStickerToExistingCards(sp){
+    try{
+      if (!sp) return;
+      const sid = firstSafe(sp, ["id","seller_id","sellerId"]);
+      const sh = norm(firstSafe(sp, ["depop_handle","depop_username","handle","username","ig","instagram"]));
+      const hrefNeedle = sh ? ("https://www.depop.com/" + sh + "/") : "";
+      const grids = document.querySelectorAll('#altGrid,#y2kGrid,#streetGrid,#vintageGrid,#archiveGrid,#cleanGrid');
+      grids.forEach(grid => {
+        Array.from(grid.querySelectorAll('a.card.seller')).forEach(a => {
+          const href = String(a.getAttribute("href")||"").trim();
+          const h = norm(href.replace("https://www.depop.com/","").replace("http://www.depop.com/","").split("/")[0]);
+          // Also check visible handle text if present
+          const text = norm((a.textContent||""));
+          const matchByHref = hrefNeedle && (href === hrefNeedle);
+          const matchByHandle = sh && (h === sh || text.includes("@"+sh) || text.includes(sh));
+          // Best effort: match by stored dataset if present
+          const dsid = a.dataset ? (a.dataset.id || a.dataset.sellerId || a.dataset.seller_id) : "";
+          const matchById = sid && dsid && String(sid) === String(dsid);
+          if (matchById || matchByHref || matchByHandle){
+            a.classList.add("hasFeaturedSticker");
+          }
+        });
+      });
+    }catch(e){}
+  }
+
+  function __tryInjectFromPool(){
+    try{
+      DBG.lastTryAt = new Date().toISOString();
+      const sp = getSpotlightProfile();
+      DBG.hasPool = !!sp;
+
+      if (!sp){
+        DBG.ok = (DBG.ok === true) ? true : false;
+        DBG.reason = DBG.reason || "no pool yet";
+        return false;
+      }
+
+      // Always ensure sticker appears even if the Spotlight seller is already in the grid
+      applyStickerToExistingCards(sp);
+
+      if (window.injectSpotlightIntoGenreGrid){
+        window.injectSpotlightIntoGenreGrid(sp);
+      }
+      return true;
+    }catch(e){
+      try{
+        DBG.errors.push((e && (e.message || e.toString())) || "unknown");
+        DBG.ok = false;
+        DBG.reason = "bootstrap exception";
+      }catch(_e){}
+      return false;
+    }
+  }
+
+  // Attempt from lifecycle points
+  document.addEventListener("DOMContentLoaded", __tryInjectFromPool);
+  window.addEventListener("load", __tryInjectFromPool);
+
+  // Poll briefly for late pool hydration (covers Supabase arriving after load)
+  let tries = 0;
+  const maxTries = 30; // ~7.5s at 250ms
+  const t = setInterval(() => {
+    tries++;
+    const did = __tryInjectFromPool();
+    if (did || tries >= maxTries) clearInterval(t);
+  }, 250);
+
+  // Also watch for Spotlight DOM updates (covers late hydration)
   try{
-    if (window.injectSpotlightIntoGenreGrid && window.__POPSTAR_SPOTLIGHT_POOL && window.__POPSTAR_SPOTLIGHT_POOL[0]){
-      window.injectSpotlightIntoGenreGrid(window.__POPSTAR_SPOTLIGHT_POOL[0]);
+    const spotEl = document.getElementById("spotlight");
+    if (spotEl && window.MutationObserver){
+      let ticks = 0;
+      const obs = new MutationObserver(() => {
+        ticks++;
+        setTimeout(__tryInjectFromPool, 0);
+        setTimeout(__tryInjectFromPool, 120);
+        setTimeout(__tryInjectFromPool, 450);
+        if (ticks >= 6){
+          try{ obs.disconnect(); }catch(e){}
+        }
+      });
+      obs.observe(spotEl, { childList:true, subtree:true, characterData:true });
+      setTimeout(() => { try{ obs.disconnect(); }catch(e){} }, 6000);
     }
   }catch(e){}
-}
+})(); 
 
-document.addEventListener("DOMContentLoaded", __tryInjectFromPool);
-window.addEventListener("load", __tryInjectFromPool);
-
-// Also watch for Spotlight DOM updates (covers late hydration)
-try{
-  const spotEl = document.getElementById("spotlight");
-  if (spotEl && window.MutationObserver){
-    let ran = false;
-    const obs = new MutationObserver(() => {
-      if (ran) return;
-      ran = true;
-      setTimeout(__tryInjectFromPool, 0);
-      setTimeout(__tryInjectFromPool, 120);
-      setTimeout(__tryInjectFromPool, 450);
-    });
-    obs.observe(spotEl, { childList:true, subtree:true, characterData:true });
-    setTimeout(() => { try{ obs.disconnect(); }catch(e){} }, 4000);
-  }
-}catch(e){}
 function getCred(name){
     try{
       const root = document.documentElement;
@@ -10107,16 +10198,6 @@ const GENRES = ["alt","y2k","street","vintage","archive","clean"];
 <script id="v148-spotlight-debug">
 /* v148 — optional debug: set window.DEBUG_SPOTLIGHT ★ = true in console to log parsed items */
 </script>
-
-
-
-
-
-
-
-
-
-
 <style id="spotlightPillSizeEqualOverride">
 /* Spotlight: make genre + subcategory pills the SAME size (chip-based pills) */
 #spotlight .spotPills .chip.spotGenrePill,
@@ -10200,9 +10281,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
-
 <style id="genreMainPillBlackOverride">
 /* FINAL OVERRIDE: Genre section seller-card main genre pills -> black w/ white text */
 .section.cluster a.card.seller .pill.mainPill,
@@ -10315,7 +10393,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
 <!--
 /* --- genre view all buttons --- */
 .viewAllWrap{
@@ -10473,9 +10550,6 @@ button[type="submit"]:hover{
 }
 
 </style>
-
-
-
 <script id="filterBarScrollReset">
 (function(){
   function reset(){
@@ -10493,9 +10567,6 @@ button[type="submit"]:hover{
   window.addEventListener("pageshow", reset);
 })();
 </script>
-
-
-
 <script id="genreFilterScript">
 document.addEventListener("DOMContentLoaded", function(){
 
@@ -10525,17 +10596,14 @@ document.addEventListener("DOMContentLoaded", function(){
 
 });
 </script>
-
-
 <script id="sellerSearchScript">
-/* Search sellers by shop name, username, bio keywords, and city/location */
+/* Search sellers by shop name, username, bio keywords, and city/location.
+   Works with cards rendered after load (Supabase/demo renders). */
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput =
     document.querySelector("#search") ||
     document.querySelector("input.search") ||
     document.querySelector('input[type="search"]');
-
-  const sellerCards = Array.from(document.querySelectorAll("a.card.seller"));
 
   function norm(s){
     return (s || "")
@@ -10570,25 +10638,46 @@ document.addEventListener("DOMContentLoaded", () => {
     return norm([shop, username, bio, city, fallback].join(" • "));
   }
 
-  const haystacks = new Map();
-  sellerCards.forEach(c => haystacks.set(c, cardHaystack(c)));
+  const hayCache = new WeakMap();
+  function hay(card){
+    if(hayCache.has(card)) return hayCache.get(card);
+    const h = cardHaystack(card);
+    hayCache.set(card, h);
+    return h;
+  }
+
+  function cards(){
+    return Array.from(document.querySelectorAll("a.card.seller"));
+  }
 
   function applySearch(){
     const q = norm(searchInput?.value || "");
+    const allCards = cards();
+
     if(!q){
-      sellerCards.forEach(c => { c.style.display = ""; });
+      allCards.forEach(c => { c.style.display = ""; });
       return;
     }
 
     // Support multi-term search: all terms must match somewhere.
     const terms = q.split(" ").filter(Boolean);
 
-    sellerCards.forEach(card => {
-      const h = haystacks.get(card) || "";
+    allCards.forEach(card => {
+      const h = hay(card);
       const ok = terms.every(t => h.includes(t));
       card.style.display = ok ? "" : "none";
     });
   }
+
+  // If cards are injected after load (Supabase), keep search working.
+  const mo = new MutationObserver(() => {
+    // Invalidate cache for any mutated cards by simply clearing on new nodes:
+    // (WeakMap will release old nodes automatically.)
+    if(searchInput && norm(searchInput.value || "")) applySearch();
+  });
+  try{
+    mo.observe(document.body, { childList:true, subtree:true });
+  }catch(e){ /* ignore */ }
 
   if(searchInput){
     searchInput.addEventListener("input", applySearch);
@@ -10596,8 +10685,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
-
-
 <script>
 /* === POPSTAR: Supabase → Spotlight bridge (failsafe) ===
    This script updates the existing rebuilt spotlight DOM with live data.
@@ -10675,7 +10762,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const spot = document.getElementById("spotlight");
       if(!spot) return;
       const pl = profile && (profile.__placement || profile.placement || profile.__pl) ? (profile.__placement || profile.placement || profile.__pl) : null;
-      const key = (pl && (pl.spotlight_color || pl.theme_color || pl.accent_color)) ? String(pl.spotlight_color || pl.theme_color || pl.accent_color).trim().toLowerCase() : "";
+      const key = (pl && (pl.spotlight_color || pl.theme_color || pl.accent_color))
+        ? String(pl.spotlight_color || pl.theme_color || pl.accent_color).trim().toLowerCase()
+        : "";
+      // IMPORTANT: avoid any brand-green flash on first paint.
+      // If placement key is "brand" (often used as a placeholder), do not apply an accent yet.
+      // If you truly want brand green, set the placement color to an explicit hex (e.g. "#8ACE00").
+      if(key === "brand"){
+        spot.style.removeProperty("--spotAccent");
+        spot.style.removeProperty("--spotAccentText");
+        spot.removeAttribute("data-accent-ready");
+        return;
+      }
       // DB-allowed keys: brand, blue, pink, orange, purple, lemon, ice, black (or null)
       const brand = (getComputedStyle(document.documentElement).getPropertyValue("--brand") || "#8ACE00").trim();
       const map = {
@@ -10688,10 +10786,16 @@ document.addEventListener("DOMContentLoaded", () => {
         "ice": "#AEEBFF",
         "black": "#000000"
       };
-      const accent = (key && map[key]) ? map[key] : brand;
+
+      // IMPORTANT: if key isn't present/valid yet, do NOTHING.
+      // This prevents a brief brand-green flash before the real spotlight accent arrives.
+      if(!key || !map[key]) return;
+
+      const accent = map[key];
       const text = (String(accent).toLowerCase() === "#000000") ? "#fff" : "#000";
       spot.style.setProperty("--spotAccent", accent);
       spot.style.setProperty("--spotAccentText", text);
+      spot.setAttribute("data-accent-ready","1");
     }catch(e){ /* no-op */ }
   }
 
@@ -10969,9 +11073,6 @@ DEBUG.poolLength = 1;
   window.addEventListener('load', () => { loadFromSupabase(); });
 })();
 </script>
-
-
-
 <script id="spotlightInjectBootstrapV36">
 /* v36: always-available injector + error capture */
 (function(){
@@ -11174,20 +11275,31 @@ grid.insertBefore(a, grid.firstChild);
   setTimeout(tryInject, 1800);
 })();
 </script>
-
 <script id="spotlightNameColorJSV51">
 /* v51 — Spotlight name/username:
-   Default = --spotAccent
+   Default = accent color (readable on white background)
    Hover over spotlight box = white
-   (No mutation observer to avoid overriding hover state) */
+   Also: keep in sync if accent is set after async hydration (Supabase) */
 (function(){
+  function norm(c){
+    return String(c || "").trim().toLowerCase();
+  }
+  function isWhite(c){
+    const v = norm(c);
+    return v === "#fff" || v === "#ffffff" || v === "white" || v === "rgb(255, 255, 255)";
+  }
+  function getVar(el, name){
+    try{ return (getComputedStyle(el).getPropertyValue(name) || "").trim(); }catch(e){ return ""; }
+  }
   function getAccent(spot){
     try{
-      const v = (getComputedStyle(spot).getPropertyValue("--spotAccent") || "").trim();
-      if (v) return v;
-      const brand = (getComputedStyle(document.documentElement).getPropertyValue("--brand") || "").trim();
-      return brand || "#00ff6a";
-    }catch(e){ return "#00ff6a"; }
+      const v = getVar(spot, "--spotAccent");
+      const brand = getVar(document.documentElement, "--brand") || "#8ACE00";
+      // Avoid any "brand green" placeholder flashes: stay black until a real spotlight accent exists.
+      if (!v || isWhite(v)) return "#000";
+      if (norm(v) === norm(brand)) return "#000";
+      return v;
+    }catch(e){ return "#000"; }
   }
 
   function apply(){
@@ -11208,8 +11320,28 @@ grid.insertBefore(a, grid.firstChild);
         user.style.setProperty("color", "#ffffff", "important");
       };
 
-      // Initial state
+      // Initial state (readable even before async hydration)
       setAccent();
+
+      // Keep in sync for a short window while data hydrates / accent gets set
+      if (!spot.__nameAccentSync){
+        let last = "";
+        let ticks = 0;
+        spot.__nameAccentSync = setInterval(() => {
+          // Don't fight hover state
+          if (spot.matches(":hover")) return;
+          const a = getAccent(spot);
+          if (a && a !== last){
+            last = a;
+            setAccent();
+          }
+          ticks++;
+          if (ticks > 40){ // ~8 seconds max
+            clearInterval(spot.__nameAccentSync);
+            spot.__nameAccentSync = null;
+          }
+        }, 200);
+      }
 
       if (!spot.__nameHoverBound){
         spot.addEventListener("mouseenter", setWhite);
@@ -11269,7 +11401,6 @@ grid.insertBefore(a, grid.firstChild);
   setTimeout(apply, 800);
 })();
 </script>
-
 <script id="spotlightCarouselLogicV53">
 (function(){
   let currentIndex = 0;
@@ -11317,9 +11448,6 @@ grid.insertBefore(a, grid.firstChild);
   window.addEventListener("load", init);
 })();
 </script>
-
-
-
 <script>
 /* auth v1: magic link login (separate from public anon client) */
 (function(){
@@ -11489,21 +11617,19 @@ grid.insertBefore(a, grid.firstChild);
   });
 })();
 </script>
-
 <!-- auth modal -->
 <div class="authOverlay" id="authOverlay" role="presentation"></div>
-<div class="authModal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-  <button class="authClose" id="authCloseBtn" type="button" aria-label="close">×</button>
-  <h3 id="authTitle">log in</h3>
-  <p>enter your email and we’ll send you a magic link.</p>
-  <div class="authRow">
-    <input class="authInput" id="authEmail" type="email" inputmode="email" autocomplete="email" placeholder="email address" />
-    <button class="authBtn" id="authSendBtn" type="button">send link</button>
-    <button class="authBtn" id="authLogoutBtn" type="button" style="display:none;">log out</button>
-  </div>
-  <div class="authMsg" id="authMsg"></div>
+<div aria-labelledby="authTitle" aria-modal="true" class="authModal" id="authModal" role="dialog">
+<button aria-label="close" class="authClose" id="authCloseBtn" type="button">×</button>
+<h3 id="authTitle">log in</h3>
+<p>enter your email and we’ll send you a magic link.</p>
+<div class="authRow">
+<input autocomplete="email" class="authInput" id="authEmail" inputmode="email" placeholder="email address" type="email"/>
+<button class="authBtn" id="authSendBtn" type="button">send link</button>
+<button class="authBtn" id="authLogoutBtn" style="display:none;" type="button">log out</button>
 </div>
-
+<div class="authMsg" id="authMsg"></div>
+</div>
 <script>
 // v102: form chips (main category + subcategories)
 (function(){
@@ -11561,7 +11687,14 @@ grid.insertBefore(a, grid.firstChild);
     });
 
     // default selection
-    setMain("archive");
+
+
+// Start unselected (no default genre)
+mainHidden.value = "";
+mainWrap.querySelectorAll(".chip").forEach(x => x.classList.remove("is-on"));
+if (subWrap) subWrap.innerHTML = "";
+if (sub1) sub1.value = "";
+if (sub2) sub2.value = "";
   }
 
   if (document.readyState === "loading"){
@@ -11692,6 +11825,86 @@ grid.insertBefore(a, grid.firstChild);
     setStatus("status_profile","");
 }catch(e){}
 })();
+</script>
+<script id="popstarChipDelegateV1">
+/* Popstar ★ chips: start unselected; keep selected pills green (no dependency on MAIN/SUBS) */
+document.addEventListener("DOMContentLoaded", () => {
+  const mainWrap = document.getElementById("primaryChips");
+  const subWrap  = document.getElementById("subChips");
+  const mainHidden = document.getElementById("mainCategory");
+  let sub1 = document.getElementById("subTag1Hidden");
+  let sub2 = document.getElementById("subTag2Hidden");
+  if (!mainWrap || !subWrap || !mainHidden) return;
+
+  // Ensure hidden inputs exist (some forms were missing them)
+  if (!sub1){
+    sub1 = document.createElement("input");
+    sub1.type = "hidden";
+    sub1.id = "subTag1Hidden";
+    sub1.name = "sub_tag_1";
+    mainHidden.insertAdjacentElement("afterend", sub1);
+  }
+  if (!sub2){
+    sub2 = document.createElement("input");
+    sub2.type = "hidden";
+    sub2.id = "subTag2Hidden";
+    sub2.name = "sub_tag_2";
+    (sub1 || mainHidden).insertAdjacentElement("afterend", sub2);
+  }
+
+  // Start unselected
+  mainHidden.value = "";
+  sub1.value = "";
+  sub2.value = "";
+  mainWrap.querySelectorAll(".chip.is-on").forEach(b => b.classList.remove("is-on"));
+  subWrap.querySelectorAll(".chip.is-on").forEach(b => b.classList.remove("is-on"));
+
+  function syncSubHidden(){
+    const on = [...subWrap.querySelectorAll(".chip.is-on")].slice(0,2);
+    sub1.value = on[0]?.dataset.word || on[0]?.textContent?.trim() || "";
+    sub2.value = on[1]?.dataset.word || on[1]?.textContent?.trim() || "";
+  }
+
+  // MAIN: single select
+  mainWrap.addEventListener("click", (e) => {
+    const btn = e.target.closest("button.chip, .chip");
+    if (!btn || !mainWrap.contains(btn)) return;
+    if (btn.tagName.toLowerCase() === "a") return; // ignore links just in case
+    e.preventDefault();
+
+    mainWrap.querySelectorAll(".chip.is-on").forEach(b => b.classList.remove("is-on"));
+    btn.classList.add("is-on");
+
+    const genre = btn.dataset.genre || btn.getAttribute("data-genre") || btn.textContent.trim();
+    mainHidden.value = genre || "";
+
+    // Reset subs when main changes
+    subWrap.querySelectorAll(".chip.is-on").forEach(b => b.classList.remove("is-on"));
+    sub1.value = "";
+    sub2.value = "";
+  }, true);
+
+  // SUB: multi select up to 2
+  subWrap.addEventListener("click", (e) => {
+    const btn = e.target.closest("button.chip, .chip");
+    if (!btn || !subWrap.contains(btn)) return;
+    if (btn.tagName.toLowerCase() === "a") return;
+    e.preventDefault();
+
+    // Toggle
+    if (btn.classList.contains("is-on")){
+      btn.classList.remove("is-on");
+      syncSubHidden();
+      return;
+    }
+
+    const on = subWrap.querySelectorAll(".chip.is-on");
+    if (on.length >= 2) return; // cap at 2
+    btn.classList.add("is-on");
+    syncSubHidden();
+  }, true);
+
+});
 </script>
 </body>
 </html>
