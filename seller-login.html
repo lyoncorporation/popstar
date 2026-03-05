@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>seller log in • popstar</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="shortcut icon" href="favicon-32.png">
+  <meta name="theme-color" content="#8ACE00">
+
+  <style>
+    :root{
+      --brand:#8ACE00;
+      --bg:#f5f5f2;
+      --ink:#0b0b0c;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"sf pro text",system-ui;
+      text-transform:lowercase;
+      overflow-x:hidden;
+    }
+    /* subtle grain (same vibe as site) */
+    body:before{
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.10'/%3E%3C/svg%3E");
+      mix-blend-mode:multiply;
+      opacity:.18;
+    }
+    a{color:inherit}
+    .wrap{max-width:980px; margin:0 auto; padding:20px 16px 90px;}
+    .topbar{
+      position:sticky; top:0; z-index:80;
+      width:100vw;
+      margin-left:calc(50% - 50vw);
+      margin-right:calc(50% - 50vw);
+      background:var(--brand);
+      border:0;
+      box-shadow:none;
+      padding:8px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brand{font-weight:1000; letter-spacing:-.03em;}
+    .back{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:10px 12px; border-radius:999px;
+      border:2px solid #000;
+      background:rgba(255,255,255,.92);
+      font-weight:950;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .card{
+      margin-top:28px;
+      background:rgba(255,255,255,.92);
+      border:2px solid #000;
+      border-radius:var(--radius);
+      box-shadow:0 16px 34px rgba(0,0,0,.14);
+      overflow:hidden;
+    }
+    .inner{padding:16px;}
+    h1{margin:0 0 8px; font-size:34px; line-height:1; font-weight:1000; letter-spacing:-.04em;}
+    .sub{margin:0 0 14px; opacity:.78; font-weight:900; max-width:70ch;}
+    label{display:block; font-weight:950; margin:0 0 6px;}
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:2px solid #000;
+      background:rgba(255,255,255,.96);
+      font-weight:850;
+      outline:none;
+    }
+    input:focus{box-shadow:0 0 0 4px rgba(138,206,0,.28);}
+    .row{margin-top:12px;}
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; align-items:center;}
+    
+
+button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px 16px;
+  border-radius:14px;
+  border:2px solid #000;
+  background:#000;
+  color:#fff;
+  font-weight:1000;
+  cursor:pointer;
+}
+button:hover{
+  background:var(--brand);
+  color:#000;
+}
+
+
+    button:hover{background:var(--brand); color:#000;}
+    
+    
+    
+    .ok{display:none;}
+    .small{font-size:13px; opacity:.78; font-weight:900; margin-top:10px;}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:12px;}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">popstar★ seller log in</div>
+    <a class="back" href="index.html">back</a>
+  </div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="inner">
+        <h1>log in</h1>
+        <p class="sub">enter your email and we’ll send you a one-time magic link.</p>
+
+        <div class="row">
+          <label for="email">email</label>
+          <input id="email" type="email" placeholder="your@email.com" autocomplete="email" spellcheck="false" />
+        </div>
+
+        <div class="btnRow">
+          <button id="sendBtn" type="button">send magic link</button>
+        </div>
+
+        <div id="status" style="margin-top:10px; font-weight:900; display:none;">sent. check your email for the link.</div>
+        <div id="error" style="margin-top:10px; font-weight:900; color:#000; display:none;"></div>
+
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase Auth (magic link) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (function(){
+      const SUPABASE_URL = 'https://otvznctmwutbwulbhfvx.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90dnpuY3Rtd3V0Ynd1bGJoZnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNzc3MzcsImV4cCI6MjA4NzY1MzczN30.txShYO4rqLSMHeLuN_2rzRmvXZK3mnPsaabFtTa8Ph8';
+      const EMAIL_REDIRECT_TO = "https://popstarrr.com/seller.html";
+
+      const statusEl = document.getElementById('status');
+      const errorEl = document.getElementById('error');
+      const btn = document.getElementById('sendBtn');
+      const emailInput = document.getElementById('email');
+
+      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      function showError(msg) {
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+        statusEl.style.display = 'none';
+      }
+      function showOk() {
+        errorEl.style.display = 'none';
+        statusEl.style.display = 'block';
+      }
+
+      async function boot() {
+        try {
+          const { data } = await sb.auth.getSession();
+          if (data && data.session) {
+            window.location.href = "seller.html";
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      btn.addEventListener('click', async () => {
+        const email = (emailInput.value || '').trim();
+        if (!email) return showError('enter an email');
+        btn.disabled = true;
+        btn.textContent = 'sending…';
+        try {
+          const { error } = await sb.auth.signInWithOtp({
+            email,
+            options: { emailRedirectTo: EMAIL_REDIRECT_TO }
+          });
+          if (error) throw error;
+          showOk();
+        } catch (e) {
+          showError(e?.message || 'could not send link');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'send magic link';
+        }
+      });
+
+      boot();
+    })();
+  </script>
+</body>
+</html>
