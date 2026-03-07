@@ -189,14 +189,24 @@ h2{
   box-shadow: 0 16px 34px rgba(0,0,0,.14);
 }
 .thumb{
-  /* Genre section seller cards: allow true square profile images.
-     The previous fixed height acted like a "locking mechanism" that
-     prevented the cards from getting taller. */
+  /* Genre section seller cards: keep profile images perfectly square and clipped
+     so uploaded square images fully fill the card image area. */
   aspect-ratio: 1 / 1;
   height:auto;
+  position:relative;
+  overflow:hidden;
   background: linear-gradient(135deg, rgba(138,206,0,.28), rgba(0,0,0,.04));
 }
-.thumb img{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1.10) contrast(1.05);}
+.thumb img{
+  display:block;
+  width:100% !important;
+  height:100% !important;
+  min-width:100%;
+  min-height:100%;
+  object-fit:cover;
+  object-position:center;
+  filter:saturate(1.10) contrast(1.05);
+}
 .meta{padding:12px;}
 .name{font-weight:1000; letter-spacing:-.02em; margin:0 0 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .handle{margin:0 0 10px; color:rgba(0,0,0,.72); font-weight:900; font-size:13px;}
