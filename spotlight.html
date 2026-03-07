@@ -13477,7 +13477,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-<script>/* APPLY FORM -> SUPABASE (WITH INFLUENCER CODES / PLACEMENTS). */
+<script>/* APPLY FORM -> SUPABASE (SPOTLIGHT + INFLUENCER CODES). */
 (function() {
   const form = document.getElementById('applyForm');
   if(!form) return;
@@ -13493,11 +13493,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function setStatus(msg, kind){
     if(!statusEl) return;
     statusEl.style.display = msg ? '' : 'none';
-    statusEl.className = 'notice' + (kind === 'error' ? ' error' : '');
+    statusEl.className = kind === 'error' ? 'error' : 'notice';
     statusEl.textContent = msg || '';
   }
 
   function nowISO(){ try{ return new Date().toISOString(); }catch(e){ return ""; } }
+
+  function plusDaysISO(days){
+    try{
+      const d = new Date();
+      d.setDate(d.getDate() + Number(days || 0));
+      return d.toISOString();
+    }catch(e){ return nowISO(); }
+  }
 
   function normalizeHandle(h){
     h = (h || "").trim();
@@ -13508,30 +13516,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function getMeta(name){
     const el = document.querySelector('meta[name="'+name+'"]');
     return el ? el.getAttribute('content') : "";
-  }
-
-  function canonPlacementType(v){
-    const s = String(v || '').trim().toLowerCase();
-    if (!s) return '';
-    if (s.includes('spot')) return 'spotlight';
-    if (s.includes('feat')) return 'feature';
-    return '';
-  }
-
-  function inferPlacementType(codeRow, codeText){
-    const candidates = [
-      codeRow && codeRow.placement_type,
-      codeRow && codeRow.type,
-      codeRow && codeRow.code_type,
-      codeRow && codeRow.reward_type,
-      codeRow && codeRow.kind,
-      codeText
-    ];
-    for (const c of candidates){
-      const hit = canonPlacementType(c);
-      if (hit) return hit;
-    }
-    return '';
   }
 
   async function getSb(){
@@ -13601,62 +13585,44 @@ document.addEventListener("DOMContentLoaded", () => {
     return out;
   }
 
-  async function fetchInfluencerCode(sb, rawCode){
-    const code = String(rawCode || '').trim();
-    if (!code) return null;
-    let res = await sb.from('influencer_codes').select('*').eq('code', code).limit(1).maybeSingle();
-    if (!res.error && res.data) return res.data;
-    res = await sb.from('influencer_codes').select('*').ilike('code', code).limit(1).maybeSingle();
-    if (res.error) throw res.error;
-    return res.data || null;
+  function inferPlacementType(codeRow, codeText){
+    const explicit = String(codeRow?.placement_type || codeRow?.type || codeRow?.reward_type || "").trim().toLowerCase();
+    if (explicit === "feature" || explicit === "featured") return "feature";
+    if (explicit === "spotlight") return "spotlight";
+    const code = String(codeText || "").trim().toLowerCase();
+    if (code.includes("spotlight")) return "spotlight";
+    if (code.includes("feature")) return "feature";
+    return "";
   }
 
-  function isCodeUsable(row){
-    if (!row) return false;
-    if (row.is_active === false || row.is_active === 0 || row.is_active === '0' || row.is_active === 'false') return false;
-    const maxUses = Number(row.max_uses);
-    const uses = Number(row.uses || 0);
-    if (Number.isFinite(maxUses) && maxUses > 0 && uses >= maxUses) return false;
-    return true;
-  }
+  async function lookupInfluencerCode(sb, rawCode){
+    const code = String(rawCode || "").trim();
+    if(!code) return null;
 
-  async function incrementInfluencerCodeUse(sb, row){
-    if (!row) return;
-    const nextUses = Number(row.uses || 0) + 1;
-    if (row.id != null) {
-      const res = await sb.from('influencer_codes').update({ uses: nextUses }).eq('id', row.id);
-      if (!res.error) return;
-    }
-    await sb.from('influencer_codes').update({ uses: nextUses }).eq('code', row.code);
-  }
+    let resp = await sb.from("influencer_codes").select("*").ilike("code", code).limit(1).maybeSingle();
+    if (resp.error) throw resp.error;
+    const row = resp.data;
+    if (!row) throw new Error("invalid influencer code");
+    if (row.is_active === false) throw new Error("this influencer code is inactive");
 
-  async function createPlacement(sb, sellerId, placementType, genre){
-    const genreValue = String(genre || '').trim().toLowerCase() || null;
-    const start = nowISO();
-    const attempts = [
-      { seller_id: sellerId, placement_type: placementType, status: 'active', genre: genreValue, placement_start: start },
-      { seller_id: sellerId, placement_type: placementType, status: 'active', genre: genreValue },
-      { seller_id: sellerId, placement_type: placementType, status: 'active' },
-      { seller_id: sellerId, placement_type: placementType }
-    ];
-    let lastErr = null;
-    for (const payload of attempts){
-      const cleaned = Object.fromEntries(Object.entries(payload).filter(([,v]) => v !== null && v !== ''));
-      const res = await sb.from('placements').insert(cleaned);
-      if (!res.error) return true;
-      lastErr = res.error;
-    }
-    throw lastErr || new Error('could not create placement');
+    const maxUses = Number(row.max_uses ?? 0);
+    const uses = Number(row.uses ?? 0);
+    if (maxUses > 0 && uses >= maxUses) throw new Error("this influencer code has already been used");
+
+    const placementType = inferPlacementType(row, code);
+    if (!placementType) throw new Error("could not determine placement type from influencer code");
+
+    return { row, code, placementType };
   }
 
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
-    setStatus('', '');
 
     setHelp("status_profile","");
     setHelp("status_item1","");
     setHelp("status_item2","");
     setHelp("status_item3","");
+    setStatus("", "");
 
     const shop_name = (document.getElementById("shopName")?.value || "").trim();
     const depop_handle_raw = (document.getElementById("handle")?.value || "").trim();
@@ -13667,9 +13633,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const main_category = (document.getElementById("mainCategory")?.value || "").trim();
     const bio = (document.getElementById("bio")?.value || "").trim();
     const subcategories = getSelectedSubs();
-
-    const hasCode = !!document.getElementById('hasCode')?.checked;
-    const influencerCode = (document.getElementById('influencerCode')?.value || '').trim();
+    const influencerCode = (document.getElementById("influencerCode")?.value || "").trim();
+    const hasCode = !!document.getElementById("hasCode")?.checked;
 
     const profileFile = document.getElementById("file_profile")?.files?.[0] || null;
     const item1File = document.getElementById("file_item1")?.files?.[0] || null;
@@ -13685,8 +13650,8 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("profile photo is required.");
       return;
     }
-    if (hasCode && !influencerCode){
-      alert('please enter your influencer code.');
+    if(hasCode && !influencerCode){
+      alert("enter your influencer code.");
       return;
     }
 
@@ -13697,19 +13662,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try{
-      let codeRow = null;
-      let placementType = '';
-      if (hasCode && influencerCode){
-        setStatus('checking influencer code…');
-        codeRow = await fetchInfluencerCode(sb, influencerCode);
-        if (!codeRow) throw new Error('invalid influencer code');
-        if (!isCodeUsable(codeRow)) throw new Error('that influencer code is inactive or fully used');
-        placementType = inferPlacementType(codeRow, influencerCode);
-        if (!placementType) throw new Error('influencer code is missing a placement type');
+      let codeInfo = null;
+      if (hasCode){
+        setStatus("checking influencer code…", "");
+        codeInfo = await lookupInfluencerCode(sb, influencerCode);
       }
 
       setHelp("status_profile","uploading…");
-      setStatus('uploading images…');
       const profile_image_url = await uploadIfPresent(sb, "avatars", "submissions/profile", profileFile);
       setHelp("status_profile","✓ uploaded");
 
@@ -13721,7 +13680,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if(item3File) setHelp("status_item3","✓ uploaded");
 
       const shop_url = "https://www.depop.com/" + depop_handle + "/";
-      const sellerStatus = placementType ? 'approved' : 'pending';
+      const isInfluencerPlacement = !!codeInfo;
+      const sellerStatus = isInfluencerPlacement ? "approved" : "pending";
+
       const payload = {
         status: sellerStatus,
         shop_name,
@@ -13730,6 +13691,7 @@ document.addEventListener("DOMContentLoaded", () => {
         contact_email,
         city,
         state: null,
+        country,
         main_category,
         subcategories,
         bio,
@@ -13738,30 +13700,56 @@ document.addEventListener("DOMContentLoaded", () => {
         item_image_2_url: item_image_2_url || null,
         item_image_3_url: item_image_3_url || null
       };
-      if (influencerCode) payload.influencer_code = influencerCode;
 
-      setStatus(placementType ? ('creating ' + placementType + ' placement…') : 'submitting…');
-      let insertRes = await sb.from("sellers").insert(payload).select("id").single();
-      if (insertRes.error && String(insertRes.error.message || '').toLowerCase().includes('influencer_code')) {
-        delete payload.influencer_code;
-        insertRes = await sb.from("sellers").insert(payload).select("id").single();
-      }
-      const { data, error } = insertRes;
+      setStatus(isInfluencerPlacement ? "creating approved placement…" : "submitting…", "");
+      const { data, error } = await sb.from("sellers").insert(payload).select("id").single();
       if(error) throw error;
 
-      if (placementType){
-        await createPlacement(sb, data.id, placementType, main_category);
-        try{ await incrementInfluencerCodeUse(sb, codeRow); }catch(e){ console.warn('could not increment influencer code usage', e); }
+      if (isInfluencerPlacement){
+        const placementPayload = {
+          seller_id: data.id,
+          placement_type: codeInfo.placementType,
+          status: "active",
+          genre: String(main_category || "").trim().toLowerCase(),
+          placement_start: nowISO(),
+          placement_end: plusDaysISO(30),
+          influencer_code_id: codeInfo.row.id || null,
+          influencer_code: codeInfo.code || null
+        };
+
+        const { error: placementError } = await sb.from("placements").insert(placementPayload);
+        if(placementError) throw placementError;
+
+        try{
+          const nextUses = Number(codeInfo.row.uses || 0) + 1;
+          await sb.from("influencer_codes").update({ uses: nextUses }).eq("id", codeInfo.row.id);
+        }catch(updateErr){
+          console.error("influencer code usage update failed", updateErr);
+        }
       }
 
-      const successHTML = placementType
-        ? `<div class="popstarSuccess"><div class="successInner"><div class="successLine">approved.</div><div class="successLine small">your ${placementType} placement is live.</div><div class="successBrand">popstar ★</div><a class="btn backToPopstar" href="index.html">back to popstar ★</a></div></div>`
-        : `<div class="popstarSuccess"><div class="successInner"><div class="successLine">submitted.</div><div class="successLine small">we\'ll email you after approval.</div><div class="successBrand">popstar ★</div><a class="btn backToPopstar" href="index.html">back to popstar ★</a></div></div>`;
+      const successHTML = isInfluencerPlacement
+        ? `<div class="popstarSuccess">
+            <div class="successInner">
+              <div class="successLine">submitted.</div>
+              <div class="successLine small">your ${codeInfo.placementType} is now live.</div>
+              <div class="successBrand">popstar ★</div>
+              <a class="btn backToPopstar" href="index.html">back to popstar ★</a>
+            </div>
+          </div>`
+        : `<div class="popstarSuccess">
+            <div class="successInner">
+              <div class="successLine">submitted.</div>
+              <div class="successLine small">we\'ll email you after approval.</div>
+              <div class="successBrand">popstar ★</div>
+              <a class="btn backToPopstar" href="index.html">back to popstar ★</a>
+            </div>
+          </div>`;
       form.outerHTML = successHTML;
     }catch(err){
       console.error(err);
       const msg = (err && (err.message || err.error_description)) ? (err.message || err.error_description) : String(err);
-      setStatus(msg, 'error');
+      setStatus("", "");
       alert("could not submit: " + msg);
     }
   });
