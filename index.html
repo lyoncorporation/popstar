@@ -4906,6 +4906,8 @@ button[type="submit"]:hover{
   height:100%;
   object-fit:cover;
   display:block;
+  opacity:1 !important;
+  visibility:visible !important;
 }
 @keyframes spotMiniScroll{
   from{ transform: translate3d(0,0,0); }
@@ -14429,14 +14431,50 @@ document.addEventListener("DOMContentLoaded", function(){
     const styleIcon = first(profile, ['style_icon','styleicon','style']).toLowerCase();
     const era = first(profile, ['favorite_era','era']).toLowerCase();
     const favCity = first(profile, ['favorite_city','city_favorite','fav_city']).toLowerCase();
-    const quote = [styleIcon, era, favCity].filter(Boolean).join(' • ');
+    const tail = [era, favCity].filter(Boolean).join(' ');
+    const quote = styleIcon ? [styleIcon, tail ? ('in ' + tail) : ''].filter(Boolean).join(' ') : tail;
     const depopUrl = slug ? ('https://www.depop.com/' + slug + '/') : 'https://www.depop.com/';
     const accent = colorHex(placement.spotlight_color || placement.theme_color || placement.accent_color || '');
     const accentText = textColorFor(accent);
 
     const q = (sel) => spot.querySelector(sel);
-    const setText = (el, txt) => { if (el) el.textContent = txt || '\u00A0'; };
+    const setText = (el, txt) => { if (el) el.textContent = txt || ' '; };
     const setImg = (el, src) => { if (el && src && el.getAttribute('src') !== src) el.setAttribute('src', src); };
+    const pickSaleLike = (obj) => {
+      if(!obj || typeof obj !== 'object') return '';
+      const keys = Object.keys(obj);
+      const enabledKey = keys.find(k => /^sale[_\s-]?enabled$/i.test(k) || /^saleEnabled$/i.test(k));
+      if (enabledKey) {
+        const en = obj[enabledKey];
+        if (en === false || en === 0 || en === '0' || String(en).toLowerCase() === 'false') return '';
+      }
+      const pctKey = keys.find(k => /(^|_|\s)(pct|percent)(_|$|\s)/i.test(k) || /sale[_\s-]?pct/i.test(k));
+      const hoursKey = keys.find(k => /(hours?|hrs?|duration)/i.test(k));
+      const labelKey = keys.find(k => /sale[_\s-]?label/i.test(k));
+      const pctStr = pctKey && obj[pctKey] != null ? String(obj[pctKey]).trim() : '';
+      const hrsStr = hoursKey && obj[hoursKey] != null ? String(obj[hoursKey]).trim() : '';
+      const labelStr = labelKey && obj[labelKey] != null ? String(obj[labelKey]).trim() : '';
+      if (labelStr && /%/.test(labelStr)) return labelStr;
+      if (pctStr && labelStr) return (`${pctStr}% ${labelStr}`).toLowerCase();
+      const explicit = ['sale_label','sale_text','sale','discount_text','promo_text','banner_text','sale_info','sale_copy','sale_banner','sale_message','offer_text','promo','promotion','offer'];
+      for (const k of explicit) {
+        if (Object.prototype.hasOwnProperty.call(obj, k)) {
+          const v = obj[k];
+          if (v != null && String(v).trim()) return String(v).trim();
+        }
+      }
+      if (pctStr && hrsStr) return (`${pctStr}% off for ${hrsStr} hours`).toLowerCase();
+      if (pctStr) return (`${pctStr}% off for 24 hours`).toLowerCase();
+      for (const k of keys) {
+        if (/(sale|discount|promo|offer|deal)/i.test(k)) {
+          const v = obj[k];
+          if (v == null || typeof v === 'boolean') continue;
+          const s = String(v).trim();
+          if (s) return s;
+        }
+      }
+      return '';
+    };
 
     setText(q('#spotStyleQuoteText'), quote);
     setText(q('#spotShopName'), shop);
@@ -14455,7 +14493,7 @@ document.addEventListener("DOMContentLoaded", function(){
         genrePill.className = 'spotGenrePill';
         mainLine.prepend(genrePill);
       }
-      genrePill.textContent = genre || '\u00A0';
+      genrePill.textContent = genre || ' ';
     }
     if (subLine) {
       subLine.innerHTML = '';
@@ -14472,19 +14510,106 @@ document.addEventListener("DOMContentLoaded", function(){
       spot.style.setProperty('--spotAccentText', accentText);
     }
 
+    const saleEl = q('#spotSaleBanner') || document.getElementById('spotSaleBanner');
+    if (saleEl) {
+      const saleText = (pickSaleLike(placement) || pickSaleLike(profile) || '').trim();
+      saleEl.textContent = saleText || ' ';
+      if (saleText) {
+        saleEl.style.setProperty('background', '#E10600', 'important');
+        saleEl.style.setProperty('color', '#FFFFFF', 'important');
+      } else {
+        const highlighted = spot.matches(':hover') || spot.classList.contains('is-highlighted') || spot.dataset.highlighted === '1';
+        saleEl.style.setProperty('background', highlighted && accent ? accent : '#FFFFFF', 'important');
+        saleEl.style.setProperty('color', highlighted && accent ? accentText : '#000000', 'important');
+      }
+    }
+
     // keep mini-carousel tied to the current profile
     const track = q('.spotMiniTrack');
     if (track) {
-      const imgs = [
-        first(profile, ['item_image_1_url']),
-        first(profile, ['item_image_2_url']),
-        first(profile, ['item_image_3_url'])
-      ].filter(Boolean);
-      if (imgs.length) {
-        const sig = imgs.join('|');
-        if (track.getAttribute('data-sig') !== sig) {
-          track.setAttribute('data-sig', sig);
-          track.innerHTML = imgs.concat(imgs).map(src => `<div class="spotMiniItem"><img alt="item" src="${src}"></div>`).join('');
+      const collectSpotMiniImages = (obj) => {
+        if (!obj || typeof obj !== 'object') return [];
+        let out = [];
+        const candidateArrays = [
+          obj.item_images,
+          obj.itemImages,
+          obj.items,
+          obj.carousel_images,
+          obj.carouselImages
+        ];
+        candidateArrays.forEach((value) => {
+          if (Array.isArray(value)) out = out.concat(value);
+          else if (typeof value === 'string' && value.trim()) {
+            const raw = value.trim();
+            try {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) out = out.concat(parsed);
+              else if (raw.includes('http')) out = out.concat(raw.split(',').map(x => x.trim()));
+            } catch (e) {
+              if (raw.includes('http')) out = out.concat(raw.split(',').map(x => x.trim()));
+            }
+          }
+        });
+        out = out.concat([
+          obj.item_image_1_url,
+          obj.item_image_2_url,
+          obj.item_image_3_url,
+          obj.item1_image_url,
+          obj.item2_image_url,
+          obj.item3_image_url,
+          obj.item_1,
+          obj.item_2,
+          obj.item_3,
+          obj.item1,
+          obj.item2,
+          obj.item3
+        ]);
+        const seen = new Set();
+        return out
+          .map(x => String(x || '').trim())
+          .filter(Boolean)
+          .filter(x => /^https?:\/\//i.test(x))
+          .filter(x => {
+            if (seen.has(x)) return false;
+            seen.add(x);
+            return true;
+          })
+          .slice(0,3);
+      };
+
+      const imgs = collectSpotMiniImages(profile).length
+        ? collectSpotMiniImages(profile)
+        : collectSpotMiniImages(placement);
+
+      const sig = imgs.join('|');
+      if (track.getAttribute('data-sig') !== sig) {
+        track.setAttribute('data-sig', sig);
+        if (imgs.length) {
+          const loopImgs = imgs.concat(imgs);
+          track.innerHTML = '';
+          loopImgs.forEach((src) => {
+            const item = document.createElement('div');
+            item.className = 'spotMiniItem';
+            const img = document.createElement('img');
+            img.alt = 'item';
+            img.loading = 'eager';
+            img.decoding = 'async';
+            img.referrerPolicy = 'no-referrer';
+            img.src = src;
+            item.appendChild(img);
+            track.appendChild(item);
+          });
+          requestAnimationFrame(() => {
+            const items = Array.from(track.querySelectorAll('.spotMiniItem'));
+            if (items.length >= 4) {
+              const loopPx = items[3].offsetLeft - items[0].offsetLeft;
+              if (loopPx > 0) track.style.setProperty('--miniLoopPx', `${loopPx}px`);
+            }
+            track.style.animation = 'spotMiniScroll 12s linear infinite';
+          });
+        } else {
+          track.style.removeProperty('animation');
+          track.innerHTML = '';
         }
       }
     }
@@ -14520,8 +14645,241 @@ document.addEventListener("DOMContentLoaded", function(){
   document.addEventListener('DOMContentLoaded', boot);
   document.addEventListener('popstar:spotlight-hydrate', boot);
   window.addEventListener('load', boot);
-  // overpower legacy spotlight scripts that still race after hydration
-  setInterval(boot, 300);
+  // legacy interval removed by v92 single-controller hotfix
+})();
+</script>
+
+
+<script id="popstarSpotlightSingleControllerV92">
+(function(){
+  if (window.__POPSTAR_SINGLE_SPOTLIGHT_CONTROLLER_V92__) return;
+  window.__POPSTAR_SINGLE_SPOTLIGHT_CONTROLLER_V92__ = true;
+
+  const DEBUG = window.__POPSTAR_SPOTLIGHT_DEBUG = window.__POPSTAR_SPOTLIGHT_DEBUG || {};
+  DEBUG.controller = 'v92';
+
+  function first(obj, keys){
+    for(const k of keys){
+      const v = obj && obj[k];
+      if(v !== undefined && v !== null && String(v).trim() !== '') return v;
+    }
+    return '';
+  }
+  function key(v){ return String(v == null ? '' : v).trim().toLowerCase(); }
+  function clone(v){
+    try{ return JSON.parse(JSON.stringify(v)); }
+    catch(e){ return v && typeof v === 'object' ? Object.assign({}, v) : v; }
+  }
+  function shuffle(arr){
+    const out = (Array.isArray(arr) ? arr : []).slice();
+    for(let i = out.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = out[i]; out[i] = out[j]; out[j] = t;
+    }
+    return out;
+  }
+  function livePlacement(pl){
+    const now = Date.now();
+    const start = pl && pl.placement_start ? new Date(pl.placement_start).getTime() : NaN;
+    const end = pl && pl.placement_end ? new Date(pl.placement_end).getTime() : NaN;
+    if(Number.isFinite(start) && start > now) return false;
+    if(Number.isFinite(end) && end <= now) return false;
+    return String(first(pl, ['status']) || 'active').trim().toLowerCase() === 'active';
+  }
+  function profileStableId(profile){
+    return key(first(profile, ['id','seller_id','depop_username','username','handle','shop_name']));
+  }
+  function currentPool(){
+    return Array.isArray(window.__POPSTAR_SPOTLIGHT_POOL) ? window.__POPSTAR_SPOTLIGHT_POOL : [];
+  }
+  function ensureIndex(pool){
+    const rows = Array.isArray(pool) ? pool : currentPool();
+    if(!rows.length){ window.__POPSTAR_SPOTLIGHT_INDEX = 0; return 0; }
+    let idx = Number.isFinite(window.__POPSTAR_SPOTLIGHT_INDEX) ? window.__POPSTAR_SPOTLIGHT_INDEX : 0;
+    idx = ((idx % rows.length) + rows.length) % rows.length;
+    window.__POPSTAR_SPOTLIGHT_INDEX = idx;
+    return idx;
+  }
+  function spotlightEl(){ return document.getElementById('spotlight'); }
+  function renderCurrent(){
+    const pool = currentPool();
+    if(!pool.length) return false;
+    const idx = ensureIndex(pool);
+    const profile = pool[idx];
+    DEBUG.expectedId = profileStableId(profile);
+    DEBUG.index = idx;
+    DEBUG.poolLength = pool.length;
+    window.__POPSTAR_EXPECTED_SPOTLIGHT_ID = DEBUG.expectedId;
+    if(typeof window.updateSpotlightDOM === 'function'){
+      window.updateSpotlightDOM(profile);
+    }
+    try{ document.dispatchEvent(new CustomEvent('popstar:spotlight-hydrate')); }catch(e){}
+    return true;
+  }
+  function goto(dir){
+    const pool = currentPool();
+    if(!pool.length) return;
+    const idx = ensureIndex(pool);
+    window.__POPSTAR_SPOTLIGHT_INDEX = (idx + dir + pool.length) % pool.length;
+    renderCurrent();
+  }
+  function bindArrow(el, dir){
+    if(!el || el.__v92Bound) return;
+    el.__v92Bound = true;
+    el.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+      goto(dir);
+    }, true);
+  }
+  function bindArrows(){
+    bindArrow(document.getElementById('spotNavLeft') || document.getElementById('spotArrowLeft') || document.querySelector('.spotArrowLeft') || document.querySelector('[data-spot-arrow="left"]'), -1);
+    bindArrow(document.getElementById('spotNavRight') || document.getElementById('spotArrowRight') || document.querySelector('.spotArrowRight') || document.querySelector('[data-spot-arrow="right"]'), 1);
+  }
+  async function hydratePool(){
+    try{
+      const sb = await (window.initSupabase ? window.initSupabase() : null);
+      if(!sb) return false;
+      const [profilesRes, placementsRes] = await Promise.all([
+        sb.from('seller_profiles').select('*').eq('status','approved'),
+        sb.from('placements').select('*').eq('placement_type','spotlight').eq('status','active').order('placement_start',{ascending:false})
+      ]);
+      const profiles = Array.isArray(profilesRes && profilesRes.data) ? profilesRes.data.map(clone) : [];
+      const placements = Array.isArray(placementsRes && placementsRes.data) ? placementsRes.data.filter(livePlacement).map(clone) : [];
+      const byId = new Map(profiles.map(p => [key(p.id), p]));
+      const rows = [];
+      const seen = new Set();
+      for(const pl of placements){
+        const base = byId.get(key(pl.seller_id));
+        if(!base) continue;
+        const row = clone(base);
+        row.__placement = clone(pl);
+        row.spotlight = true;
+        row.featured = true;
+        const id = profileStableId(row);
+        if(!id || seen.has(id)) continue;
+        seen.add(id);
+        rows.push(row);
+      }
+      if(!rows.length) return false;
+      const prevPool = currentPool();
+      const prevId = prevPool.length ? profileStableId(prevPool[ensureIndex(prevPool)]) : '';
+      const nextPool = shuffle(rows);
+      window.__POPSTAR_SPOTLIGHT_POOL = nextPool;
+      if(prevId){
+        const nextIdx = nextPool.findIndex(p => profileStableId(p) === prevId);
+        window.__POPSTAR_SPOTLIGHT_INDEX = nextIdx >= 0 ? nextIdx : 0;
+      } else if(!Number.isFinite(window.__POPSTAR_SPOTLIGHT_INDEX) || window.__POPSTAR_SPOTLIGHT_INDEX >= nextPool.length){
+        window.__POPSTAR_SPOTLIGHT_INDEX = 0;
+      }
+      return true;
+    }catch(e){
+      DEBUG.hydrateError = String((e && (e.message || e)) || e);
+      return false;
+    }
+  }
+
+  let repairQueued = false;
+  function queueRepair(){
+    if(repairQueued) return;
+    repairQueued = true;
+    requestAnimationFrame(function(){
+      repairQueued = false;
+      const pool = currentPool();
+      if(!pool.length) return;
+      const spot = spotlightEl();
+      const idx = ensureIndex(pool);
+      const expected = profileStableId(pool[idx]);
+      const actual = key(spot && spot.getAttribute('data-stable-spotlight-id'));
+      if(!actual || actual !== expected) renderCurrent();
+    });
+  }
+
+  function installObserver(){
+    const spot = spotlightEl();
+    if(!spot || spot.__v92Observer) return;
+    const observer = new MutationObserver(function(){ queueRepair(); });
+    observer.observe(spot, { subtree:true, childList:true, attributes:true, characterData:true });
+    spot.__v92Observer = observer;
+  }
+
+  async function boot(){
+    bindArrows();
+    installObserver();
+    await hydratePool();
+    renderCurrent();
+  }
+
+  document.addEventListener('DOMContentLoaded', boot);
+  window.addEventListener('load', boot);
+  document.addEventListener('popstar:spotlight-hydrate', function(){ bindArrows(); installObserver(); queueRepair(); });
+  setTimeout(boot, 400);
+  setTimeout(boot, 1400);
+})();
+</script>
+
+
+<script>
+(function(){
+  function hasSaleText(el){
+    if(!el) return false;
+    const t = (el.textContent || '').replace(/\u00A0/g,' ').trim();
+    return !!t;
+  }
+  function currentAccent(spot){
+    const cs = getComputedStyle(spot);
+    return {
+      bg: (cs.getPropertyValue('--spotAccent') || '').trim() || '#B7FF4A',
+      fg: (cs.getPropertyValue('--spotAccentText') || '').trim() || '#000000'
+    };
+  }
+  function applySaleState(){
+    const spot = document.getElementById('spotlight');
+    const saleEl = document.getElementById('spotSaleBanner');
+    if(!spot || !saleEl) return;
+    const highlighted = spot.matches(':hover') || spot.classList.contains('is-highlighted') || spot.dataset.highlighted === '1';
+    const accent = currentAccent(spot);
+    saleEl.style.border = 'none';
+    if(hasSaleText(saleEl)){
+      saleEl.style.setProperty('background', '#E10600', 'important');
+      saleEl.style.setProperty('color', '#FFFFFF', 'important');
+    }else if(highlighted){
+      saleEl.style.setProperty('background', accent.bg, 'important');
+      saleEl.style.setProperty('color', accent.fg, 'important');
+    }else{
+      saleEl.style.setProperty('background', '#FFFFFF', 'important');
+      saleEl.style.setProperty('color', '#000000', 'important');
+    }
+  }
+  function bind(){
+    const spot = document.getElementById('spotlight');
+    const saleEl = document.getElementById('spotSaleBanner');
+    if(!spot || !saleEl) return;
+    if(!spot.__v94SaleBound){
+      ['mouseenter','mouseleave','focusin','focusout'].forEach(evt=>spot.addEventListener(evt, applySaleState, true));
+      spot.__v94SaleBound = true;
+    }
+    if(!saleEl.__v94SaleObserver){
+      const obs = new MutationObserver(applySaleState);
+      obs.observe(saleEl, {childList:true, characterData:true, subtree:true, attributes:true});
+      saleEl.__v94SaleObserver = obs;
+    }
+    if(!spot.__v94SpotObserver){
+      const obs2 = new MutationObserver(applySaleState);
+      obs2.observe(spot, {attributes:true, attributeFilter:['class','style','data-highlighted']});
+      spot.__v94SpotObserver = obs2;
+    }
+    applySaleState();
+    requestAnimationFrame(applySaleState);
+    setTimeout(applySaleState, 0);
+    setTimeout(applySaleState, 200);
+    setTimeout(applySaleState, 800);
+  }
+  document.addEventListener('DOMContentLoaded', bind);
+  window.addEventListener('load', bind);
+  document.addEventListener('popstar:spotlight-hydrate', bind);
+  bind();
 })();
 </script>
 
