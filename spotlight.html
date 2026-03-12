@@ -13630,38 +13630,63 @@ document.addEventListener("DOMContentLoaded", () => {
     return '';
   }
 
-  
-function validSpotlightColor(v){
-  const s = String(v || '').trim().toLowerCase();
-  const spotlightColorMap = {
-    'neon green': 'neon green',
-    'hot pink': 'hot pink',
-    'electric blue': 'electric blue',
-    'neon purple': 'neon purple',
-    'neon orange': 'neon orange',
-    'lemon yellow': 'lemon yellow',
-    'aqua': 'aqua',
-    'red': 'red',
-    'brand': 'neon green',
-    '#8ace00': 'neon green',
-    '#ff3da8': 'hot pink',
-    '#ff2db2': 'hot pink',
-    '#2d7bff': 'electric blue',
-    '#2d6bff': 'electric blue',
-    '#8a2be2': 'neon purple',
-    '#b026ff': 'neon purple',
-    '#ff6a00': 'neon orange',
-    '#ff5a1f': 'neon orange',
-    '#ffe600': 'lemon yellow',
-    '#ffd400': 'lemon yellow',
-    '#aeebff': 'aqua',
-    '#17e9d6': 'aqua',
-    '#ff3b30': 'red',
-    '#ff2e2e': 'red'
-  };
-  return spotlightColorMap[s] || null;
-}
+  function validSpotlightColor(v){
+    const s = String(v || '').trim().toLowerCase();
+    const spotlightColorMap = {
+      'neon green': 'neon green',
+      'hot pink': 'hot pink',
+      'electric blue': 'electric blue',
+      'neon purple': 'neon purple',
+      'neon orange': 'neon orange',
+      'lemon yellow': 'lemon yellow',
+      'aqua': 'aqua',
+      'red': 'red',
+      'brand': 'neon green',
+      'green': 'neon green',
+      'pink': 'hot pink',
+      'blue': 'electric blue',
+      'purple': 'neon purple',
+      'orange': 'neon orange',
+      'lemon': 'lemon yellow',
+      'yellow': 'lemon yellow',
+      'ice': 'aqua',
+      'black': 'neon green',
+      '#8ace00': 'neon green',
+      '#ff3da8': 'hot pink',
+      '#ff2db2': 'hot pink',
+      '#2d7bff': 'electric blue',
+      '#2d6bff': 'electric blue',
+      '#8a2be2': 'neon purple',
+      '#b026ff': 'neon purple',
+      '#ff6a00': 'neon orange',
+      '#ff5a1f': 'neon orange',
+      '#ffe600': 'lemon yellow',
+      '#ffd400': 'lemon yellow',
+      '#aeebff': 'aqua',
+      '#17e9d6': 'aqua',
+      '#ff3b30': 'red',
+      '#ff2e2e': 'red'
+    };
+    return spotlightColorMap[s] || null;
+  }
 
+  function resolveSpotlightColor(){
+    const selectEl = document.getElementById('spotlightColor');
+    if(!selectEl) return null;
+    const rawValue = String(selectEl.value || '').trim();
+    const option = selectEl.options && selectEl.selectedIndex >= 0 ? selectEl.options[selectEl.selectedIndex] : null;
+    const optionValue = option ? String(option.value || '').trim() : '';
+    const optionText = option ? String(option.textContent || option.innerText || '').trim() : '';
+    const candidates = [rawValue, optionValue, optionText];
+    for(const candidate of candidates){
+      const normalized = validSpotlightColor(candidate);
+      if(normalized){
+        try{ selectEl.value = normalized; }catch(_e){}
+        return normalized;
+      }
+    }
+    return null;
+  }
 
   function profileSubmissionTypeFor(placementType){
     if (placementType === 'spotlight') return 'spotlight';
@@ -13689,8 +13714,7 @@ function validSpotlightColor(v){
     const city = (document.getElementById("city")?.value || "").trim();
     const country = (document.getElementById("country")?.value || "").trim();
     const main_category = (document.getElementById("mainCategory")?.value || "").trim().toLowerCase();
-    const rawSpotlightColor = (document.getElementById("spotlightColor")?.value || "").trim();
-    const spotlight_color = validSpotlightColor(rawSpotlightColor);
+    const spotlight_color = resolveSpotlightColor();
     const style_icon = (document.getElementById("styleIcon")?.value || "").trim();
     const favorite_era = (document.getElementById("favoriteEra")?.value || "").trim();
     const favorite_city = (document.getElementById("favoriteCity")?.value || "").trim();
@@ -13818,18 +13842,17 @@ function validSpotlightColor(v){
           placement_end: placementEndIso
         };
         if(placementType === 'spotlight'){
-          
-const finalSpotlightColor = validSpotlightColor(spotlight_color);
-if(!finalSpotlightColor){
-  throw new Error('invalid spotlight color');
-}
-placementPayload.spotlight_color = finalSpotlightColor;
-
+          const finalSpotlightColor = resolveSpotlightColor() || spotlight_color;
+          if(!finalSpotlightColor){
+            throw new Error('please choose a valid spotlight color');
+          }
+          placementPayload.spotlight_color = finalSpotlightColor;
         }
 
+        console.log('POPSTAR spotlight submit v6', JSON.stringify(placementPayload, null, 2));
         debugLog("placementPayload", placementPayload);
 
-        const placeRes = await sb.from('placements').insert(placementPayload).select('id').maybeSingle();
+        const placeRes = await sb.from('placements').insert([placementPayload]).select('id').maybeSingle();
         if(placeRes.error) throw placeRes.error;
 
         try{
