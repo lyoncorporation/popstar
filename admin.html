@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>popstar admin</title>
+
+  <meta name="popstar-supabase-url" content="https://otvznctmwutbwulbhfvx.supabase.co" />
+  <meta name="popstar-supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90dnpuY3Rtd3V0Ynd1bGJoZnZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNzc3MzcsImV4cCI6MjA4NzY1MzczN30.txShYO4rqLSMHeLuN_2rzRmvXZK3mnPsaabFtTa8Ph8" />
+
+  <style>
+    :root{
+      --bg:#0b0b0c; --card:#121214; --card2:#17171a; --text:#f3f3f4; --muted:#a8a8ad; --border:#242428;
+      --ok:#30d158; --warn:#ffd60a; --bad:#ff453a; --brand:#8ACE00;
+      --shadow: 0 10px 30px rgba(0,0,0,.35); --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family:var(--sans); color:var(--text);
+      background:
+        radial-gradient(900px 500px at 20% 0%, rgba(48,209,88,.10), transparent 55%),
+        radial-gradient(900px 500px at 85% 15%, rgba(10,132,255,.10), transparent 55%),
+        var(--bg);
+    }
+    a{color:inherit}
+    .wrap{max-width:1280px;margin:0 auto;padding:28px 18px 72px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:12px}
+    .dot{width:14px;height:14px;border-radius:50%;background:conic-gradient(from 0deg, #30d158, #0a84ff, #ff9f0a, #ff453a, #30d158);box-shadow:0 0 0 6px rgba(255,255,255,.03)}
+    h1{margin:0;font-size:18px;letter-spacing:.2px;font-weight:800;text-transform:lowercase}
+    .sub{margin:2px 0 0;color:var(--muted);font-size:13px}
+    .topActions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .pill{border:1px solid var(--border);background:rgba(255,255,255,.03);border-radius:999px;padding:10px 12px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+    .badge{font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.10);color:var(--muted);text-transform:lowercase}
+    .badge.ok{ color: var(--ok); border-color: rgba(48,209,88,.35); background: rgba(48,209,88,.10); }
+    .badge.warn{ color: var(--warn); border-color: rgba(255,214,10,.35); background: rgba(255,214,10,.10); }
+    .badge.bad{ color: var(--bad); border-color: rgba(255,69,58,.35); background: rgba(255,69,58,.10); }
+    .mono{font-family:var(--mono);font-size:12px;color:var(--muted)}
+    .btn{border:1px solid rgba(255,255,255,.14);background:#f3f3f4;color:#0b0b0c;border-radius:999px;padding:10px 12px;font-size:13px;font-weight:800;cursor:pointer;transition:transform .08s ease, opacity .12s ease;user-select:none;white-space:nowrap}
+    .btn:active{transform:scale(.98)}
+    .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+    .btn.bad{background:transparent;color:var(--bad);border:1px solid rgba(255,69,58,.35)}
+    .btn.ok{background: rgba(48,209,88,.12);color:var(--ok);border:1px solid rgba(48,209,88,.35)}
+    .btn.warn{background: rgba(255,214,10,.12);color:var(--warn);border:1px solid rgba(255,214,10,.35)}
+
+    .summaryGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
+    @media (max-width:1100px){.summaryGrid{grid-template-columns:repeat(3,1fr)}}
+    @media (max-width:700px){.summaryGrid{grid-template-columns:1fr}}
+    .kpiBox{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);border-radius:16px;padding:12px;box-shadow:var(--shadow)}
+    .kpiLabel{font-size:12px;color:var(--muted);text-transform:lowercase}
+    .kpiVal{margin-top:6px;font-size:22px;font-weight:900;letter-spacing:.2px}
+    .tiny{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35}
+
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .panel + .panel{margin-top:14px}
+    .panelHead{display:flex;align-items:center;justify-content:space-between;padding:14px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.12);gap:10px;flex-wrap:wrap}
+    .panelHead h2{margin:0;font-size:14px;letter-spacing:.2px;text-transform:lowercase}
+    .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .input,.select{border:1px solid var(--border);background:rgba(0,0,0,.22);color:var(--text);border-radius:999px;padding:10px 12px;font-size:13px;outline:none}
+    .input{min-width:240px}
+    .select{cursor:pointer}
+    .list{padding:12px;display:flex;flex-direction:column;gap:12px}
+    .note{padding:12px 14px;color:var(--muted);font-size:13px;line-height:1.45}
+
+    .sellerRow,.hotRow{border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.18);border-radius:18px;padding:14px;display:grid;gap:14px;align-items:start}
+    .sellerRow{grid-template-columns:140px minmax(0,1fr) auto}
+    .hotRow{grid-template-columns:120px minmax(0,1fr) auto}
+    @media (max-width:980px){.sellerRow,.hotRow{grid-template-columns:1fr}}
+    .thumbWrap{position:relative}
+    .avatar,.itemImage{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(135deg, rgba(138,206,0,.28), rgba(0,0,0,.06))}
+    .headLine{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .title{font-size:17px;font-weight:900;letter-spacing:.1px}
+    .handleLink{color:var(--brand);text-decoration:none}
+    .handleLink:hover{text-decoration:underline}
+    .fieldGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+    @media (max-width:820px){.fieldGrid{grid-template-columns:1fr}}
+    .fieldCard{border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);border-radius:14px;padding:10px}
+    .fieldLabel{font-size:11px;color:var(--muted);text-transform:lowercase;letter-spacing:.04em;margin-bottom:4px}
+    .fieldValue{font-size:13px;line-height:1.45;overflow-wrap:anywhere;word-break:break-word}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .chip{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.06);border-radius:999px;padding:7px 10px;font-size:12px;text-transform:lowercase}
+    .subtle{color:var(--muted)}
+    .details{margin-top:12px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);border-radius:14px;padding:10px}
+    .details summary{cursor:pointer;font-weight:800}
+    .rawGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+    @media (max-width:820px){.rawGrid{grid-template-columns:1fr}}
+    .rawItem{border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:8px;background:rgba(0,0,0,.12)}
+    .rawKey{font-size:11px;color:var(--muted);margin-bottom:4px;overflow-wrap:anywhere}
+    .rawVal{font-size:12px;line-height:1.4;overflow-wrap:anywhere;word-break:break-word}
+    .rowActions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;align-items:flex-start}
+    .emptyState{padding:22px 14px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="dot" aria-hidden="true"></div>
+        <div>
+          <h1>popstar admin</h1>
+          <div class="sub">seller profiles + hot items review</div>
+        </div>
+      </div>
+
+      <div class="topActions">
+        <div class="pill">
+          <span class="badge" id="sessionBadge">checking session…</span>
+          <span class="mono" id="sessionEmail"></span>
+        </div>
+        <button class="btn ghost" id="refreshBtn">refresh</button>
+        <button class="btn bad" id="signOutBtn">sign out</button>
+      </div>
+    </header>
+
+    <section class="summaryGrid">
+      <div class="kpiBox"><div class="kpiLabel">seller pending</div><div class="kpiVal" id="kpiSellerPending">—</div><div class="tiny">profiles waiting for review</div></div>
+      <div class="kpiBox"><div class="kpiLabel">seller approved</div><div class="kpiVal" id="kpiSellerApproved">—</div><div class="tiny">live on site</div></div>
+      <div class="kpiBox"><div class="kpiLabel">seller rejected</div><div class="kpiVal" id="kpiSellerRejected">—</div><div class="tiny">hidden from site</div></div>
+      <div class="kpiBox"><div class="kpiLabel">hot items pending</div><div class="kpiVal" id="kpiHotPending">—</div><div class="tiny">awaiting approval</div></div>
+      <div class="kpiBox"><div class="kpiLabel">hot items approved</div><div class="kpiVal" id="kpiHotApproved">—</div><div class="tiny">approved submissions</div></div>
+      <div class="kpiBox"><div class="kpiLabel">hot items live</div><div class="kpiVal" id="kpiHotLive">—</div><div class="tiny">currently in rotation</div></div>
+    </section>
+
+    <section class="panel">
+      <div class="panelHead">
+        <h2>seller profiles</h2>
+        <div class="controls">
+          <input class="input" id="sellerSearch" placeholder="search shop, handle, city, bio…" />
+          <select class="select" id="sellerFilter">
+            <option value="pending">pending</option>
+            <option value="approved">approved</option>
+            <option value="rejected">rejected</option>
+            <option value="all">all</option>
+          </select>
+        </div>
+      </div>
+      <div class="list" id="sellerList"><div class="note">loading seller profiles…</div></div>
+    </section>
+
+    <section class="panel">
+      <div class="panelHead">
+        <h2>hot items</h2>
+        <div class="controls">
+          <input class="input" id="hotSearch" placeholder="search item, handle, price…" />
+          <select class="select" id="hotFilter">
+            <option value="pending">pending</option>
+            <option value="approved">approved</option>
+            <option value="rejected">rejected</option>
+            <option value="all">all</option>
+          </select>
+        </div>
+      </div>
+      <div class="list" id="hotList"><div class="note">loading hot items…</div></div>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  (function(){
+    function readMeta(name){
+      var el = document.querySelector('meta[name="' + name + '"]');
+      return el ? el.getAttribute('content') : '';
+    }
+    var URL = readMeta('popstar-supabase-url');
+    var KEY = readMeta('popstar-supabase-anon-key');
+    var _clientPromise = null;
+    window.initSupabase = function initSupabase(){
+      if (_clientPromise) return _clientPromise;
+      try{
+        if (!window.supabase || typeof window.supabase.createClient !== 'function') return Promise.resolve(null);
+        if (!URL || !KEY || KEY.indexOf('REPLACE_WITH') === 0) return Promise.resolve(null);
+        if (window.__POPSTAR_ADMIN_SB) return Promise.resolve(window.__POPSTAR_ADMIN_SB);
+        _clientPromise = Promise.resolve(window.supabase.createClient(URL, KEY, {
+          auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true }
+        })).then(function(c){ window.__POPSTAR_ADMIN_SB = c; return c; });
+        return _clientPromise;
+      }catch(e){
+        console.error('[popstar admin] init failed', e);
+        return Promise.resolve(null);
+      }
+    };
+  })();
+  </script>
+
+  <script>
+  (function(){
+    var $ = function(sel){ return document.querySelector(sel); };
+    var FALLBACK_AVATAR = 'https://otvznctmwutbwulbhfvx.supabase.co/storage/v1/object/public/avatars/square-image.jpg';
+    var state = {
+      sb:null,
+      user:null,
+      sellerRows:[],
+      hotRows:[],
+      sellerFilter:'pending',
+      sellerSearch:'',
+      hotFilter:'pending',
+      hotSearch:''
+    };
+
+    function setBadge(kind, text){
+      var b = $('#sessionBadge');
+      b.className = 'badge' + (kind ? (' ' + kind) : '');
+      b.textContent = text;
+    }
+    function escapeHtml(s){
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]);
+      });
+    }
+    function lower(v){ return String(v == null ? '' : v).trim().toLowerCase(); }
+    function titleStatusClass(status){
+      var s = lower(status);
+      if (['approved','active','live','paid'].indexOf(s) !== -1) return 'ok';
+      if (['rejected','failed','expired'].indexOf(s) !== -1) return 'bad';
+      return 'warn';
+    }
+    function first(obj, keys){
+      for (var i=0;i<keys.length;i++){
+        var k = keys[i];
+        if (obj && obj[k] != null && String(obj[k]).trim() !== '') return obj[k];
+      }
+      return '';
+    }
+    function toArray(v){
+      if (!v) return [];
+      if (Array.isArray(v)) return v.map(function(x){ return String(x).trim(); }).filter(Boolean);
+      return String(v).split(',').map(function(x){ return x.trim(); }).filter(Boolean);
+    }
+    function formatDate(v){
+      if (!v) return '';
+      var d = new Date(v);
+      if (isNaN(d.getTime())) return String(v);
+      return d.toLocaleString();
+    }
+    function formatPrice(v){
+      if (v == null || v === '') return '';
+      var n = Number(v);
+      if (!isFinite(n)) return String(v);
+      return n % 1 === 0 ? ('$' + n.toFixed(0)) : ('$' + n.toFixed(2));
+    }
+    function joinLocation(row){
+      var loc = first(row, ['location']);
+      if (loc) return String(loc);
+      return [row.city, row.state, row.country].filter(Boolean).join(', ');
+    }
+    function sellerImage(row){
+      return first(row, ['profile_image_url','avatar_url','avatar','profile_pic','profile_image','image_url','img']) || FALLBACK_AVATAR;
+    }
+    function sellerHandle(row){
+      var raw = first(row, ['depop_username','username','handle','depop_handle']);
+      if (!raw) return '';
+      raw = String(raw).trim();
+      return raw.charAt(0) === '@' ? raw : '@' + raw;
+    }
+    function sellerProfileUrl(row){
+      return first(row, ['profile_url','shop_url','depop_url','url']) || (sellerHandle(row) ? ('https://www.depop.com/' + sellerHandle(row).replace(/^@/,'') + '/') : '');
+    }
+    function hotImage(row){
+      return first(row, ['item_image_url','image_url','image','thumbnail_url','photo_url']) || FALLBACK_AVATAR;
+    }
+    function hotUrl(row){
+      return first(row, ['item_url','url','depop_url','listing_url']);
+    }
+    function hotTitle(row){
+      return first(row, ['item_title','title','name']) || 'hot item';
+    }
+    function hotHandle(row){
+      var raw = first(row, ['depop_handle','handle','depop_username','username']);
+      if (!raw) return '';
+      raw = String(raw).trim();
+      return raw.charAt(0) === '@' ? raw : '@' + raw;
+    }
+    function safeEntries(obj){
+      return Object.keys(obj || {}).sort().filter(function(key){
+        var val = obj[key];
+        if (val == null || val === '') return false;
+        if (typeof val === 'object' && val !== null){
+          try{ return JSON.stringify(val).length < 1600; }catch(e){ return false; }
+        }
+        return String(val).length < 1600;
+      }).map(function(key){ return [key, obj[key]]; });
+    }
+    function matchesSearch(row, term){
+      if (!term) return true;
+      var t = lower(term);
+      try{
+        return JSON.stringify(row).toLowerCase().indexOf(t) !== -1;
+      }catch(e){
+        return false;
+      }
+    }
+    function normalizeStatus(v){
+      var s = lower(v);
+      if (s === 'active' || s === 'live' || s === 'paid') return 'approved';
+      if (!s) return 'pending';
+      return s;
+    }
+
+    async function requireSession(){
+      state.sb = await window.initSupabase();
+      if (!state.sb){
+        setBadge('bad','supabase not configured');
+        $('#sessionEmail').textContent = '';
+        return false;
+      }
+      var res = await state.sb.auth.getUser();
+      state.user = res && res.data ? res.data.user : null;
+      if (!state.user){
+        setBadge('warn','not signed in');
+        $('#sessionEmail').textContent = 'open seller.html and sign in, then come back.';
+        return false;
+      }
+      setBadge('ok','signed in');
+      $('#sessionEmail').textContent = state.user.email || '';
+      return true;
+    }
+
+    async function loadSellerProfiles(){
+      var resp = await state.sb.from('seller_profiles').select('*').order('created_at', { ascending:false }).limit(250);
+      if (resp.error){
+        $('#sellerList').innerHTML = '<div class="note"><b style="color:var(--bad)">error loading seller profiles</b><div class="tiny mono">' + escapeHtml(resp.error.message) + '</div></div>';
+        state.sellerRows = [];
+        updateSellerCounts();
+        return;
+      }
+      state.sellerRows = Array.isArray(resp.data) ? resp.data : [];
+      updateSellerCounts();
+      renderSellers();
+    }
+
+    async function loadHotItems(){
+      var attempts = [
+        function(){ return state.sb.from('hot_items_submissions').select('*').order('created_at', { ascending:false }).limit(250); },
+        function(){ return state.sb.from('hot_items_live').select('*').order('created_at', { ascending:false }).limit(250); },
+        function(){ return state.sb.from('hot_items_current').select('*').order('created_at', { ascending:false }).limit(250); },
+        function(){ return state.sb.from('hot_items_top_12').select('*').limit(250); }
+      ];
+      var success = null;
+      for (var i=0;i<attempts.length;i++){
+        try{
+          var r = await attempts[i]();
+          if (!r.error){ success = r; break; }
+        }catch(e){}
+      }
+      if (!success){
+        $('#hotList').innerHTML = '<div class="note"><b style="color:var(--bad)">error loading hot items</b><div class="tiny">could not find an accessible hot items table or view.</div></div>';
+        state.hotRows = [];
+        updateHotCounts();
+        return;
+      }
+      state.hotRows = Array.isArray(success.data) ? success.data : [];
+      updateHotCounts();
+      renderHotItems();
+    }
+
+    function updateSellerCounts(){
+      var rows = state.sellerRows || [];
+      var pending=0, approved=0, rejected=0;
+      rows.forEach(function(r){
+        var st = normalizeStatus(first(r,['status','profile_status','state']));
+        if (st === 'approved') approved++;
+        else if (st === 'rejected') rejected++;
+        else pending++;
+      });
+      $('#kpiSellerPending').textContent = String(pending);
+      $('#kpiSellerApproved').textContent = String(approved);
+      $('#kpiSellerRejected').textContent = String(rejected);
+    }
+
+    function updateHotCounts(){
+      var rows = state.hotRows || [];
+      var pending=0, approved=0, live=0;
+      rows.forEach(function(r){
+        var st = normalizeStatus(first(r,['status','item_status','submission_status']));
+        if (st === 'approved') approved++; else if (st === 'pending') pending++;
+        if (String(r.is_active) === 'true' || lower(r.status) === 'live' || lower(r.status) === 'active') live++;
+      });
+      $('#kpiHotPending').textContent = String(pending);
+      $('#kpiHotApproved').textContent = String(approved);
+      $('#kpiHotLive').textContent = String(live);
+    }
+
+    function renderSellers(){
+      var term = state.sellerSearch.trim();
+      var f = state.sellerFilter;
+      var rows = (state.sellerRows || []).filter(function(r){
+        var st = normalizeStatus(first(r,['status','profile_status','state']));
+        return (f === 'all' || st === f) && matchesSearch(r, term);
+      });
+      if (!rows.length){
+        $('#sellerList').innerHTML = '<div class="emptyState">no seller profiles found for this view.</div>';
+        return;
+      }
+      var html = '';
+      rows.forEach(function(r){
+        var status = normalizeStatus(first(r,['status','profile_status','state']));
+        var shop = first(r,['shop_name','shop','store_name','store','name']) || 'untitled seller';
+        var handle = sellerHandle(r);
+        var profileUrl = sellerProfileUrl(r);
+        var location = joinLocation(r);
+        var genre = first(r,['genre','main_category','main_genre','category']);
+        var bio = first(r,['bio','about','description','blurb']);
+        var subs = toArray(first(r,['subcategories','subcategory','subs','tags','keywords']));
+        var image = sellerImage(r);
+        var created = formatDate(first(r,['created_at']));
+        var approvedAt = formatDate(first(r,['approved_at']));
+        var id = first(r,['id','seller_id']) || '';
+        var staffPick = r.staff_pick === true || lower(r.staff_pick) === 'true';
+        var founded = r.founding_shop === true || lower(r.founding_shop) === 'true';
+        var featured = r.featured === true || lower(r.featured) === 'true' || r.spotlight === true || lower(r.spotlight) === 'true';
+
+        var raw = safeEntries(r).map(function(pair){
+          var val = pair[1];
+          if (typeof val === 'object' && val !== null){
+            try{ val = JSON.stringify(val); }catch(e){ val = '[object]'; }
+          }
+          return '<div class="rawItem"><div class="rawKey">' + escapeHtml(pair[0]) + '</div><div class="rawVal">' + escapeHtml(val) + '</div></div>';
+        }).join('');
+
+        html += ''+
+          '<div class="sellerRow" data-id="' + escapeHtml(id) + '">'+
+            '<div class="thumbWrap"><img class="avatar" src="' + escapeHtml(image) + '" alt="' + escapeHtml(shop) + '" loading="lazy" decoding="async"/></div>'+
+            '<div>'+
+              '<div class="headLine">'+
+                '<div class="title">' + escapeHtml(shop) + '</div>'+
+                '<span class="badge ' + titleStatusClass(status) + '">' + escapeHtml(status) + '</span>'+
+                (handle ? '<a class="handleLink" href="' + escapeHtml(profileUrl || '#') + '" target="_blank" rel="noreferrer">' + escapeHtml(handle) + '</a>' : '')+
+              '</div>'+
+              '<div class="chips">' +
+                (genre ? '<span class="chip">' + escapeHtml(genre) + '</span>' : '') +
+                (staffPick ? '<span class="chip">staff pick</span>' : '') +
+                (founded ? '<span class="chip">founding shop</span>' : '') +
+                (featured ? '<span class="chip">featured</span>' : '') +
+                subs.slice(0,8).map(function(s){ return '<span class="chip">' + escapeHtml(s) + '</span>'; }).join('') +
+              '</div>'+
+              '<div class="fieldGrid">'+
+                '<div class="fieldCard"><div class="fieldLabel">bio</div><div class="fieldValue">' + escapeHtml(bio || '—') + '</div></div>'+
+                '<div class="fieldCard"><div class="fieldLabel">location</div><div class="fieldValue">' + escapeHtml(location || '—') + '</div></div>'+
+                '<div class="fieldCard"><div class="fieldLabel">profile url</div><div class="fieldValue">' + (profileUrl ? '<a href="' + escapeHtml(profileUrl) + '" target="_blank" rel="noreferrer">' + escapeHtml(profileUrl) + '</a>' : '—') + '</div></div>'+
+                '<div class="fieldCard"><div class="fieldLabel">created</div><div class="fieldValue">' + escapeHtml(created || '—') + '</div></div>'+
+                '<div class="fieldCard"><div class="fieldLabel">approved at</div><div class="fieldValue">' + escapeHtml(approvedAt || '—') + '</div></div>'+
+                '<div class="fieldCard"><div class="fieldLabel">id</div><div class="fieldValue mono">' + escapeHtml(id || '—') + '</div></div>'+
+              '</div>'+
+              '<details class="details"><summary>all profile fields</summary><div class="rawGrid">' + raw + '</div></details>'+
+            '</div>'+
+            '<div class="rowActions">'+
+              '<button class="btn ok" data-type="seller" data-action="approve">approve</button>'+
+              '<button class="btn bad" data-type="seller" data-action="reject">reject</button>'+
+              '<button class="btn ghost" data-type="seller" data-action="pending">set pending</button>'+
+            '</div>'+
+          '</div>';
+      });
+      $('#sellerList').innerHTML = html;
+    }
+
+    function renderHotItems(){
+      var term = state.hotSearch.trim();
+      var f = state.hotFilter;
+      var rows = (state.hotRows || []).filter(function(r){
+        var st = normalizeStatus(first(r,['status','item_status','submission_status']));
+        return (f === 'all' || st === f) && matchesSearch(r, term);
+      });
+      if (!rows.length){
+        $('#hotList').innerHTML = '<div class="emptyState">no hot items found for this view.</div>';
+        return;
+      }
+      var html = '';
+      rows.forEach(function(r){
+        var status = normalizeStatus(first(r,['status','item_status','submission_status']));
+        var title = hotTitle(r);
+        var handle = hotHandle(r);
+        var price = formatPrice(first(r,['item_price','price']));
+        var url = hotUrl(r);
+        var image = hotImage(r);
+        var created = formatDate(first(r,['created_at']));
+        var placement = first(r,['placement_length','duration']);
+        var payment = first(r,['stripe_payment_status','payment_status']);
+        var id = first(r,['id']) || '';
+        var raw = safeEntries(r).map(function(pair){
+          var val = pair[1];
+          if (typeof val === 'object' && val !== null){
+            try{ val = JSON.stringify(val); }catch(e){ val = '[object]'; }
+          }
+          return '<div class="rawItem"><div class="rawKey">' + escapeHtml(pair[0]) + '</div><div class="rawVal">' + escapeHtml(val) + '</div></div>';
+        }).join('');
+
+        html += ''+
+          '<div class="hotRow" data-id="' + escapeHtml(id) + '">'+
+            '<div class="thumbWrap"><img class="itemImage" src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="lazy" decoding="async"/></div>'+
+            '<div>'+
+              '<div class="headLine">'+
+                '<div class="title">' + escapeHtml(title) + '</div>'+
+                '<span class="badge ' + titleStatusClass(status) + '">' + escapeHtml(status) + '</span>'+
+                (handle ? '<span class="chip">' + escapeHtml(handle) + '</span>' : '')+
+                (price ? '<span class="chip">' + escapeHtml(price) + '</span>' : '')+
+              '</div>'+
+              '<div class="fieldGrid">'+
+                '<div class="fieldCard"><div class="fieldLabel">item url</div><div class="fieldValue">' + (url ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noreferrer">' + escapeHtml(url) + '</a>' : '—') + '</div></div>'+
+                '<div class="fieldCard"><div class="fieldLabel">placement length</div><div class="fieldValue">' + escapeHtml(placement || '—') + '</div></div>'+
+                '<div class="fieldCard"><div class="fieldLabel">payment</div><div class="fieldValue">' + escapeHtml(payment || '—') + '</div></div>'+
+                '<div class="fieldCard"><div class="fieldLabel">created</div><div class="fieldValue">' + escapeHtml(created || '—') + '</div></div>'+
+                '<div class="fieldCard"><div class="fieldLabel">id</div><div class="fieldValue mono">' + escapeHtml(id || '—') + '</div></div>'+
+                '<div class="fieldCard"><div class="fieldLabel">image url</div><div class="fieldValue">' + escapeHtml(image || '—') + '</div></div>'+
+              '</div>'+
+              '<details class="details"><summary>all hot item fields</summary><div class="rawGrid">' + raw + '</div></details>'+
+            '</div>'+
+            '<div class="rowActions">'+
+              '<button class="btn ok" data-type="hot" data-action="approve">approve</button>'+
+              '<button class="btn bad" data-type="hot" data-action="reject">reject</button>'+
+              '<button class="btn ghost" data-type="hot" data-action="pending">set pending</button>'+
+            '</div>'+
+          '</div>';
+      });
+      $('#hotList').innerHTML = html;
+    }
+
+    async function setSellerStatus(id, status){
+      var attempts = [
+        async function(){
+          var rpc = await state.sb.rpc('set_seller_status', { seller_id:id, new_status:status });
+          return !rpc.error;
+        },
+        async function(){
+          var q = await state.sb.from('seller_profiles').update({ status:status }).eq('id', id);
+          return !q.error;
+        },
+        async function(){
+          var q = await state.sb.from('sellers').update({ status:status }).eq('id', id);
+          return !q.error;
+        }
+      ];
+      for (var i=0;i<attempts.length;i++){
+        try{ if (await attempts[i]()) return true; }catch(e){}
+      }
+      alert('seller status update failed');
+      return false;
+    }
+
+    async function setHotStatus(id, status){
+      var attempts = [
+        async function(){
+          var q = await state.sb.from('hot_items_submissions').update({ status:status }).eq('id', id);
+          return !q.error;
+        },
+        async function(){
+          var q = await state.sb.from('hot_items_live').update({ status:status, is_active: status === 'approved' }).eq('id', id);
+          return !q.error;
+        },
+        async function(){
+          var q = await state.sb.from('hot_items_current').update({ status:status }).eq('id', id);
+          return !q.error;
+        }
+      ];
+      for (var i=0;i<attempts.length;i++){
+        try{ if (await attempts[i]()) return true; }catch(e){}
+      }
+      alert('hot item status update failed');
+      return false;
+    }
+
+    async function refreshAll(){
+      await Promise.all([loadSellerProfiles(), loadHotItems()]);
+    }
+
+    $('#sellerFilter').addEventListener('change', function(e){ state.sellerFilter = e.target.value; renderSellers(); });
+    $('#sellerSearch').addEventListener('input', function(e){ state.sellerSearch = e.target.value || ''; renderSellers(); });
+    $('#hotFilter').addEventListener('change', function(e){ state.hotFilter = e.target.value; renderHotItems(); });
+    $('#hotSearch').addEventListener('input', function(e){ state.hotSearch = e.target.value || ''; renderHotItems(); });
+    $('#refreshBtn').addEventListener('click', function(){ refreshAll().catch(function(){}); });
+    $('#signOutBtn').addEventListener('click', async function(){
+      try{ var sb = await window.initSupabase(); await sb.auth.signOut(); }catch(e){}
+      location.reload();
+    });
+
+    $('#sellerList').addEventListener('click', async function(e){
+      var btn = e.target && e.target.closest ? e.target.closest('button[data-action][data-type="seller"]') : null;
+      if (!btn) return;
+      var row = btn.closest('.sellerRow');
+      if (!row) return;
+      var id = row.getAttribute('data-id');
+      var action = btn.getAttribute('data-action');
+      var next = action === 'approve' ? 'approved' : action === 'reject' ? 'rejected' : 'pending';
+      btn.disabled = true; btn.style.opacity = '.6';
+      var ok = await setSellerStatus(id, next);
+      btn.disabled = false; btn.style.opacity = '';
+      if (ok){
+        state.sellerRows.forEach(function(r){ if (String(first(r,['id','seller_id'])) === String(id)) r.status = next; });
+        updateSellerCounts();
+        renderSellers();
+      }
+    });
+
+    $('#hotList').addEventListener('click', async function(e){
+      var btn = e.target && e.target.closest ? e.target.closest('button[data-action][data-type="hot"]') : null;
+      if (!btn) return;
+      var row = btn.closest('.hotRow');
+      if (!row) return;
+      var id = row.getAttribute('data-id');
+      var action = btn.getAttribute('data-action');
+      var next = action === 'approve' ? 'approved' : action === 'reject' ? 'rejected' : 'pending';
+      btn.disabled = true; btn.style.opacity = '.6';
+      var ok = await setHotStatus(id, next);
+      btn.disabled = false; btn.style.opacity = '';
+      if (ok){
+        state.hotRows.forEach(function(r){ if (String(first(r,['id'])) === String(id)) r.status = next; });
+        updateHotCounts();
+        renderHotItems();
+      }
+    });
+
+    (async function boot(){
+      var ok = await requireSession();
+      if (!ok){
+        $('#sellerList').innerHTML = '<div class="note"><b style="color:var(--warn)">not signed in.</b><div class="tiny">open seller.html, sign in via magic link, then return here.</div></div>';
+        $('#hotList').innerHTML = '<div class="note">sign in first to load hot items.</div>';
+        return;
+      }
+      await refreshAll();
+    })();
+  })();
+  </script>
+</body>
+</html>
